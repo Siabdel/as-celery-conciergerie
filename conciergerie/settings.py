@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from django.utils.translation import gettext_lazy as _
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 #BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,6 +24,11 @@ PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+ADMINS = (
+    # ('Your Name', 'your_email@example.com'),
+)
+
+MANAGERS = ADMINS
 
 
 # Quick-start development settings - unsuitable for production
@@ -34,6 +41,7 @@ SECRET_KEY = "django-insecure-fumu!8#a64vb1b55&oum7bhexxp=u3o&(t-6b+qykitij(3wj*
 DEBUG = True
 
 ALLOWED_HOSTS = []
+SITE = 1
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -48,6 +56,18 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # 3rd-party apps
+    'rest_framework', # new
+    'rest_framework.authtoken',
+    "dj_rest_auth",
+    # debug tools
+    'debug_toolbar', # newo
+    'django_extensions',
+    'corsheaders', 
+    # User Authentication
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
     # local
     'schedule',  # ou le nom correct de votre application
     'django_celery_beat',
@@ -57,11 +77,16 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",  # new
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Add the account middleware:
+    "allauth.account.middleware.AccountMiddleware",
+    # debug 
+    'debug_toolbar.middleware.DebugToolbarMiddleware', # new
 ]
 
 ROOT_URLCONF = "conciergerie.urls"
@@ -74,6 +99,8 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
@@ -162,6 +189,17 @@ STATICFILES_DIRS__ = [
     os.path.join(BASE_DIR, 'media', 'upload'),
 ]
 
+## 
+# ManifestStaticFilesStorage is recommended in production, to prevent outdated
+# JavaScript / CSS assets being served from cache (e.g. after a Wagtail upgrade).
+# See https://docs.djangoproject.com/en/4.0/ref/contrib/staticfiles/#manifeststaticfilesstorage
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+# List of finder classes that know how to find static files in
+# various locations.
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -172,6 +210,80 @@ STATICFILES_DIRS__ = [
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Celery configuration
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 # Celery Beat settings
+
+# Celery settings
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES' : [
+        ##'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_AUTHENTIFICATION_CLASS' : [
+        'rest_famework.authentification.SessionAuthentification', 
+        'rest_framework.authentification.BasicAuthentification',
+        'rest_framework_simplejwt.authentication.JWTAuthentication', 
+        'rest_framework.authtoken',
+    ] 
+    
+}
+
+# DJANGO REST FRAMEWORKS
+
+CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+    "http://localhost:8000",
+    'http://localhost:8080',
+] # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
+CORS_ORIGIN_REGEX_WHITELIST = [
+    'http://localhost:3000',
+    'http://localhost:8080',
+]
+
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_URL = "/accounts/login/"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_URL = "/accounts/login/"
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            ##'level': 'DEBUG',
+        },
+    },
+}

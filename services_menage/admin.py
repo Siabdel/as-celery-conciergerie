@@ -1,12 +1,31 @@
 # Register your models here.
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
+from django.contrib import messages
 from .models import Reservation, Employee, CleaningTask
 from schedule.models import Calendar, Event
+
+@admin.action(description=_("Dupliquer les réservations sélectionnées"))
+def duplicate_reservation(modeladmin, request, queryset):
+    for reservation in queryset:
+        # Créer une nouvelle réservation avec les mêmes données
+        new_reservation = Reservation.objects.create(
+            client=reservation.client,
+            check_in=reservation.check_in,
+            check_out=reservation.check_out,
+            # Ajoutez ici d'autres champs si nécessaire
+        )
+        # Vous pouvez personnaliser le nouveau titre si vous le souhaitez
+        new_reservation.client = f"Copie de {new_reservation.client}"
+        new_reservation.save()
+    
+    messages.success(request, _(f"{queryset.count()} réservation(s) dupliquée(s) avec succès."))
 
 class ReservationAdmin(admin.ModelAdmin):
     list_display = ('client', 'check_in', 'check_out')
     list_filter = ('check_in', 'check_out')
     search_fields = ('client',)
+    actions = [duplicate_reservation]  # Ajoutez l'action ici
 
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('name', 'get_calendar_name')

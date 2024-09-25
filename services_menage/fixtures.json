@@ -1,0 +1,201 @@
+[
+  {
+    "model": "schedule.calendar",
+    "pk": 1,
+    "fields": {
+      "name": "Main Calendar",
+      "slug": "main-calendar"
+    }
+  },
+  {
+    "model": "services_menage.employee",
+    "pk": 1,
+    "fields": {
+      "name": "John Doe",
+      "calendar": 1
+    }
+  },
+  {
+    "model": "services_menage.employee",
+    "pk": 2,
+    "fields": {
+      "name": "Jane Smith",
+      "calendar": 1
+    }
+  },
+  {
+    "model": "services_menage.reservation",
+    "pk": 1,
+    "fields": {
+      "client": "Alice Brown",
+      "check_in": "2024-10-01T14:00:00Z",
+      "check_out": "2024-10-05T10:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.reservation",
+    "pk": 2,
+    "fields": {
+      "client": "Charlie Davis",
+      "check_in": "2024-10-10T15:00:00Z",
+      "check_out": "2024-10-15T11:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.reservation",
+    "pk": 3,
+    "fields": {
+      "client": "Eva Green",
+      "check_in": "2024-10-20T12:00:00Z",
+      "check_out": "2024-10-25T10:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.reservation",
+    "pk": 4,
+    "fields": {
+      "client": "Frank White",
+      "check_in": "2024-11-01T14:00:00Z",
+      "check_out": "2024-11-05T11:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.reservation",
+    "pk": 5,
+    "fields": {
+      "client": "Grace Lee",
+      "check_in": "2024-11-10T15:00:00Z",
+      "check_out": "2024-11-15T10:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.cleaningtask",
+    "pk": 1,
+    "fields": {
+      "reservation": 1,
+      "employee": 1,
+      "scheduled_time": "2024-10-05T12:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.cleaningtask",
+    "pk": 2,
+    "fields": {
+      "reservation": 2,
+      "employee": 2,
+      "scheduled_time": "2024-10-15T13:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.cleaningtask",
+    "pk": 3,
+    "fields": {
+      "reservation": 3,
+      "employee": 1,
+      "scheduled_time": "2024-10-25T12:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.cleaningtask",
+    "pk": 4,
+    "fields": {
+      "reservation": 4,
+      "employee": 2,
+      "scheduled_time": "2024-11-05T13:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.cleaningtask",
+    "pk": 5,
+    "fields": {
+      "reservation": 5,
+      "employee": 1,
+      "scheduled_time": "2024-11-15T12:00:00Z"
+    }
+  },
+  {
+    "model": "schedule.event",
+    "pk": 1,
+    "fields": {
+      "start": "2024-10-01T14:00:00Z",
+      "end": "2024-10-05T10:00:00Z",
+      "title": "[Réservation] Alice Brown",
+      "description": "",
+      "calendar": 1,
+      "creator": null,
+      "created_on": "2024-09-25T00:00:00Z",
+      "updated_on": "2024-09-25T00:00:00Z",
+      "rule": null,
+      "end_recurring_period": null,
+      "color_event": ""
+    }
+  },
+  {
+    "model": "schedule.event",
+    "pk": 2,
+    "fields": {
+      "start": "2024-10-10T15:00:00Z",
+      "end": "2024-10-15T11:00:00Z",
+      "title": "[Réservation] Charlie Davis",
+      "description": "",
+      "calendar": 1,
+      "creator": null,
+      "created_on": "2024-09-25T00:00:00Z",
+      "updated_on": "2024-09-25T00:00:00Z",
+      "rule": null,
+      "end_recurring_period": null,
+      "color_event": ""
+    }
+  },
+  {
+    "model": "schedule.event",
+    "pk": 3,
+    "fields": {
+      "start": "2024-10-20T12:00:00Z",
+      "end": "2024-10-25T10:00:00Z",
+      "title": "[Réservation] Eva Green",
+      "description": "",
+      "calendar": 1,
+      "creator": null,
+      "created_on": "2024-09-25T00:00:00Z",
+      "updated_on": "2024-09-25T00:00:00Z",
+      "rule": null,
+      "end_recurring_period": null,
+      "color_event": ""
+    }
+  },
+  {
+    "model": "schedule.event",
+    "pk": 4,
+    "fields": {
+      "start": "2024-11-01T14:00:00Z",
+      "end": "2024-11-05T11:00:00Z",
+      "title": "[Réservation] Frank White",
+      "description": "",
+      "calendar": 1,
+      "creator": null,
+      "created_on": "2024-09-25T00:00:00Z",
+      "updated_on": "2024-09-25T00:00:00Z",
+      "rule": null,
+      "end_recurring_period": null,
+      "color_event": ""
+    }
+  },
+  {
+    "model": "schedule.event",
+    "pk": 5,
+    "fields": {
+      "start": "2024-11-10T15:00:00Z",
+      "end": "2024-11-15T10:00:00Z",
+      "title": "[Réservation] Grace Lee",
+      "description": "",
+      "calendar": 1,
+      "creator": null,
+      "created_on": "2024-09-25T00:00:00Z",
+      "updated_on": "2024-09-25T00:00:00Z",
+      "rule": null,
+      "end_recurring_period": null,
+      "color_event": ""
+    }
+  }
+]

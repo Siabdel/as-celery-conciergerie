@@ -1,26 +1,43 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from schedule.models.calendars import Calendar
 from services_menage import models as ser_models
+from schedule.models import Event, Calendar
 
+
+
+## Calendar
+def calendar_home(request):
+    return render(request, 'fullcalendar_v5.html')
 
 ## Logique
+def init_create(requete):
 
-## 1. Créez un calendrier principal pour les réservations :
+    ## 1. Créez un calendrier principal pour les réservations :
+    main_calendar = Calendar.objects.get_or_create(name="Reservations", slug="Reservations")
 
-main_calendar = Calendar.objects.get_or_create(name="Reservations", slug="Reservations")
+    # 2. Créez un calendrier pour chaque employé :
+    for employee in ser_models.Employee.objects.all():
+        employee.calendar = Calendar.objects.create(name=f"Calendrier de {employee.name}")
+        employee.save()
 
-# 2. Créez un calendrier pour chaque employé :
+    # 3. Lorsqu'une réservation est créée, ajoutez-la au calendrier principal :
+    return HttpResponse("Init Calendar ...")
 
-for employee in ser_models.Employee.objects.all():
-    employee.calendar = Calendar.objects.create(name=f"Calendrier de {employee.name}")
-    employee.save()
 
-# 3. Lorsqu'une réservation est créée, ajoutez-la au calendrier principal :
+# 4. Planifiez une tâche de nettoyage après chaque départ :
+# 5. Utilisez des signaux pour automatiser la création d'événements :
+
+@receiver(post_save, sender=ser_models.Reservation)
+def reservation_created(sender, instance, created, **kwargs):
+    if created:
+        create_reservation_event(instance)
+        schedule_cleaning(instance)
 
 def create_reservation_event(reservation):
+    main_calendar = Calendar.objects.get(name="Reservations")
     Event.objects.create(
         start=reservation.check_in,
         end=reservation.check_out,
@@ -29,14 +46,12 @@ def create_reservation_event(reservation):
     )
 
 # 4. Planifiez une tâche de nettoyage après chaque départ :
-
-
 def schedule_cleaning(reservation):
     cleaning_time = reservation.check_out + timezone.timedelta(hours=2)
     available_employee = find_available_employee(cleaning_time)
     
     if available_employee:
-        cleaning_task = CleaningTask.objects.create(
+        cleaning_task = ser_models.CleaningTask.objects.create(
             reservation=reservation,
             employee=available_employee,
             scheduled_time=cleaning_time
@@ -48,9 +63,10 @@ def schedule_cleaning(reservation):
             title=f"Nettoyage: Chambre de {reservation.client}",
             calendar=available_employee.calendar
         )
-
+ 
+# 4. touvez des employees diponible
 def find_available_employee(cleaning_time):
-    for employee in Employee.objects.all():
+    for employee in ser_models.Employee.objects.all():
         if not Event.objects.filter(
             calendar=employee.calendar,
             start__lte=cleaning_time,
@@ -58,28 +74,3 @@ def find_available_employee(cleaning_time):
         ).exists():
             return employee
     return None
-
-# 5. Utilisez des signaux pour automatiser la création d'événements :
-
-
-@receiver(post_save, sender=ser_models.Reservation)
-def reservation_created(sender, instance, created, **kwargs):
-    if created:
-        create_reservation_event(instance)
-        schedule_cleaning(instance)
-
-
-## Créez des vues pour afficher les calendriers :
-def main_calendar_view(request):
-    return render(request, 'main_calendar.html', {
-        'calendar': main_calendar
-    })
-
-def employee_calendar_view(request, employee_id):
-    employee = Employee.objects.get(id=employee_id)
-    return render(request, 'employee_calendar.html', {
-        'calendar': employee.calendar,
-        'employee': employee
-    })
-
-## Templates

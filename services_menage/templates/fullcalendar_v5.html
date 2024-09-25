@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Calendrier des tâches de ménage</title>
+    <!-- ... bootstrap liens CSS  ... -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- ... vos autres liens CSS et scripts ... -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container-fluid" id='calendar'></div>
+    <!--  Bull info Card... -->
+    <div class="card" id="tooltip" style="width: 18rem;display:none; position:absolute;
+             background:#FFFF00; border:1px solid #ccc; padding:10px;">
+        <div class="card-body" id="tooltip" ></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core/locales/fr.global.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var tooltipEl = document.getElementById('tooltip');
+
+        //--------------
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+                    locale: 'fr',
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    events: '/service/api/events/',  // Assurez-vous que cette URL est correcte
+                    eventClick: function(info) { alert("click Ok :")},
+                    // on Mouse enter
+                    eventMouseEnter: function(info) {
+                        var event = info.event;
+                        var content = '<h5 class="card-title bg-secondary text-light" >' + event.title + '</h5>' +
+                                        'Start: ' + event.start.toLocaleString() + '<br>' +
+                                        'End: ' + event.end.toLocaleString() + '<br>' +
+                                        'Guest: ' + event.extendedProps.guest_name + '<br>' +
+                                        'Email: ' + event.extendedProps.guest_email + '<br>' +
+                                        'Total Price: $' + event.extendedProps.total_price;
+
+                        tooltipEl.innerHTML = content;
+                        tooltipEl.style.display = 'block';
+                        tooltipEl.style.left = (info.jsEvent.pageX + 10) + 'px';
+                        tooltipEl.style.top = (info.jsEvent.pageY + 10) + 'px';
+                    },
+                    // leave
+                    eventMouseLeave: function() {
+                            tooltipEl.style.display = 'none';
+                    },
+        });
+
+        //--------------
+        calendar.render();
+        // Fermer le tooltip quand on clique ailleurs sur la page
+             
+        });
+        //--------------
+        
+    </script>
+    <!-- ... Bootstrap   scripts ... -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ... Fullcalendar  scripts ... -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core/locales/fr.global.min.js'></script>
+</body>
+</html>
+

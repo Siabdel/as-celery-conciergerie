@@ -1,7 +1,6 @@
 from django.db import models
 from schedule.models import Event, Calendar
 
-
 class Reservation(models.Model):
     client = models.CharField(max_length=100)
     check_in = models.DateTimeField()
