@@ -1,15 +1,15 @@
 
+from __future__ import absolute_import
 import os
 from celery import Celery
+from django.conf import settings
 
-# Set the default Django settings module for the 'celery' program.
+# Indique à Celery où trouver les settings de Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'conciergerie.settings')
-
 app = Celery('conciergerie')
 
-# Using a string here means the worker doesn't have to serialize
-# the configuration object to child processes.
+# Charger les configurations de Celery depuis le fichier settings.py
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-# Load task modules from all registered Django apps.
-app.autodiscover_tasks()
+# Découvrir automatiquement les tâches de toutes les applications installées
+app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)

@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import Employee, Reservation, CleaningTask
+from .models import Employee, Reservation, MaintenanceTask
 from schedule.models import Calendar, Event
 
 class CalendarSerializer(serializers.ModelSerializer):
@@ -20,12 +20,12 @@ class ReservationSerializer(serializers.ModelSerializer):
         model = Reservation
         fields = ['id', 'client', 'check_in', 'check_out']
 
-class CleaningTaskSerializer(serializers.ModelSerializer):
+class MaintenanceTaskSerializer(serializers.ModelSerializer):
     reservation = ReservationSerializer(read_only=True)
     employee = EmployeeSerializer(read_only=True)
 
     class Meta:
-        model = CleaningTask
+        model = MaintenanceTask
         fields = ['id', 'reservation', 'employee', 'scheduled_time']
 
 class EventSerializer(serializers.ModelSerializer):

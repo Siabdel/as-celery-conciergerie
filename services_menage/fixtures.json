@@ -1,201 +1,281 @@
 [
   {
     "model": "schedule.calendar",
+    "pk": 2,
+    "fields": {
+      "name": "Calendrier Employee",
+      "slug": "calendrier-Employee"
+    }
+  },
+  {
+    "model": "services_menage.property",
     "pk": 1,
     "fields": {
-      "name": "Main Calendar",
-      "slug": "main-calendar"
+      "name": "Appartement Centre-Ville",
+      "type": "apartment",
+      "address": "123 Rue Principale, Ville",
+      "owner": 1,
+      "price_per_night": "100.00"
     }
   },
   {
     "model": "services_menage.employee",
     "pk": 1,
     "fields": {
-      "name": "John Doe",
-      "calendar": 1
+      "name": "Jean Dupont",
+      "calendar": 1,
+      "property": 1
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 2,
+    "fields": {
+      "name": "Appartement Centre-Ville",
+      "type": "apartment",
+      "address": "123 Rue Principale, Ville",
+      "owner": 1,
+      "price_per_night": "100.00"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 3,
+    "fields": {
+      "name": "Villa Bord de Mer",
+      "type": "villa",
+      "address": "45 Avenue de la Plage, Ville Côtière",
+      "owner": 1,
+      "price_per_night": "250.00"
     }
   },
   {
     "model": "services_menage.employee",
     "pk": 2,
     "fields": {
-      "name": "Jane Smith",
-      "calendar": 1
+      "name": "Jean Dupont",
+      "calendar": 1,
+      "property": 1
     }
   },
   {
     "model": "services_menage.reservation",
     "pk": 1,
     "fields": {
-      "client": "Alice Brown",
-      "check_in": "2024-10-01T14:00:00Z",
-      "check_out": "2024-10-05T10:00:00Z"
+      "property": 1,
+      "start_date": "2024-10-01T14:00:00Z",
+      "end_date": "2024-10-05T10:00:00Z",
+      "guest_name": "Alice Martin",
+      "guest_email": "alice@example.com",
+      "platform": "airbnb",
+      "reservation_status": "confirmed",
+      "number_of_guests": 2,
+      "total_price": "450.00",
+      "cleaning_fee": "50.00",
+      "service_fee": "20.00",
+      "guest_phone": "+33123456789",
+      "special_requests": "Vue sur la ville si possible",
+      "is_business_trip": false,
+      "cancellation_policy": "Flexible",
+      "booking_date": "2024-09-15T10:00:00Z"
     }
   },
   {
     "model": "services_menage.reservation",
     "pk": 2,
     "fields": {
-      "client": "Charlie Davis",
-      "check_in": "2024-10-10T15:00:00Z",
-      "check_out": "2024-10-15T11:00:00Z"
+      "property": 2,
+      "start_date": "2024-10-10T15:00:00Z",
+      "end_date": "2024-10-17T11:00:00Z",
+      "guest_name": "Bernard Dubois",
+      "guest_email": "bernard@example.com",
+      "platform": "booking",
+      "reservation_status": "confirmed",
+      "number_of_guests": 4,
+      "total_price": "1850.00",
+      "cleaning_fee": "100.00",
+      "service_fee": "50.00",
+      "guest_phone": "+33987654321",
+      "special_requests": "Lit bébé nécessaire",
+      "is_business_trip": false,
+      "cancellation_policy": "Modérée",
+      "booking_date": "2024-09-20T14:30:00Z"
     }
   },
   {
     "model": "services_menage.reservation",
     "pk": 3,
     "fields": {
-      "client": "Eva Green",
-      "check_in": "2024-10-20T12:00:00Z",
-      "check_out": "2024-10-25T10:00:00Z"
+      "property": 1,
+      "start_date": "2024-10-20T14:00:00Z",
+      "end_date": "2024-10-22T10:00:00Z",
+      "guest_name": "Claire Lefebvre",
+      "guest_email": "claire@example.com",
+      "platform": "direct",
+      "reservation_status": "pending",
+      "number_of_guests": 1,
+      "total_price": "220.00",
+      "cleaning_fee": "50.00",
+      "service_fee": "10.00",
+      "guest_phone": "+33654321987",
+      "special_requests": "",
+      "is_business_trip": true,
+      "cancellation_policy": "Stricte",
+      "booking_date": "2024-10-01T09:15:00Z"
     }
   },
   {
     "model": "services_menage.reservation",
     "pk": 4,
     "fields": {
-      "client": "Frank White",
-      "check_in": "2024-11-01T14:00:00Z",
-      "check_out": "2024-11-05T11:00:00Z"
+      "property": 2,
+      "start_date": "2024-11-01T15:00:00Z",
+      "end_date": "2024-11-08T11:00:00Z",
+      "guest_name": "David Moreau",
+      "guest_email": "david@example.com",
+      "platform": "airbnb",
+      "reservation_status": "confirmed",
+      "number_of_guests": 6,
+      "total_price": "1950.00",
+      "cleaning_fee": "150.00",
+      "service_fee": "100.00",
+      "guest_phone": "+33123987456",
+      "special_requests": "Accès piscine demandé",
+      "is_business_trip": false,
+      "cancellation_policy": "Flexible",
+      "booking_date": "2024-10-05T11:30:00Z"
     }
   },
   {
     "model": "services_menage.reservation",
     "pk": 5,
     "fields": {
-      "client": "Grace Lee",
-      "check_in": "2024-11-10T15:00:00Z",
-      "check_out": "2024-11-15T10:00:00Z"
+      "property": 1,
+      "start_date": "2024-11-10T14:00:00Z",
+      "end_date": "2024-11-15T10:00:00Z",
+      "guest_name": "Emilie Rousseau",
+      "guest_email": "emilie@example.com",
+      "platform": "booking",
+      "reservation_status": "confirmed",
+      "number_of_guests": 2,
+      "total_price": "550.00",
+      "cleaning_fee": "50.00",
+      "service_fee": "25.00",
+      "guest_phone": "+33789456123",
+      "special_requests": "Demande d'un étage élevé",
+      "is_business_trip": false,
+      "cancellation_policy": "Modérée",
+      "booking_date": "2024-10-20T16:45:00Z"
     }
   },
   {
-    "model": "services_menage.cleaningtask",
-    "pk": 1,
+    "model": "services_menage.reservation",
+    "pk": 6,
     "fields": {
-      "reservation": 1,
-      "employee": 1,
-      "scheduled_time": "2024-10-05T12:00:00Z"
+      "property": 2,
+      "start_date": "2024-11-20T15:00:00Z",
+      "end_date": "2024-11-27T11:00:00Z",
+      "guest_name": "François Dupuis",
+      "guest_email": "francois@example.com",
+      "platform": "direct",
+      "reservation_status": "confirmed",
+      "number_of_guests": 4,
+      "total_price": "1850.00",
+      "cleaning_fee": "100.00",
+      "service_fee": "50.00",
+      "guest_phone": "+33654789321",
+      "special_requests": "Demande de barbecue",
+      "is_business_trip": false,
+      "cancellation_policy": "Stricte",
+      "booking_date": "2024-11-01T10:00:00Z"
     }
   },
   {
-    "model": "services_menage.cleaningtask",
-    "pk": 2,
+    "model": "services_menage.reservation",
+    "pk": 7,
     "fields": {
-      "reservation": 2,
-      "employee": 2,
-      "scheduled_time": "2024-10-15T13:00:00Z"
+      "property": 1,
+      "start_date": "2024-12-01T14:00:00Z",
+      "end_date": "2024-12-05T10:00:00Z",
+      "guest_name": "Gabrielle Lemaire",
+      "guest_email": "gabrielle@example.com",
+      "platform": "airbnb",
+      "reservation_status": "pending",
+      "number_of_guests": 3,
+      "total_price": "470.00",
+      "cleaning_fee": "50.00",
+      "service_fee": "20.00",
+      "guest_phone": "+33123456780",
+      "special_requests": "Allergique aux acariens",
+      "is_business_trip": true,
+      "cancellation_policy": "Flexible",
+      "booking_date": "2024-11-15T14:20:00Z"
     }
   },
   {
-    "model": "services_menage.cleaningtask",
-    "pk": 3,
+    "model": "services_menage.reservation",
+    "pk": 8,
     "fields": {
-      "reservation": 3,
-      "employee": 1,
-      "scheduled_time": "2024-10-25T12:00:00Z"
+      "property": 2,
+      "start_date": "2024-12-10T15:00:00Z",
+      "end_date": "2024-12-17T11:00:00Z",
+      "guest_name": "Henri Bertrand",
+      "guest_email": "henri@example.com",
+      "platform": "booking",
+      "reservation_status": "confirmed",
+      "number_of_guests": 5,
+      "total_price": "1900.00",
+      "cleaning_fee": "150.00",
+      "service_fee": "100.00",
+      "guest_phone": "+33987654322",
+      "special_requests": "Demande de décoration de Noël",
+      "is_business_trip": false,
+      "cancellation_policy": "Modérée",
+      "booking_date": "2024-11-25T09:30:00Z"
     }
   },
   {
-    "model": "services_menage.cleaningtask",
-    "pk": 4,
+    "model": "services_menage.reservation",
+    "pk": 9,
     "fields": {
-      "reservation": 4,
-      "employee": 2,
-      "scheduled_time": "2024-11-05T13:00:00Z"
+      "property": 1,
+      "start_date": "2024-12-20T14:00:00Z",
+      "end_date": "2024-12-27T10:00:00Z",
+      "guest_name": "Isabelle Girard",
+      "guest_email": "isabelle@example.com",
+      "platform": "direct",
+      "reservation_status": "confirmed",
+      "number_of_guests": 2,
+      "total_price": "750.00",
+      "cleaning_fee": "50.00",
+      "service_fee": "30.00",
+      "guest_phone": "+33654321988",
+      "special_requests": "Demande d'un sapin de Noël",
+      "is_business_trip": false,
+      "cancellation_policy": "Stricte",
+      "booking_date": "2024-12-01T11:15:00Z"
     }
   },
   {
-    "model": "services_menage.cleaningtask",
-    "pk": 5,
+    "model": "services_menage.reservation",
+    "pk": 10,
     "fields": {
-      "reservation": 5,
-      "employee": 1,
-      "scheduled_time": "2024-11-15T12:00:00Z"
-    }
-  },
-  {
-    "model": "schedule.event",
-    "pk": 1,
-    "fields": {
-      "start": "2024-10-01T14:00:00Z",
-      "end": "2024-10-05T10:00:00Z",
-      "title": "[Réservation] Alice Brown",
-      "description": "",
-      "calendar": 1,
-      "creator": null,
-      "created_on": "2024-09-25T00:00:00Z",
-      "updated_on": "2024-09-25T00:00:00Z",
-      "rule": null,
-      "end_recurring_period": null,
-      "color_event": ""
-    }
-  },
-  {
-    "model": "schedule.event",
-    "pk": 2,
-    "fields": {
-      "start": "2024-10-10T15:00:00Z",
-      "end": "2024-10-15T11:00:00Z",
-      "title": "[Réservation] Charlie Davis",
-      "description": "",
-      "calendar": 1,
-      "creator": null,
-      "created_on": "2024-09-25T00:00:00Z",
-      "updated_on": "2024-09-25T00:00:00Z",
-      "rule": null,
-      "end_recurring_period": null,
-      "color_event": ""
-    }
-  },
-  {
-    "model": "schedule.event",
-    "pk": 3,
-    "fields": {
-      "start": "2024-10-20T12:00:00Z",
-      "end": "2024-10-25T10:00:00Z",
-      "title": "[Réservation] Eva Green",
-      "description": "",
-      "calendar": 1,
-      "creator": null,
-      "created_on": "2024-09-25T00:00:00Z",
-      "updated_on": "2024-09-25T00:00:00Z",
-      "rule": null,
-      "end_recurring_period": null,
-      "color_event": ""
-    }
-  },
-  {
-    "model": "schedule.event",
-    "pk": 4,
-    "fields": {
-      "start": "2024-11-01T14:00:00Z",
-      "end": "2024-11-05T11:00:00Z",
-      "title": "[Réservation] Frank White",
-      "description": "",
-      "calendar": 1,
-      "creator": null,
-      "created_on": "2024-09-25T00:00:00Z",
-      "updated_on": "2024-09-25T00:00:00Z",
-      "rule": null,
-      "end_recurring_period": null,
-      "color_event": ""
-    }
-  },
-  {
-    "model": "schedule.event",
-    "pk": 5,
-    "fields": {
-      "start": "2024-11-10T15:00:00Z",
-      "end": "2024-11-15T10:00:00Z",
-      "title": "[Réservation] Grace Lee",
-      "description": "",
-      "calendar": 1,
-      "creator": null,
-      "created_on": "2024-09-25T00:00:00Z",
-      "updated_on": "2024-09-25T00:00:00Z",
-      "rule": null,
-      "end_recurring_period": null,
-      "color_event": ""
+      "property": 2,
+      "start_date": "2024-12-28T15:00:00Z",
+      "end_date": "2025-01-04T11:00:00Z",
+      "guest_name": "Jacques Mercier",
+      "guest_email": "jacques@example.com",
+      "platform": "airbnb",
+      "reservation_status": "confirmed",
+      "number_of_guests": 8,
+      "total_price": "2500.00",
+      "cleaning_fee": "200.00",
+      "service_fee": "150.00",
+      "guest_phone": "+33123987457",
+      "special_requests": "Demande de réveillon du Nouvel An",
+      "is_business_trip": false,
+      "cancellation_policy": "Stricte",
+      "booking_date": "2024-12-10T16:00:00Z"
     }
   }
 ]

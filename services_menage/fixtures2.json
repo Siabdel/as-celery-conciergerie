@@ -1,0 +1,74 @@
+[
+  {
+    "model": "services_menage.property",
+    "pk": 1,
+    "fields": {
+      "name": "Villa Sunshine",
+      "type": "villa",
+      "address": "123 Beach Road, Sunny City",
+      "owner": 1,
+      "price_per_night": "250.00"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 2,
+    "fields": {
+      "name": "City Center Apartment",
+      "type": "apartment",
+      "address": "456 Main Street, Metro City",
+      "owner": 1,
+      "price_per_night": "150.00"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 3,
+    "fields": {
+      "name": "Cozy Cottage",
+      "type": "house",
+      "address": "789 Forest Lane, Quiet Town",
+      "owner": 2,
+      "price_per_night": "100.00"
+    }
+  },
+  {
+    "model": "services_menage.cleaningTask",
+    "pk": 1,
+    "fields": {
+      "employee": 1,
+      "property": 1,
+      "description": "Deep clean villa after long-term guests",
+      "due_date": "2024-10-01T10:00:00Z",
+      "status": "pending",
+      "completed": false,
+      "maintenance_type": "cleaning"
+    }
+  },
+  {
+    "model": "services_menage.cleaningTask",
+    "pk": 2,
+    "fields": {
+      "employee": 2,
+      "property": 2,
+      "description": "Regular apartment cleaning",
+      "due_date": "2024-10-02T14:00:00Z",
+      "status": "pending",
+      "completed": false,
+      "maintenance_type": "cleaning"
+    }
+  },
+  {
+    "model": "services_menage.cleaningTask",
+    "pk": 3,
+    "fields": {
+      "employee": 1,
+      "property": 3,
+      "description": "Laundry service for Cozy Cottage",
+      "due_date": "2024-10-03T09:00:00Z",
+      "status": "pending",
+      "completed": false,
+      "maintenance_type": "laundry"
+    }
+  }
+]

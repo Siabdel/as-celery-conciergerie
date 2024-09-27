@@ -9,7 +9,7 @@ from . import api_views
 router = DefaultRouter()
 router.register(r'employees', api_views.EmployeeViewSet)
 router.register(r'reservations', api_views.ReservationViewSet)
-router.register(r'cleaning-tasks', api_views.CleaningTaskViewSet)
+router.register(r'maintenance_tasks', api_views.MaintenanceTaskViewSet)
 router.register(r'calendars', api_views.CalendarViewSet)
 router.register(r'events', api_views.EventViewSet)
 

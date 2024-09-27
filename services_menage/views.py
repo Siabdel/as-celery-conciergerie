@@ -39,28 +39,28 @@ def reservation_created(sender, instance, created, **kwargs):
 def create_reservation_event(reservation):
     main_calendar = Calendar.objects.get(name="Reservations")
     Event.objects.create(
-        start=reservation.check_in,
-        end=reservation.check_out,
-        title=f"Réservation: {reservation.client}",
+        start=reservation.start_date,
+        end=reservation.end_date,
+        title=f"Réservation: {reservation.property}",
         calendar=main_calendar
     )
 
 # 4. Planifiez une tâche de nettoyage après chaque départ :
 def schedule_cleaning(reservation):
-    cleaning_time = reservation.check_out + timezone.timedelta(hours=2)
+    cleaning_time = reservation.end_date + timezone.timedelta(hours=2)
     available_employee = find_available_employee(cleaning_time)
     
     if available_employee:
-        cleaning_task = ser_models.CleaningTask.objects.create(
-            reservation=reservation,
+        cleaning_task = ser_models.MaintenanceTask.objects.create(
+            property=reservation.property,
             employee=available_employee,
-            scheduled_time=cleaning_time
+            due_date=cleaning_time
         )
         
         Event.objects.create(
             start=cleaning_time,
             end=cleaning_time + timezone.timedelta(hours=2),
-            title=f"Nettoyage: Chambre de {reservation.client}",
+            title=f"Nettoyage: Chambre de {reservation.property}",
             calendar=available_employee.calendar
         )
  

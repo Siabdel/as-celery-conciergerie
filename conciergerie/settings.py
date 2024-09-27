@@ -254,6 +254,7 @@ CORS_ORIGIN_REGEX_WHITELIST = [
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_URL = "/accounts/login/"
 
+"""
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -262,7 +263,8 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
-}
+} 
+"""
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
