@@ -2,6 +2,13 @@
 from rest_framework import serializers
 from .models import Employee, Reservation, MaintenanceTask
 from schedule.models import Calendar, Event
+from django_celery_beat.models import PeriodicTask
+
+class CustomPeriodicTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PeriodicTask
+        fields = '__all__'
+
 
 class CalendarSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,6 +36,7 @@ class MaintenanceTaskSerializer(serializers.ModelSerializer):
         fields = ['id', 'reservation', 'employee', 'scheduled_time']
 
 class EventSerializer(serializers.ModelSerializer):
+    
     calendar = CalendarSerializer(read_only=True)
     calendar_id = serializers.PrimaryKeyRelatedField(
         queryset=Calendar.objects.all(),
@@ -46,3 +54,8 @@ class EventSerializer(serializers.ModelSerializer):
         if data['end'] < data['start']:
             raise serializers.ValidationError("End time must be later than start time.")
         return data
+    
+class PeriodicTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PeriodicTask
+        fields = '__all__'

@@ -6,6 +6,14 @@ from rest_framework import viewsets, permissions
 from services_menage import serializers 
 from django.utils.dateparse import parse_datetime
 from django.http import JsonResponse
+from rest_framework import generics
+from django_celery_beat.models import PeriodicTask
+from .serializers import PeriodicTaskSerializer
+
+class PeriodicTaskListCreate(generics.ListCreateAPIView):
+    queryset = PeriodicTask.objects.all()
+    serializer_class = PeriodicTaskSerializer
+
 
 
 class EmployeeViewSet(viewsets.ModelViewSet):
@@ -56,3 +64,22 @@ def calendar_events(request):
         })
     
     return JsonResponse(events, safe=False)
+
+#----------------------------------------------------------
+#--  Exemple d'API avec DRF pour afficher les tâches Celery 
+#----------------------------------------------------------
+class PeriodicTaskViewSet(viewsets.ModelViewSet):
+    queryset = PeriodicTask.objects.all()
+    serializer_class = PeriodicTaskSerializer
+
+    def list(self, request):
+        tasks = PeriodicTask.objects.all()
+        serializer = PeriodicTaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+
+#
+
+class PeriodicTaskListCreate(generics.ListCreateAPIView):
+    queryset = PeriodicTask.objects.all()
+    serializer_class = PeriodicTaskSerializer
+ 

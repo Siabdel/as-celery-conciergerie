@@ -1,11 +1,17 @@
 # Register your models here.
 from django.contrib import admin
+import json
 from django.utils.translation import gettext_lazy as _
-
 from django.contrib import messages
 from django.db.models import Count, Sum
 from django.utils.html import format_html
 from .models import Reservation, Employee, MaintenanceTask, Property   
+# celery
+from django.utils.timezone import now
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
+from .models import Reservation
+from .tasks import service_menage_task
+##
 from schedule.models import Calendar, Event
 
 @admin.register(Property)
@@ -39,13 +45,13 @@ def duplicate_reservation(modeladmin, request, queryset):
     for reservation in queryset:
         # Créer une nouvelle réservation avec les mêmes données
         new_reservation = Reservation.objects.create(
-            client=reservation.client,
+            client=reservation.property,
             check_in=reservation.check_in,
             check_out=reservation.check_out,
             # Ajoutez ici d'autres champs si nécessaire
         )
         # Vous pouvez personnaliser le nouveau titre si vous le souhaitez
-        new_reservation.client = f"Copie de {new_reservation.client}"
+        new_reservation.property = f"Copie de {new_reservation.property}"
         new_reservation.save()
     
     messages.success(request, _(f"{queryset.count()} réservation(s) dupliquée(s) avec succès."))
@@ -100,10 +106,10 @@ class EmployeeAdmin(admin.ModelAdmin):
 class MaintenanceTaskAdmin(admin.ModelAdmin):
     list_display = ('get_client', 'employee', 'due_date')
     #list_filter = ('scheduled_time', 'employee')
-    search_fields = ('reservation__client', 'employee__name')
+    search_fields = ('property__client', 'employee__name')
 
     def get_client(self, obj):
-        return obj.reservation.client
+        return obj.property
     get_client.short_description = 'Client'
 
 # Personnalisation de l'admin pour Calendar et Event
@@ -119,3 +125,19 @@ class EventAdmin(admin.ModelAdmin):
 
 # Réenregistrement des modèles de django-scheduler avec notre configuration personnalisée
 admin.site.unregister
+
+## Planiffier service Menage
+def planifier_nettoyage(sender, instance, created, **kwargs):
+    if created:
+        # Calcul du délai en secondes jusqu'à la date de check-out
+        intervalle = (instance.end_date - now()).total_seconds()
+        # Créer une tâche périodique à exécuter après la check-out
+        schedule, created = IntervalSchedule.objects.get_or_create(every=int(intervalle), 
+                                                        period=IntervalSchedule.SECONDS)
+        PeriodicTask.objects.create(
+            interval=schedule,
+            name=f"Nettoyage pour {instance.property} à {instance.end_date}",
+            task='services_menage.task',
+            args=json.dumps([instance.id])
+        )
+   
