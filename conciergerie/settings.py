@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 from django.utils.translation import gettext_lazy as _
+from celery.schedules import crontab
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -213,18 +214,28 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Celery Beat settings
 
 # Celery settings
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'  # Assurez-vous que le fuseau horaire 
 #
 # Ancienne configuration (encore supportée jusqu'à Celery 6.0)
 CELERY_BROKER_CONNECTION_RETRY = True
 
 # Nouvelle configuration pour Celery 6.0 et au-delà
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+
+CELERY_BEAT_SCHEDULE = {
+    'create-events-daily': {
+        'task': 'services_menage.tasks.checkin_checkout_task',
+        ##'schedule': crontab(hour=22, minute=18),
+        'schedule': crontab(minute='*/1'),  # Exécute toutes les minutes
+    },
+}
+
 
 
 REST_FRAMEWORK = {
@@ -291,7 +302,7 @@ LOGGING = {
     'loggers': {
         'django.db.backends': {
             'handlers': ['console'],
-            ##'level': 'DEBUG',
+            #'level': 'DEBUG',
         },
     },
 }

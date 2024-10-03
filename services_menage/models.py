@@ -1,10 +1,22 @@
 from django.db import models
+from django.contrib import messages
 from schedule.models import Event, Calendar
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db import models, IntegrityError
+from schedule.models import Calendar as BaseCalendar
 
+class Calendar(BaseCalendar):
+    class Meta:
+        proxy = True
+
+    @classmethod
+    def create_unique(cls, name, slug):
+        if not cls.objects.filter(name=name).exists():
+            return cls.objects.create(name=name, slug=slug)
+        return cls.objects.get(name=name)
 
 class Property(models.Model):
     PROPERTY_TYPES = [
@@ -25,7 +37,7 @@ class Property(models.Model):
         return self.listings.filter(is_active=True)
 
     def get_upcoming_reservations(self):
-        return self.reservations.filter(start_date__gte=timezone.now().date())
+        return self.reservations.filter(check_in__gte=timezone.now().date())
 
 class Reservation(models.Model):
     RESERVATION_STATUS = [
@@ -42,8 +54,8 @@ class Reservation(models.Model):
 
     property = models.ForeignKey(Property, on_delete=models.CASCADE, 
                                             related_name='reservations')
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    check_in = models.DateTimeField()
+    check_out = models.DateTimeField()
     guest_name = models.CharField(max_length=100)
     guest_email = models.EmailField()
     
@@ -63,20 +75,34 @@ class Reservation(models.Model):
     cancellation_policy = models.CharField(max_length=100, blank=True)
     booking_date = models.DateTimeField(auto_now_add=True)
     
+    class Meta :
+        ordering = ("property", "check_in", )
+        unique_together = ("property", "check_in", )
+    
     def get_duration(self):
-        return (self.end_date - self.start_date).days + 1
+        return (self.check_out - self.check_in).days + 1
 
     def calculate_total_price(self):
         duration = self.get_duration()
         return (self.property.price_per_night * duration) + self.cleaning_fee + self.service_fee
 
     def save(self, *args, **kwargs):
+        if self.check_in > self.check_out :
+            raise ValidationError("choisir une date d'entree inferieur a la date de check_out !!")
+        ##
         if not self.total_price:
             self.total_price = self.calculate_total_price()
-        super().save(*args, **kwargs)
+        try :
+            super().save(*args, **kwargs)
+        except IntegrityError as err:
+            # Au lieu de cela, levez une exception personnalisée
+            raise ValidationError("Une réservation existe déjà pour cette \
+                propriété à cette date. Veuillez choisir une autre date ou \
+                    une autre propriété.")
 
     def __str__(self):
-        return f"Reservation for {self.property} from {self.start_date} to {self.end_date}"
+        return f"Reservation for {self.property} from {self.check_in} to {self.check_out}"
+
 
 
 class Employee(models.Model):

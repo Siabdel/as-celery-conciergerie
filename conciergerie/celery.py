@@ -2,7 +2,8 @@
 from __future__ import absolute_import
 import os
 from django.conf import settings
-from celery import Celery
+from celery import Celery, shared_task
+## from django_celery_beat.models import PeriodicTask, CrontabSchedule
 
 # Indique à Celery où trouver les settings de Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'conciergerie.settings')

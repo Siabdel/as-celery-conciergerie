@@ -1,0 +1,375 @@
+[
+{
+  "model": "schedule.calendar",
+  "pk": 1,
+  "fields": {
+    "name": "Reservations",
+    "slug": "reservations"
+  }
+},
+{
+  "model": "schedule.calendar",
+  "pk": 2,
+  "fields": {
+    "name": "Calendrier Employee",
+    "slug": "calendrier-Employee"
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 1,
+  "fields": {
+    "start": "2024-10-01T14:00:00Z",
+    "end": "2024-10-05T10:00:00Z",
+    "title": "Réservation: Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": 1,
+    "created_on": "2024-09-27T07:01:44.385Z",
+    "updated_on": "2024-09-29T18:08:17.916Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": "#000000"
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 2,
+  "fields": {
+    "start": "2024-10-05T12:00:00Z",
+    "end": "2024-10-05T14:00:00Z",
+    "title": "Nettoyage: Chambre de Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.389Z",
+    "updated_on": "2024-09-27T07:01:44.389Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 3,
+  "fields": {
+    "start": "2024-10-10T15:00:00Z",
+    "end": "2024-10-17T11:00:00Z",
+    "title": "Réservation: Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.391Z",
+    "updated_on": "2024-09-27T07:01:44.391Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 4,
+  "fields": {
+    "start": "2024-10-17T13:00:00Z",
+    "end": "2024-10-17T15:00:00Z",
+    "title": "Nettoyage: Chambre de Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.393Z",
+    "updated_on": "2024-09-27T07:01:44.393Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 5,
+  "fields": {
+    "start": "2024-10-20T14:00:00Z",
+    "end": "2024-10-22T10:00:00Z",
+    "title": "Réservation: Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.396Z",
+    "updated_on": "2024-09-27T07:01:44.396Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 6,
+  "fields": {
+    "start": "2024-10-22T12:00:00Z",
+    "end": "2024-10-22T14:00:00Z",
+    "title": "Nettoyage: Chambre de Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.398Z",
+    "updated_on": "2024-09-27T07:01:44.398Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 7,
+  "fields": {
+    "start": "2024-11-01T15:00:00Z",
+    "end": "2024-11-08T11:00:00Z",
+    "title": "Réservation: Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.400Z",
+    "updated_on": "2024-09-27T07:01:44.400Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 8,
+  "fields": {
+    "start": "2024-11-08T13:00:00Z",
+    "end": "2024-11-08T15:00:00Z",
+    "title": "Nettoyage: Chambre de Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.402Z",
+    "updated_on": "2024-09-27T07:01:44.402Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 9,
+  "fields": {
+    "start": "2024-11-10T14:00:00Z",
+    "end": "2024-11-15T10:00:00Z",
+    "title": "Réservation: Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.404Z",
+    "updated_on": "2024-09-27T07:01:44.404Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 10,
+  "fields": {
+    "start": "2024-11-15T12:00:00Z",
+    "end": "2024-11-15T14:00:00Z",
+    "title": "Nettoyage: Chambre de Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.406Z",
+    "updated_on": "2024-09-27T07:01:44.406Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 11,
+  "fields": {
+    "start": "2024-11-20T15:00:00Z",
+    "end": "2024-11-27T11:00:00Z",
+    "title": "Réservation: Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.408Z",
+    "updated_on": "2024-09-27T07:01:44.408Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 12,
+  "fields": {
+    "start": "2024-11-27T13:00:00Z",
+    "end": "2024-11-27T15:00:00Z",
+    "title": "Nettoyage: Chambre de Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.410Z",
+    "updated_on": "2024-09-27T07:01:44.410Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 13,
+  "fields": {
+    "start": "2024-12-01T14:00:00Z",
+    "end": "2024-12-05T10:00:00Z",
+    "title": "Réservation: Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.412Z",
+    "updated_on": "2024-09-27T07:01:44.412Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 14,
+  "fields": {
+    "start": "2024-12-05T12:00:00Z",
+    "end": "2024-12-05T14:00:00Z",
+    "title": "Nettoyage: Chambre de Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.415Z",
+    "updated_on": "2024-09-27T07:01:44.415Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 15,
+  "fields": {
+    "start": "2024-12-10T15:00:00Z",
+    "end": "2024-12-17T11:00:00Z",
+    "title": "Réservation: Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.417Z",
+    "updated_on": "2024-09-27T07:01:44.417Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 16,
+  "fields": {
+    "start": "2024-12-17T13:00:00Z",
+    "end": "2024-12-17T15:00:00Z",
+    "title": "Nettoyage: Chambre de Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.419Z",
+    "updated_on": "2024-09-27T07:01:44.419Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 17,
+  "fields": {
+    "start": "2024-12-20T14:00:00Z",
+    "end": "2024-12-27T10:00:00Z",
+    "title": "Réservation: Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.421Z",
+    "updated_on": "2024-09-27T07:01:44.421Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 18,
+  "fields": {
+    "start": "2024-12-27T12:00:00Z",
+    "end": "2024-12-27T14:00:00Z",
+    "title": "Nettoyage: Chambre de Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.423Z",
+    "updated_on": "2024-09-27T07:01:44.423Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 19,
+  "fields": {
+    "start": "2024-12-28T15:00:00Z",
+    "end": "2025-01-04T11:00:00Z",
+    "title": "Réservation: Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.425Z",
+    "updated_on": "2024-09-27T07:01:44.425Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 20,
+  "fields": {
+    "start": "2025-01-04T13:00:00Z",
+    "end": "2025-01-04T15:00:00Z",
+    "title": "Nettoyage: Chambre de Appartement Centre-Ville (apartment)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-27T07:01:44.428Z",
+    "updated_on": "2024-09-27T07:01:44.428Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+},
+{
+  "model": "schedule.event",
+  "pk": 21,
+  "fields": {
+    "start": "2024-09-03T10:45:24Z",
+    "end": "2024-09-05T10:45:37Z",
+    "title": "Réservation: Villa Bord de Mer (villa)",
+    "description": "",
+    "creator": null,
+    "created_on": "2024-09-28T11:08:20.513Z",
+    "updated_on": "2024-09-28T11:08:20.513Z",
+    "rule": null,
+    "end_recurring_period": null,
+    "calendar": 1,
+    "color_event": ""
+  }
+}
+]

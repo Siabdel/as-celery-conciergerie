@@ -4,6 +4,8 @@ import json
 from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 from django.db.models import Count, Sum
+from django.db import models, IntegrityError
+from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from .models import Reservation, Employee, MaintenanceTask, Property   
 # celery
@@ -44,26 +46,35 @@ class PropertyAdmin(admin.ModelAdmin):
 def duplicate_reservation(modeladmin, request, queryset):
     for reservation in queryset:
         # Créer une nouvelle réservation avec les mêmes données
-        new_reservation = Reservation.objects.create(
-            client=reservation.property,
-            check_in=reservation.check_in,
-            check_out=reservation.check_out,
-            # Ajoutez ici d'autres champs si nécessaire
-        )
-        # Vous pouvez personnaliser le nouveau titre si vous le souhaitez
-        new_reservation.property = f"Copie de {new_reservation.property}"
-        new_reservation.save()
-    
-    messages.success(request, _(f"{queryset.count()} réservation(s) dupliquée(s) avec succès."))
+        try :
+            new_reservation = Reservation.objects.create(
+                property = reservation.property,
+                check_in = now(),
+                check_out =  now(),
+                reservation_status = "Pending",
+                # Ajoutez ici d'autres champs si nécessaire
+            )
+            #
+            messages.success(request, _(f"{queryset.count()} réservation(s) dupliquée(s) avec succès."))
+            ##new_reservation.save()
+        except ValidationError as err:
+            messages.error(request, "## Erreur ###" + str(err))
+        #
 
 
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
-    list_display = ('property', 'guest_name', 'start_date', 'end_date', 'reservation_status', 'total_price')
-    list_filter = ('reservation_status', 'property', 'start_date')
+    list_display = ('property', 'guest_name', 'check_in', 'check_out', 'reservation_status', 'total_price')
+    list_filter = ('reservation_status', 'property', 'check_in')
     search_fields = ('guest_name', 'guest_email', 'property__name')
-    date_hierarchy = 'start_date'
+    date_hierarchy = 'check_in'
     actions = [duplicate_reservation]  # Ajoutez l'action ici
+    
+    def save_model(self, request, obj, form, change):
+        try:
+            obj.save()
+        except ValidationError as err:
+            messages.error(request, str(err))
    
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -114,8 +125,9 @@ class MaintenanceTaskAdmin(admin.ModelAdmin):
 
 # Personnalisation de l'admin pour Calendar et Event
 class CalendarAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'slug')
+    list_display = ('id', 'name', 'slug', )
     search_fields = ('name', 'slug')
+
 
 class EventAdmin(admin.ModelAdmin):
     list_display = ('title', 'start', 'end', 'calendar')
@@ -125,19 +137,5 @@ class EventAdmin(admin.ModelAdmin):
 
 # Réenregistrement des modèles de django-scheduler avec notre configuration personnalisée
 admin.site.unregister
+admin.register(Event, EventAdmin)
 
-## Planiffier service Menage
-def planifier_nettoyage(sender, instance, created, **kwargs):
-    if created:
-        # Calcul du délai en secondes jusqu'à la date de check-out
-        intervalle = (instance.end_date - now()).total_seconds()
-        # Créer une tâche périodique à exécuter après la check-out
-        schedule, created = IntervalSchedule.objects.get_or_create(every=int(intervalle), 
-                                                        period=IntervalSchedule.SECONDS)
-        PeriodicTask.objects.create(
-            interval=schedule,
-            name=f"Nettoyage pour {instance.property} à {instance.end_date}",
-            task='services_menage.task',
-            args=json.dumps([instance.id])
-        )
-   
