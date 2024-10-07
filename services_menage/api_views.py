@@ -1,6 +1,6 @@
 
 from rest_framework import viewsets
-from .models import Employee, Reservation, MaintenanceTask
+from .models import Employee, Reservation, ServiceTask
 from schedule.models import Calendar, Event
 from rest_framework import viewsets, permissions
 from services_menage import serializers 
@@ -24,9 +24,9 @@ class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
     serializer_class = serializers.ReservationSerializer
 
-class MaintenanceTaskViewSet(viewsets.ModelViewSet):
-    queryset = MaintenanceTask.objects.all()
-    serializer_class = serializers.MaintenanceTaskSerializer
+class ServiceTaskViewSet(viewsets.ModelViewSet):
+    queryset = ServiceTask.objects.all()
+    serializer_class = serializers.ServiceTaskSerializer
 
 class CalendarViewSet(viewsets.ModelViewSet):
     queryset = Calendar.objects.all()

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 from schedule.models import Event, Calendar
 from django.core.exceptions import ValidationError
@@ -106,31 +107,72 @@ class Reservation(models.Model):
 
 
 class Employee(models.Model):
+    ROLE_CHOICES = [
+        ('cleaner', 'Cleaner'),
+        ('maintenance', 'Maintenance'),
+        ('concierge', 'Concierge'),
+        ('manager', 'Manager'),
+    ]
     name = models.CharField(max_length=100)
     calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
-    property = models.ForeignKey(Property,null=True, on_delete=models.CASCADE, related_name='%(class)s_tasks')
+    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='cleaner')
+    phone_number = models.CharField(max_length=15, null=True)
+    hire_date = models.DateField() # date d'embauche
+    is_active = models.BooleanField(default=True)
 
+    def __str__(self):
+        return f"{self.name} - {self.get_role_display()}"
 
-class MaintenanceTask(models.Model):
-    TASK_STATUS = [
-        ('pending', 'Pending'),
-        ('in_progress', 'In Progress'),
-        ('completed', 'Completed'),
-    ]
+class ServiceTask(models.Model):
+    class TaskStatus(models.TextChoices):
+        PENDING = 'PEND', _('Pending')
+        IN_PROGRESS = 'PROG', _('In progress')
+        COMPLETED = 'COMP', _('Completed')
+    
+    class TypeService(models.TextChoices):
+        CHECK_IN = 'CKIN', _('Check_in')
+        CHECK_OUT = 'CKOU', _('Check_out')
+        MAINTENANCE = 'MAINT', _('Maintenance')
     
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name='%(class)s_tasks')
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='%(class)s_tasks')
     description = models.TextField()
-    due_date = models.DateTimeField()
-    status = models.CharField(max_length=20, choices=TASK_STATUS, default='pending')
+    start_date  = models.DateTimeField()
+    end_date    = models.DateTimeField()
+    status = models.CharField(max_length=20, choices=TaskStatus.choices, default=TaskStatus.PENDING)
+    type_service = models.CharField(max_length=20, choices=TypeService.choices, default=TypeService.CHECK_IN)
     completed = models.BooleanField(default=False)
-
+    
     class Meta:
-        ordering = ['property', 'due_date',]
+        unique_together = ("start_date", "end_date", "employee", "property", )
+        ordering = ['property', 'end_date',]
 
     def __str__(self):
-        return f"Task for {self.property} - {self.due_date}"
+        return f"Task for {self.property} - {self.end_date}"
 
     def mark_as_completed(self):
         self.completed = True
         self.save()
+    
+    def mark_as_completed(self):
+        self.completed = True
+        self.save()
+
+        
+class Absence(models.Model):
+    class TypeAbsence(models.TextChoices):
+        CONGES = 'CONG', _('En conges')
+        MALADIE = 'MALD', _('En maladie')
+        INCONNU = 'NJSU', _('Non justifier')
+    
+    type_absence = models.CharField(max_length=200, 
+                                    choices=TypeAbsence.choices,
+                                    default=TypeAbsence.INCONNU)
+
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    
+    def __str__(self) -> str:
+        return f"Absence for {self.employee} - {self.start_date}"

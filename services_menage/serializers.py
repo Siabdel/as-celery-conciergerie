@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import Employee, Reservation, MaintenanceTask
+from .models import Employee, Reservation, ServiceTask
 from schedule.models import Calendar, Event
 from django_celery_beat.models import PeriodicTask
 class CustomPeriodicTaskSerializer(serializers.ModelSerializer):
@@ -20,8 +20,6 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'name', 'calendar']
-
-
 
 class EventSerializer(serializers.ModelSerializer):
     
@@ -95,10 +93,10 @@ class ReservationSerializer(serializers.ModelSerializer):
         }
 
         
-class MaintenanceTaskSerializer(serializers.ModelSerializer):
+class ServiceTaskSerializer(serializers.ModelSerializer):
     reservation = ReservationSerializer(read_only=True)
     employee = EmployeeSerializer(read_only=True)
 
     class Meta:
-        model = MaintenanceTask
+        model = ServiceTask
         fields = ['id', 'reservation', 'employee', 'scheduled_time']

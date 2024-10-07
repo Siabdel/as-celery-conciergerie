@@ -7,7 +7,7 @@ from django.db.models import Count, Sum
 from django.db import models, IntegrityError
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
-from .models import Reservation, Employee, MaintenanceTask, Property   
+from .models import Reservation, Employee, ServiceTask, Property, Absence   
 # celery
 from django.utils.timezone import now
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
@@ -113,9 +113,9 @@ class EmployeeAdmin(admin.ModelAdmin):
         return obj.calendar.name if obj.calendar else "Pas de calendrier"
     get_calendar_name.short_description = 'Calendrier'
 
-@admin.register(MaintenanceTask)
-class MaintenanceTaskAdmin(admin.ModelAdmin):
-    list_display = ('get_client', 'employee', 'due_date')
+@admin.register(ServiceTask)
+class ServiceTaskAdmin(admin.ModelAdmin):
+    list_display = ('description', 'get_client', 'employee', 'end_date')
     #list_filter = ('scheduled_time', 'employee')
     search_fields = ('property__client', 'employee__name')
 
@@ -134,7 +134,17 @@ class EventAdmin(admin.ModelAdmin):
     list_filter = ('start', 'end', 'calendar')
     search_fields = ('title',)
 
-
+@admin.register(Absence)
+class AbsenceAdmin(admin.ModelAdmin):
+    list_display = ('get_employee', 'start_date', 'end_date', 'type_absence', )
+    list_filter = ('start_date', )
+    search_fields = ('employee',)
+    
+    def get_employee(self, obj):
+        return obj.employee
+        
+    
+    
 # Réenregistrement des modèles de django-scheduler avec notre configuration personnalisée
 admin.site.unregister
 admin.register(Event, EventAdmin)

@@ -36,10 +36,11 @@ def init_create(requete):
 @receiver(post_save, sender=serv_models.Reservation)
 def reservation_created(sender, instance, created, **kwargs):
     if created:
-        create_reservation_event(instance)
-        planifier_nettoyage(sender, instance, created)
+        #create_reservation_event(instance)
+        #planifier_nettoyage(sender, instance, created)
         # schedule_cleaning(instance)
-        checkin_checkout()
+        #checkin_checkout()
+        pass
         
 
 def create_reservation_event(reservation):
