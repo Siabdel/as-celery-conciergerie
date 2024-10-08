@@ -231,8 +231,8 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_BEAT_SCHEDULE = {
     'create-events-daily': {
         'task': 'services_menage.tasks.service_checkin_task',
-        #'schedule': crontab(hour=22, minute=18),
-        'schedule': crontab(minute='*/1'),  # Exécute toutes les 10 minutes
+        'schedule': crontab(hour=22, minute=18),
+        #'schedule': crontab(minute='*/1'),  # Exécute toutes les 10 minutes
     },
 }
 

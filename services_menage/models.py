@@ -137,6 +137,7 @@ class ServiceTask(models.Model):
     
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name='%(class)s_tasks')
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='%(class)s_tasks')
+    reservation = models.ForeignKey(Reservation, on_delete=models.SET_NULL, null=True, related_name='%(class)s_tasks')
     description = models.TextField()
     start_date  = models.DateTimeField()
     end_date    = models.DateTimeField()
