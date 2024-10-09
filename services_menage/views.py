@@ -4,18 +4,23 @@ from datetime import datetime, timedelta
 from django.shortcuts import render, HttpResponse
 from django.utils import timezone
 from django.db.models.signals import post_save
-from django.dispatch import receiver
 from schedule.models.calendars import Calendar
 from schedule.models import Event
 from services_menage.models import  Calendar, Absence
 from services_menage import models as serv_models
 from django.utils.timezone import now
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
+from collections import defaultdict
 
 
-## Calendar
-def calendar_home(request):
-    return render(request, 'fullcalendar_v5.html')
+
+## Calendar reservations
+def calendar_reservation(request):
+    return render(request, 'fullcalendar_resa.html')
+
+## Calendar reservations
+def calendar_employee(request):
+    return render(request, 'fullcalendar_emp.html')
 
 ## Logique
 def init_create(requete):
@@ -33,78 +38,8 @@ def init_create(requete):
 
 
 # 4. Planifiez une tâche de nettoyage après chaque départ :
-# 5. Utilisez des signaux pour automatiser la création d'événements :
 
-@receiver(post_save, sender=serv_models.Reservation)
-def reservation_created(sender, instance, created, **kwargs):
-    if created:
-        #create_reservation_event(instance)
-        #planifier_nettoyage(sender, instance, created)
-        # schedule_cleaning(instance)
-        #checkin_checkout()
-        assign_tasks_from_reservations_with_balancing(2024, 12)
-        
 
-def create_reservation_event(reservation):
-    main_calendar = Calendar.objects.get(name="Reservations")
-    Event.objects.create(
-        start=reservation.check_in,
-        end=reservation.check_out,
-        title=f"Guest: {reservation.guest_name}, Réservation: {reservation.property}",
-
-        calendar=main_calendar
-    )
-
-"""
-@receiver(post_save, sender=serv_models.Reservation)
-def creer_tache_nettoyage(sender, instance, created, **kwargs):
-	planifier_nettoyage(sender, instance, created)
-""" 
-
-## Planiffier service Menage
-def planifier_nettoyage(sender, instance, created, **kwargs):
-    if created:
-        # Calcul du délai en secondes jusqu'à la date de check-out
-        intervalle = (instance.check_out - now()).total_seconds()
-        # Créer une tâche périodique à exécuter après la check-out
-        schedule, created = IntervalSchedule.objects.get_or_create(every=int(intervalle), 
-                                                        period=IntervalSchedule.SECONDS)
-        PeriodicTask.objects.create(
-            interval=schedule,
-            name=f"Nettoyage pour {instance.property} à {instance.check_out}",
-            task='services_menage.task',
-            args=json.dumps([instance.id])
-        )
-   
-   
-   
-def checkin_checkout():
-    #raise Exception("schedule_checkin_checkout ")
-    
-    ##futur_resevations = Reservation.objects.filter(start__gte=timezone.now())
-    
-    futur_resevations = serv_models.Reservation.objects.all()
-    ## 1. Créez un calendrier principal pour les réservations :
-    main_calendar = Calendar.objects.get(slug="reservations")
-
-    for reservation in futur_resevations:
-        ## get calendar 
-        ## create Event check-in
-        event_in = Event.objects.get_or_create(
-            calendar = main_calendar,
-            start = reservation.check_in,
-            end = reservation.check_in + timezone.timedelta(hours=1),
-            title=f"Check_in guest_name = {reservation.guest_name}, Chambre de {reservation.property}"
-        )
-        
-        ## create Event check-out
-        Event.objects.get_or_create(
-            calendar = main_calendar,
-            start = reservation.check_out,
-            end = reservation.check_out + timezone.timedelta(hours=1),
-            title=f"Check_out guest_name = {reservation.guest_name}, Chambre de {reservation.property}"
-        )
-        
 
 
 """
@@ -171,104 +106,6 @@ Plan de la fonction d'affectation :
 6-Affecter des employés disponibles pour ces tâches en excluant les jours d'absence et les autres tâches déjà assignées.
 """ 
 
-def assign_tasks_from_reservations(year, month):
-    """
-    Fonction pour affecter automatiquement des employés aux tâches de check-in, check-out et ménage
-    en fonction des réservations des clients.
-
-    Parameters:
-        year (int): Année pour laquelle affecter les tâches.
-        month (int): Mois pour lequel affecter les tâches.
-    """
-    
-    # Récupérer les réservations pour le mois donné
-    reservations = serv_models.Reservation.objects.filter(
-        check_in__year=year, check_in__month=month
-    ).order_by('check_in',)
-
-    # Obtenir la liste de tous les employés
-    employees = serv_models.Employee.objects.all()
-
-    # Stocker les tâches affectées
-    assigned_tasks = []
-
-    # Parcourir toutes les réservations pour générer les tâches
-    for reservation in reservations:
-        check_in_time = reservation.check_in
-        check_out_time = reservation.check_out
-        cleaning_day = check_out_time + timedelta(days=1)  # On fait le ménage le lendemain du check-out
-        
-        # Priorité 1 : Affecter la tâche de check-in
-        assigned = False
-        for employee in employees:
-            available_days = get_employee_availability_for_month(employee, year, month)
-            
-            if check_in_time.date() in [day for day in available_days]:
-                # Créer et assigner la tâche de check-in
-                task = serv_models.ServiceTask.objects.create(
-                    employee=employee,
-                    description="Check-in",
-                    start_date=check_in_time,
-                    end_date=check_in_time + timedelta(hours=1),
-                    reservation=reservation, # Associer la tâche à la réservation
-                    property=reservation.property, # Associer la tâche à la réservation
-                )
-                assigned_tasks.append(task)
-                assigned = True
-                break  # Sortir de la boucle dès qu'un employé est affecté
-
-        if not assigned:
-            print(f"Impossible d'assigner un employé pour le check-in à {check_in_time}")
-
-        # Priorité 2 : Affecter la tâche de check-out
-        assigned = False
-        for employee in employees:
-            available_days = get_employee_availability_for_month(employee, year, month)
-            
-            if check_out_time.date() in [day for day in available_days]:
-                # Créer et assigner la tâche de check-out
-                task = serv_models.ServiceTask.objects.create(
-                    employee=employee,
-                    description="Check-out",
-                    start_date=check_out_time,
-                    end_date=check_out_time + timedelta(hours=1),
-                    reservation=reservation,  # Associer la tâche à la réservation
-                    property=reservation.property, # Associer la tâche à la réservation
-                )
-                assigned_tasks.append(task)
-                assigned = True
-                break
-
-        if not assigned:
-            print(f"Impossible d'assigner un employé pour le check-out à {check_out_time}")
-
-        # Priorité 3 : Affecter la tâche de ménage après le check-out
-        assigned = False
-        for employee in employees:
-            available_days = get_employee_availability_for_month(employee, year, month)
-            
-            if cleaning_day in [day for day in available_days]:
-                # Créer et assigner la tâche de ménage
-                task = serv_models.ServiceTask.objects.create(
-                    employee=employee,
-                    description="Ménage",
-                    start_date=datetime.combine(cleaning_day, datetime.min.time()),
-                    end_date=datetime.combine(cleaning_day, datetime.min.time()) + timedelta(hours=2),
-                    reservation=reservation,  # Associer la tâche à la réservation
-                    property=reservation.property, # Associer la tâche à la réservation
-                )
-                assigned_tasks.append(task)
-                assigned = True
-                break
-
-        if not assigned:
-            print(f"Impossible d'assigner un employé pour le ménage le {cleaning_day}")
-
-    return assigned_tasks
-
-
-from datetime import timedelta
-from collections import defaultdict
 
 def assign_tasks_from_reservations_with_balancing(year, month):
     """
@@ -317,7 +154,21 @@ def assign_tasks_from_reservations_with_balancing(year, month):
         available_employees.sort(key=lambda emp: task_count[emp.id])
 
         return available_employees[0]  # Retourner l'employé avec le moins de tâches
-
+    ## ---------------------
+    ## create task default
+    ## ---------------------
+    def create_task_default(reservation):
+        task = serv_models.ServiceTask.objects.create(
+            employee=None,
+            description=f"Erreur Impossible d'assigner un employé pour le check-in à {reservation.check_in}",
+            type_service="ERROR",
+            start_date=reservation.check_in,
+            end_date=reservation.check_out + timedelta(hours=1),
+            reservation=reservation,
+            property=reservation.property, # Associer la tâche à la réservation
+        )
+        return task
+    
     # Parcourir toutes les réservations pour générer les tâches
     for reservation in reservations:
         check_in_time = reservation.check_in
@@ -330,7 +181,8 @@ def assign_tasks_from_reservations_with_balancing(year, month):
         if employee_for_check_in:
             task = serv_models.ServiceTask.objects.create(
                 employee=employee_for_check_in,
-                description="Check-in",
+                type_service="CKIN",
+                description=f"Check_in",
                 start_date=check_in_time,
                 end_date=check_in_time + timedelta(hours=1),
                 reservation=reservation,
@@ -339,14 +191,15 @@ def assign_tasks_from_reservations_with_balancing(year, month):
             assigned_tasks.append(task)
             task_count[employee_for_check_in.id] += 1  # Augmenter le nombre de tâches de cet employé
         else:
+            create_task_default(reservation)
             print(f"Impossible d'assigner un employé pour le check-in à {check_in_time}")
-
         # Priorité 2 : Affecter la tâche de check-out
         employee_for_check_out = find_employee_for_task(check_out_time.date())
         if employee_for_check_out:
             task = serv_models.ServiceTask.objects.create(
                 employee=employee_for_check_out,
-                description="Check-out",
+                description=f"Check_out",
+                type_service="CKOUT",
                 start_date=check_out_time,
                 end_date=check_out_time + timedelta(hours=1),
                 reservation=reservation,
@@ -355,14 +208,16 @@ def assign_tasks_from_reservations_with_balancing(year, month):
             assigned_tasks.append(task)
             task_count[employee_for_check_out.id] += 1  # Augmenter le nombre de tâches de cet employé
         else:
-            print(f"Impossible d'assigner un employé pour le check-out à {check_out_time}")
+            create_task_default(reservation)
+            print(f"Impossible d'assigner un employé pour le check out à {check_out_time}")
 
         # Priorité 3 : Affecter la tâche de ménage après le check-out
-        employee_for_cleaning = find_employee_for_task(cleaning_day)
+        employee_for_cleaning = find_employee_for_task(cleaning_day.date())
         if employee_for_cleaning:
             task = serv_models.ServiceTask.objects.create(
                 employee=employee_for_cleaning,
-                description="Ménage",
+                description=f"Ménage ",
+                type_service="CLEAN",
                 start_date=datetime.combine(cleaning_day, datetime.min.time()),
                 end_date=datetime.combine(cleaning_day, datetime.min.time()) + timedelta(hours=2),
                 reservation=reservation,
@@ -371,6 +226,7 @@ def assign_tasks_from_reservations_with_balancing(year, month):
             assigned_tasks.append(task)
             task_count[employee_for_cleaning.id] += 1  # Augmenter le nombre de tâches de cet employé
         else:
+            create_task_default(reservation)
             print(f"Impossible d'assigner un employé pour le ménage le {cleaning_day}")
 
     return assigned_tasks

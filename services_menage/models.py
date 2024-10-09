@@ -133,7 +133,9 @@ class ServiceTask(models.Model):
     class TypeService(models.TextChoices):
         CHECK_IN = 'CKIN', _('Check_in')
         CHECK_OUT = 'CKOU', _('Check_out')
+        CLEANING = 'CLEAN', _('Cleanning')
         MAINTENANCE = 'MAINT', _('Maintenance')
+        ERROR = 'ERROR', _('Affectation en erreur !')
     
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name='%(class)s_tasks')
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='%(class)s_tasks')

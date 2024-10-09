@@ -16,6 +16,7 @@ router.register(r'events', api_views.EventViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
-    path('calendar/', views.calendar_home, name='calendar'),
+    path('cal/resa/', views.calendar_reservation, name='calendar_resa'),
+    path('cal/empl/', views.calendar_employee, name='calendar_empl'),
     ## path('api/v1/calendar/employee-tasks/', EmployeeTaskCalendarView.as_view(), name='employee_task_calendar'),
 ]

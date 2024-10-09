@@ -96,7 +96,29 @@ class ReservationSerializer(serializers.ModelSerializer):
 class ServiceTaskSerializer(serializers.ModelSerializer):
     reservation = ReservationSerializer(read_only=True)
     employee = EmployeeSerializer(read_only=True)
+    start = serializers.SerializerMethodField()  
+    end = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
+   
+    def get_start(self, obj):
+        return obj.start_date.isoformat()
+
+    def get_end(self, obj):
+        return obj.end_date.isoformat()
+
+    def get_title(self, obj):
+        if obj.type_service and obj.property and obj.employee:
+            if obj.type_service == 'CKIN':    
+                return f"Check-in for {obj.property.name} by {obj.employee.name}"
+            elif obj.type_service == 'CKOUT':
+                return f"Check-out for {obj.property.name} by {obj.employee.name}"
+            elif obj.type_service == 'CLEAN':
+                return f"Cleaning for {obj.property.name} by {obj.employee.name}"
+            elif obj.type_service == 'ERROR':
+                return f"Erreur Impossible d'assigner un employé pour le {obj.type_service} à {obj.start_date}",
+            else:
+                return obj.description[:20]
 
     class Meta:
         model = ServiceTask
-        fields = ['id', 'reservation', 'employee', 'scheduled_time']
+        fields = ['id', 'title', 'type_service', 'employee', 'reservation', 'employee', 'property', 'start', 'end', ]
