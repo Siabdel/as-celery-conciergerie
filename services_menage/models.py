@@ -9,6 +9,42 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, IntegrityError
 from schedule.models import Calendar as BaseCalendar
 
+class ResaStatus(models.TextChoices):
+    """
+    PENDING : État initial d'une réservation, en attente de confirmation.
+    CONFIRMED : La réservation a été confirmée mais le séjour n'a pas encore commencé.
+    IN_PROGRESS : Indique que le séjour est en cours.
+    CHECKED_IN : Le client est arrivé et a pris possession du logement.
+    CHECKED_OUT : Le client a quitté le logement à la fin de son séjour.
+    COMPLETED : La réservation est terminée, tous les services ont été fournis.
+    CANCELLED : La réservation a été annulée.
+    EXPIRED : La réservation n'a pas été confirmée dans le délai imparti.
+    """
+    PENDING = 'PENDING', _('Pending')
+    NEED_ATTENTION = 'NEED_ATTENTION', _('Need_attention')
+    IN_PROGRESS = 'INPROGESS', _('In progress')
+    COMPLETED = 'COMPLETED', _('Completed')
+    CONFIRMED = 'CONFIRMED', _('Confirmed')
+    CHECKED_IN = 'CHECKIN', _('Checked In')
+    CHECKED_OUT= 'CHCKOUT', _('Checked Out')
+    CANCELLED = 'CANCEL', _('Cancelled')
+    EXPIRED = 'EXPIRED', _('Expired')
+
+    
+class PlatformChoices(models.TextChoices) :
+    AIRBNB = 'AIRBNB', _('Airbnb')
+    BOOKING = 'BOOKING', _('booking')
+    DIRECT = 'DIRECT' , _('Direct Booking')
+    
+ 
+class TaskTypeService(models.TextChoices):
+    CHECKED_IN = 'CHECKIN', _('Checked In')
+    CHECKED_OUT= 'CHCKOUT', _('Checked Out')
+    CLEANING = 'CLEAN', _('Cleanning')
+    MAINTENANCE = 'MAINT', _('Maintenance')
+    ERROR = 'ERROR', _('Affectation en erreur !')
+
+
 class Calendar(BaseCalendar):
     class Meta:
         proxy = True
@@ -41,29 +77,20 @@ class Property(models.Model):
         return self.reservations.filter(check_in__gte=timezone.now().date())
 
 class Reservation(models.Model):
-    RESERVATION_STATUS = [
-        ('confirmed', 'Confirmed'),
-        ('pending', 'Pending'),
-        ('cancelled', 'Cancelled'),
-    ]
     
-    PLATFORM_CHOICES = [
-        ('airbnb', 'Airbnb'),
-        ('booking', 'Booking.com'),
-        ('direct', 'Direct Booking'),
-    ]
-
-    property = models.ForeignKey(Property, on_delete=models.CASCADE, 
-                                            related_name='reservations')
+    reservation_status = models.CharField(max_length=20, 
+                                          choices=ResaStatus.choices, 
+                                          default=ResaStatus.PENDING)
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='reservations')
     check_in = models.DateTimeField()
     check_out = models.DateTimeField()
     guest_name = models.CharField(max_length=100)
     guest_email = models.EmailField()
     
     # Nouveaux champs
-    platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES, null=True)
-    reservation_status = models.CharField(max_length=20, 
-                                          choices=RESERVATION_STATUS, default='pending')
+    platform = models.CharField(max_length=20, 
+                                choices=PlatformChoices.choices, 
+                                default=PlatformChoices.AIRBNB, null=True)
     number_of_guests = models.PositiveIntegerField(validators=[MinValueValidator(1)], 
                                                    default=1)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -87,10 +114,43 @@ class Reservation(models.Model):
         duration = self.get_duration()
         return (self.property.price_per_night * duration) + self.cleaning_fee + self.service_fee
 
-    def save(self, *args, **kwargs):
+    def clean(self):
+        """
+        Cette méthode vérifie la validité du statut de la réservation par rapport aux dates importantes.
+        """
+        aujourdhui = timezone.now()
+
+
         if self.check_in > self.check_out :
             raise ValidationError("choisir une date d'entree inferieur a la date de check_out !!")
-        ##
+        
+        # Vérification des statuts incohérents avec la date actuelle et les dates de check-in/check-out
+        if self.check_out and aujourdhui > self.check_out:
+            if self.reservation_status == ResaStatus.PENDING:
+                raise ValidationError("Le statut 'PENDING' est impossible si la date actuelle est après le check-out.")
+            if self.reservation_status == ResaStatus.CONFIRMED:
+                raise ValidationError("Le statut 'CONFIRMED' est impossible après la date de check-out.")
+            if self.reservation_status == ResaStatus.CHECKED_IN:
+                raise ValidationError("Le statut 'CHECKED_IN' est impossible après la date de check-out.")
+
+        if self.check_in and aujourdhui > self.check_in and self.reservation_status == ResaStatus.PENDING:
+            raise ValidationError("Le statut 'PENDING' est impossible si la date actuelle est après la date de check-in.")
+        
+        if self.reservation_status == ResaStatus.CHECKED_OUT and aujourdhui < self.check_out:
+            raise ValidationError("Le statut 'CHECKED_OUT' ne peut pas être défini avant le check-out.")
+
+        if self.reservation_status == ResaStatus.EXPIRED and aujourdhui <= self.check_out:
+            raise ValidationError("Le statut 'EXPIRED' ne peut être défini que si la date de check-out est passée.")
+
+    def save(self, *args, **kwargs):
+        """
+        Surcharge de la méthode `save()` pour inclure la validation avant la sauvegarde.
+        """
+        # Appel de la méthode clean() pour valider les règles métier
+        ##self.clean()
+        #raise ValidationError("quelle est le status ", self.reservation_status)
+        super().save(*args, **kwargs)
+##
         if not self.total_price:
             self.total_price = self.calculate_total_price()
         try :
@@ -125,26 +185,20 @@ class Employee(models.Model):
         return f"{self.name} - {self.get_role_display()}"
 
 class ServiceTask(models.Model):
-    class TaskStatus(models.TextChoices):
-        PENDING = 'PEND', _('Pending')
-        IN_PROGRESS = 'PROG', _('In progress')
-        COMPLETED = 'COMP', _('Completed')
-    
-    class TypeService(models.TextChoices):
-        CHECK_IN = 'CKIN', _('Check_in')
-        CHECK_OUT = 'CKOU', _('Check_out')
-        CLEANING = 'CLEAN', _('Cleanning')
-        MAINTENANCE = 'MAINT', _('Maintenance')
-        ERROR = 'ERROR', _('Affectation en erreur !')
-    
-    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name='%(class)s_tasks')
-    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='%(class)s_tasks')
-    reservation = models.ForeignKey(Reservation, on_delete=models.SET_NULL, null=True, related_name='%(class)s_tasks')
+   
+    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, 
+                                 null=True, related_name='%(class)s_tasks')
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, 
+                                 related_name='%(class)s_tasks')
+    reservation = models.ForeignKey(Reservation, null=True, on_delete=models.CASCADE,
+                                    related_name='%(class)s_tasks')
     description = models.TextField()
     start_date  = models.DateTimeField()
     end_date    = models.DateTimeField()
-    status = models.CharField(max_length=20, choices=TaskStatus.choices, default=TaskStatus.PENDING)
-    type_service = models.CharField(max_length=20, choices=TypeService.choices, default=TypeService.CHECK_IN)
+    status = models.CharField(max_length=20, choices=ResaStatus.choices, 
+                              default=ResaStatus.PENDING)
+    type_service = models.CharField(max_length=20, choices=TaskTypeService.choices, 
+                                    default=TaskTypeService.CHECKED_IN)
     completed = models.BooleanField(default=False)
     
     class Meta:
@@ -156,10 +210,7 @@ class ServiceTask(models.Model):
 
     def mark_as_completed(self):
         self.completed = True
-        self.save()
-    
-    def mark_as_completed(self):
-        self.completed = True
+        self.status = self.TaskStatus.COMPLETED
         self.save()
 
         

@@ -115,13 +115,23 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 @admin.register(ServiceTask)
 class ServiceTaskAdmin(admin.ModelAdmin):
-    list_display = ('description', 'get_client', 'reservation', 'employee', 'start_date', 'end_date')
+    list_display = ('get_description', 'get_client', 'get_guestname',
+                    'employee', 'start_date', 'end_date', 'reservation', )
     #list_filter = ('scheduled_time', 'employee')
     search_fields = ('property__client', 'employee__name')
+    list_filter = ('property', 'employee', 'start_date')
 
     def get_client(self, obj):
         return obj.property
     get_client.short_description = 'Client'
+    
+    def get_description(self, obj):
+        return obj.description[:20]
+    
+    def get_guestname(self, obj):
+        # ServiceTask.objects.filter(reservation__guest_name__isnull=True).exists()
+        return obj.reservation.guest_name if obj.reservation else 'No guest name'
+      
 
 # Personnalisation de l'admin pour Calendar et Event
 class CalendarAdmin(admin.ModelAdmin):

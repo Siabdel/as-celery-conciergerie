@@ -159,12 +159,12 @@ def assign_tasks_from_reservations_with_balancing(year, month):
     ## ---------------------
     def create_task_default(reservation):
         task = serv_models.ServiceTask.objects.create(
+            reservation=reservation,
             employee=None,
             description=f"Erreur Impossible d'assigner un employé pour le check-in à {reservation.check_in}",
             type_service="ERROR",
             start_date=reservation.check_in,
             end_date=reservation.check_out + timedelta(hours=1),
-            reservation=reservation,
             property=reservation.property, # Associer la tâche à la réservation
         )
         return task
