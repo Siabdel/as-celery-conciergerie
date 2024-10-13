@@ -1,14 +1,19 @@
 
-from rest_framework import viewsets
-from .models import Employee, Reservation, ServiceTask
+from datetime import datetime, timedelta
 from schedule.models import Calendar, Event
-from rest_framework import viewsets, permissions
 from services_menage import serializers 
 from django.utils.dateparse import parse_datetime
 from django.http import JsonResponse
-from rest_framework import generics
 from django_celery_beat.models import PeriodicTask
 from .serializers import PeriodicTaskSerializer
+# DRF api rest
+from rest_framework import viewsets, permissions, generics
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+## 
+from services_menage.models import Employee, Reservation, ServiceTask
+from services_menage.serializers import TaskSerializer
+from django.utils.dateparse import parse_date
 
 class PeriodicTaskListCreate(generics.ListCreateAPIView):
     queryset = PeriodicTask.objects.all()
@@ -83,3 +88,49 @@ class PeriodicTaskListCreate(generics.ListCreateAPIView):
     queryset = PeriodicTask.objects.all()
     serializer_class = PeriodicTaskSerializer
  
+
+
+@api_view(['GET'])
+def get_employee_tasks(request):
+    """
+    API pour obtenir le planning des tâches d'un ou plusieurs employés pour une semaine ou un mois donné.
+    Paramètres de requête possibles :
+    - employee_id : ID d'un employé spécifique (optionnel, si non fourni, on renvoie pour tous les employés)
+    - year : Année concernée (obligatoire)
+    - month : Mois concerné (optionnel, pour filtrer par mois)
+    - week : Numéro de la semaine (optionnel, pour filtrer par semaine)
+    """
+    
+    # Récupérer les paramètres de requête
+    employee_id = request.query_params.get('employee_id', None)
+    year = request.query_params.get('year', None)
+    month = request.query_params.get('month', None)
+    week = request.query_params.get('week', None)
+    
+    if not year:
+        return Response({"error": "Le paramètre 'year' est obligatoire."}, status=400)
+    
+    # Filtrer les tâches par année
+    tasks = ServiceTask.objects.filter(start_date__year=year)
+
+    # Filtrer par mois si le paramètre est fourni
+    if month:
+        tasks = tasks.filter(start_date__month=month)
+
+    # Filtrer par semaine si le paramètre est fourni
+    if week:
+        # Calculer les dates de début et de fin de la semaine
+        first_day_of_year = datetime(int(year), 1, 1)
+        start_of_week = first_day_of_year + timedelta(weeks=int(week) - 1, days=-first_day_of_year.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+        
+        tasks = tasks.filter(start_date__date__range=[start_of_week.date(), end_of_week.date()])
+
+    # Filtrer par employé si un ID est fourni
+    if employee_id:
+        tasks = tasks.filter(employee__id=employee_id)
+
+    # Sérialiser les tâches
+    serializer = TaskSerializer(tasks, many=True)
+    
+    return Response(serializer.data)

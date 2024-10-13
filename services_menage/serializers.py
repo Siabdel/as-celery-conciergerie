@@ -1,8 +1,10 @@
 
 from rest_framework import serializers
-from .models import Employee, Reservation, ServiceTask
 from schedule.models import Calendar, Event
 from django_celery_beat.models import PeriodicTask
+from services_menage.models import Employee, Reservation, ServiceTask
+from services_menage.models import ResaStatus, TaskTypeService
+
 class CustomPeriodicTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = PeriodicTask
@@ -108,13 +110,13 @@ class ServiceTaskSerializer(serializers.ModelSerializer):
 
     def get_title(self, obj):
         if obj.type_service and obj.property and obj.employee:
-            if obj.type_service == 'CKIN':    
+            if obj.type_service == TaskTypeService.CHECKED_IN :    
                 return f"Check-in for {obj.property.name} by {obj.employee.name}"
-            elif obj.type_service == 'CKOUT':
+            elif obj.type_service == TaskTypeService.CHECKED_OUT :
                 return f"Check-out for {obj.property.name} by {obj.employee.name}"
-            elif obj.type_service == 'CLEAN':
+            elif obj.type_service == TaskTypeService.CLEANING : 
                 return f"Cleaning for {obj.property.name} by {obj.employee.name}"
-            elif obj.type_service == 'ERROR':
+            elif obj.type_service == TaskTypeService.ERROR:
                 return f"Erreur Impossible d'assigner un employé pour le {obj.type_service} à {obj.start_date}",
             else:
                 return obj.description[:20]
@@ -122,3 +124,10 @@ class ServiceTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceTask
         fields = ['id', 'title', 'type_service', 'employee', 'reservation', 'employee', 'property', 'start', 'end', ]
+
+
+class TaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServiceTask
+        fields = ['id', 'description', 'start_date', 'end_date', 'employee', 'reservation']
+        depth = 1  # Optionnel, si vous souhaitez inclure les détails des relations (employee, reservation)

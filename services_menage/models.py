@@ -142,6 +142,9 @@ class Reservation(models.Model):
         if self.reservation_status == ResaStatus.EXPIRED and aujourdhui <= self.check_out:
             raise ValidationError("Le statut 'EXPIRED' ne peut être défini que si la date de check-out est passée.")
 
+        if self.reservation_status == ResaStatus.COMPLETED and aujourdhui <= self.check_out:
+            raise ValidationError("Le statut 'COMPLETED' ne peut être défini que si la date de check-out n'est pas passée.")
+
     def save(self, *args, **kwargs):
         """
         Surcharge de la méthode `save()` pour inclure la validation avant la sauvegarde.

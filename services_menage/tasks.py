@@ -1,6 +1,6 @@
 
 import pandas as  pd
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from django.db.models import Q
 from django.utils import timezone
 from celery import shared_task
@@ -8,7 +8,10 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from schedule.models.calendars import Calendar
 from services_menage import models as serv_models
-from .models import Employee,  ServiceTask, Reservation, Absence
+from datetime import datetime
+from services_menage.models import Employee, Reservation, ServiceTask, Absence 
+from services_menage.models import ResaStatus, TaskTypeService
+
 
 
 @shared_task
@@ -125,12 +128,6 @@ en se basant sur le models.py ci-joint :
 avec pandas , trouver les employee dispos pour un mois donnee en tenant compte des absences 
 , service_task programmées
 """    
-import pandas as pd
-from datetime import datetime
-from django.utils import timezone
-from schedule.models import Event
-from .models import Employee, Reservation, ServiceTask, Absence, Property
-
 def calculate_employee_availability(year, month):
     # Définir la période
     start_date = datetime(year, month, 1)
@@ -226,3 +223,58 @@ def analyze_availability(year, month):
 # Utilisation
 # results = analyze_availability(2024, 1)
 # print(results)
+
+def cron_update_reservation_status(reservation):
+    aujourdhui = timezone.now()
+    mois_encours = aujourdhui.month
+    # pendre que les resa a partir du mois encours 
+    reservations = Reservation.objects.filter(check_in__month = mois_encours)
+    #update status tout les mois_encours
+    for resa in reservations:
+        update_reservation_status(resa)
+
+def update_reservation_status(reservation):
+
+    aujourdhui = timezone.now()
+
+    # Si la réservation est annulée, c'est prioritaire sur tous les autres statuts
+    if hasattr(reservation, 'cancelled_at') and reservation.cancelled_at is not None:
+        reservation.reservation_status = ResaStatus.CANCELLED
+        return  # On arrête ici pour ne pas continuer à changer le statut
+
+    # Grace period (période de grâce) pour certains statuts
+    grace_period = timezone.timedelta(hours=2)
+
+    # Si la réservation est "PENDING" (en attente)
+    if reservation.reservation_status == ResaStatus.PENDING:
+        if aujourdhui >= (reservation.check_in + grace_period):
+            reservation.reservation_status = ResaStatus.NEEDS_ATTENTION
+            # Envoyer une notification à l'équipe de gestion
+            #send_notification_to_management(reservation)
+        elif aujourdhui >= (reservation.check_in + timezone.timedelta(hours=24)):
+            reservation.reservation_status = ResaStatus.EXPIRED
+
+    # Si la réservation est "CONFIRMED" (confirmée)
+    elif reservation.reservation_status == ResaStatus.CONFIRMED:
+        if reservation.check_in <= aujourdhui < reservation.check_out:
+            reservation.reservation_status = ResaStatus.CHECKED_IN
+
+    # Si la réservation est "CHECKED_IN" (en cours)
+    elif reservation.reservation_status == ResaStatus.CHECKED_IN or \
+            reservation.reservation_status == ResaStatus.IN_PROGRESS :
+        if aujourdhui >= reservation.check_out:
+            reservation.reservation_status = ResaStatus.CHECKED_OUT
+
+    # Si la réservation est "CHECKED_OUT" (terminée)
+    elif reservation.reservation_status == ResaStatus.CHECKED_OUT:
+        if aujourdhui >= (reservation.check_out + timezone.timedelta(hours=24)):
+            reservation.reservation_status = ResaStatus.COMPLETED
+
+    # Si la réservation est "IN_PROGRESS" et que la date de check-out est dépassée
+    elif reservation.reservation_status == ResaStatus.IN_PROGRESS and reservation.check_out < aujourdhui:
+        reservation.reservation_status = ResaStatus.EXPIRED
+    elif not reservation.reservation_status :
+        reservation.reservation_status = ResaStatus.PENDING
+
+    # Si le statut est "EXPIRED", on ne le change pas
+    # L'expiration n'est pas réversible à ce stade.

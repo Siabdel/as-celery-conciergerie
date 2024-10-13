@@ -1,12 +1,11 @@
-[2024-10-08 11:26:39,649: INFO/MainProcess] beat: Starting...
-[2024-10-08 11:26:39,691: INFO/MainProcess] Scheduler: Sending due task create-events-daily (services_menage.tasks.service_checkin_task)
+[2024-10-12 13:25:34,044: INFO/MainProcess] beat: Starting...
  
  -------------- celery@debian-hpelite v5.4.0 (opalescent)
 --- ***** ----- 
--- ******* ---- Linux-5.10.0-32-amd64-x86_64-with-glibc2.31 2024-10-08 11:26:39
+-- ******* ---- Linux-5.10.0-32-amd64-x86_64-with-glibc2.31 2024-10-12 13:25:34
 - *** --- * --- 
 - ** ---------- [config]
-- ** ---------- .> app:         conciergerie:0x7f8ddf793f10
+- ** ---------- .> app:         conciergerie:0x7f0e8662eeb0
 - ** ---------- .> transport:   redis://localhost:6379//
 - ** ---------- .> results:     redis://localhost:6379/
 - *** --- * --- .> concurrency: 4 (prefork)
@@ -21,30 +20,33 @@
   . services_menage.tasks.service_checkin_task
   . services_menage.tasks.service_menage_task
 
-[2024-10-08 11:26:39,982: INFO/MainProcess] Connected to redis://localhost:6379//
-[2024-10-08 11:26:39,987: INFO/MainProcess] mingle: searching for neighbors
-[2024-10-08 11:26:40,996: INFO/MainProcess] mingle: all alone
-[2024-10-08 11:26:41,012: INFO/MainProcess] celery@debian-hpelite ready.
-[2024-10-08 11:26:41,015: INFO/MainProcess] Task services_menage.tasks.service_checkin_task[8570a89c-d851-4e54-94b3-df6027348337] received
-[2024-10-08 11:26:41,092: INFO/ForkPoolWorker-4] Task services_menage.tasks.service_checkin_task[8570a89c-d851-4e54-94b3-df6027348337] succeeded in 0.0759052299981704s: None
-[I 241008 11:26:50 command:168] Visit me at http://0.0.0.0:5555
-[I 241008 11:26:50 command:176] Broker: redis://localhost:6379//
-[I 241008 11:26:50 command:177] Registered tasks: 
-    ['celery.accumulate',
-     'celery.backend_cleanup',
-     'celery.chain',
-     'celery.chord',
-     'celery.chord_unlock',
-     'celery.chunks',
-     'celery.group',
-     'celery.map',
-     'celery.starmap',
-     'services_menage.tasks.faire_etat_des_lieu_appart',
-     'services_menage.tasks.service_checkin_task',
-     'services_menage.tasks.service_menage_task']
-[I 241008 11:26:50 mixins:228] Connected to redis://localhost:6379//
-/home/django/Depots/www/Back-end/Django/envCeleryConciergerie/lib/python3.9/site-packages/celery/app/control.py:56: DuplicateNodenameWarning: Received multiple replies from node name: celery@debian-hpelite.
-Please make sure you give each node a unique nodename using
-the celery worker `-n` option.
-  warnings.warn(DuplicateNodenameWarning(
-[2024-10-08 11:26:55,539: INFO/MainProcess] Events of group {task} enabled by remote.
+[2024-10-12 13:25:34,597: INFO/MainProcess] Connected to redis://localhost:6379//
+[2024-10-12 13:25:34,601: INFO/MainProcess] mingle: searching for neighbors
+[2024-10-12 13:25:35,609: INFO/MainProcess] mingle: all alone
+[2024-10-12 13:25:35,625: INFO/MainProcess] celery@debian-hpelite ready.
+[2024-10-13 06:15:17,274: INFO/MainProcess] Scheduler: Sending due task update-resa-status (services_menage.tasks.cron_update_reservation_status)
+[2024-10-13 06:15:17,284: INFO/MainProcess] Scheduler: Sending due task create-events-daily (services_menage.tasks.service_checkin_task)
+[2024-10-13 06:15:17,287: INFO/MainProcess] Task services_menage.tasks.service_checkin_task[d0886bd2-c3cc-45d0-937d-94d5a2170cb7] received
+[2024-10-13 06:15:17,470: INFO/ForkPoolWorker-4] Task services_menage.tasks.service_checkin_task[d0886bd2-c3cc-45d0-937d-94d5a2170cb7] succeeded in 0.1626399679807946s: None
+[2024-10-13 06:15:23,134: ERROR/MainProcess] Received unregistered task of type 'services_menage.tasks.cron_update_reservation_status'.
+The message has been ignored and discarded.
+
+Did you remember to import the module containing this task?
+Or maybe you're using relative imports?
+
+Please see
+https://docs.celeryq.dev/en/latest/internals/protocol.html
+for more information.
+
+The full contents of the message body was:
+b'[[], {}, {"callbacks": null, "errbacks": null, "chain": null, "chord": null}]' (77b)
+
+The full contents of the message headers:
+{'lang': 'py', 'task': 'services_menage.tasks.cron_update_reservation_status', 'id': '0593fc30-ddb7-41fc-af7a-8b8f900d9c3b', 'shadow': None, 'eta': None, 'expires': None, 'group': None, 'group_index': None, 'retries': 0, 'timelimit': [None, None], 'root_id': '0593fc30-ddb7-41fc-af7a-8b8f900d9c3b', 'parent_id': None, 'argsrepr': '()', 'kwargsrepr': '{}', 'origin': 'gen651181@debian-hpelite', 'ignore_result': False, 'replaced_task_nesting': 0, 'stamped_headers': None, 'stamps': {}}
+
+The delivery info for this task is:
+{'exchange': '', 'routing_key': 'celery'}
+Traceback (most recent call last):
+  File "/home/django/Depots/www/Back-end/Django/envCeleryConciergerie/lib/python3.9/site-packages/celery/worker/consumer/consumer.py", line 659, in on_task_received
+    strategy = strategies[type_]
+KeyError: 'services_menage.tasks.cron_update_reservation_status'

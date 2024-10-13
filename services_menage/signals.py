@@ -60,7 +60,7 @@ def update_reservation_status(sender, instance, **kwargs):
             instance.reservation_status = ResaStatus.NEEDS_ATTENTION
             # Envoyer une notification à l'équipe de gestion
             #send_notification_to_management(instance)
-        elif aujourdhui >= (instance.check_in - timezone.timedelta(hours=24)):
+        elif aujourdhui >= (instance.check_in + timezone.timedelta(hours=24)):
             instance.reservation_status = ResaStatus.EXPIRED
 
     # Si la réservation est "CONFIRMED" (confirmée)
@@ -69,7 +69,8 @@ def update_reservation_status(sender, instance, **kwargs):
             instance.reservation_status = ResaStatus.CHECKED_IN
 
     # Si la réservation est "CHECKED_IN" (en cours)
-    elif instance.reservation_status == ResaStatus.CHECKED_IN:
+    elif instance.reservation_status == ResaStatus.CHECKED_IN or \
+            instance.reservation_status == ResaStatus.IN_PROGRESS :
         if aujourdhui >= instance.check_out:
             instance.reservation_status = ResaStatus.CHECKED_OUT
 
@@ -81,6 +82,10 @@ def update_reservation_status(sender, instance, **kwargs):
     # Si la réservation est "IN_PROGRESS" et que la date de check-out est dépassée
     elif instance.reservation_status == ResaStatus.IN_PROGRESS and instance.check_out < aujourdhui:
         instance.reservation_status = ResaStatus.EXPIRED
+    elif not instance.reservation_status :
+        instance.reservation_status = ResaStatus.PENDING
+        
+        
 
     # Si le statut est "EXPIRED", on ne le change pas
     # L'expiration n'est pas réversible à ce stade.

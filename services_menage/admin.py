@@ -1,22 +1,26 @@
 # Register your models here.
-from django.contrib import admin
 import json
+from django.contrib import admin
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 from django.db.models import Count, Sum
 from django.db import models, IntegrityError
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
-from .models import Reservation, Employee, ServiceTask, Property, Absence   
+from services_menage import models as cg_models
 # celery
-from django.utils.timezone import now
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
-from .models import Reservation
-from .tasks import service_menage_task
-##
 from schedule.models import Calendar, Event
+from django.db.models import Count, Sum
+from django.utils.html import format_html
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
+from import_export import resources, fields, widgets
 
-@admin.register(Property)
+
+
+@admin.register(cg_models.Property)
 class PropertyAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'address', 'owner', 'reservation_count', 'total_revenue')
     list_filter = ('type', 'owner')
@@ -62,8 +66,29 @@ def duplicate_reservation(modeladmin, request, queryset):
         #
 
 
-@admin.register(Reservation)
-class ReservationAdmin(admin.ModelAdmin):
+class ReservationResource(resources.ModelResource):
+    property_name = fields.Field(column_name='property_name', 
+                                 attribute='property', 
+                                 widget=widgets.ForeignKeyWidget(cg_models.Property, 'name'))
+    class Meta:
+        model = cg_models.Reservation
+        fields = ('id', 'property', 'start_date', 'end_date', 'guest_name', 'guest_email', 'number_of_guests', 'total_price')
+        export_order = fields
+   
+        
+    def before_import_row(self, row, **kwargs):
+        # Logique personnalisée avant l'import de chaque ligne
+        pass
+
+    def after_import_row(self, row, row_result, **kwargs):
+        # Logique personnalisée après l'import de chaque ligne
+        pass
+    
+
+@admin.register(cg_models.Reservation)
+class ReservationAdmin(ImportExportModelAdmin):
+    resource_class = ReservationResource
+    #
     list_display = ('property', 'guest_name', 'check_in', 'check_out', 'reservation_status', 'total_price')
     list_filter = ('reservation_status', 'property', 'check_in')
     search_fields = ('guest_name', 'guest_email', 'property__name')
@@ -102,9 +127,8 @@ class ReservationAdmin(admin.ModelAdmin):
         return response
 
 
-    actions = [duplicate_reservation]  # Ajoutez l'action ici
 
-@admin.register(Employee)
+@admin.register(cg_models.Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('name', 'get_calendar_name')
     search_fields = ('name',)
@@ -113,7 +137,7 @@ class EmployeeAdmin(admin.ModelAdmin):
         return obj.calendar.name if obj.calendar else "Pas de calendrier"
     get_calendar_name.short_description = 'Calendrier'
 
-@admin.register(ServiceTask)
+@admin.register(cg_models.ServiceTask)
 class ServiceTaskAdmin(admin.ModelAdmin):
     list_display = ('get_description', 'get_client', 'get_guestname',
                     'employee', 'start_date', 'end_date', 'reservation', )
@@ -144,7 +168,7 @@ class EventAdmin(admin.ModelAdmin):
     list_filter = ('start', 'end', 'calendar')
     search_fields = ('title',)
 
-@admin.register(Absence)
+@admin.register(cg_models.Absence)
 class AbsenceAdmin(admin.ModelAdmin):
     list_display = ('get_employee', 'start_date', 'end_date', 'type_absence', )
     list_filter = ('start_date', )

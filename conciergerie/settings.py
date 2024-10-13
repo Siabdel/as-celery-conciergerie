@@ -57,6 +57,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+     ## import / Export
+    'import_export',
     # 3rd-party apps
     'rest_framework', # new
     'rest_framework.authtoken',
@@ -233,6 +235,11 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'services_menage.tasks.service_checkin_task',
         'schedule': crontab(hour=22, minute=18),
         #'schedule': crontab(minute='*/1'),  # Exécute toutes les 10 minutes
+    },
+    'update-resa-status': {
+        'task': 'services_menage.tasks.cron_update_reservation_status',
+        #'schedule': crontab(minute='*/1'),  # Exécute toutes les 10 minutes
+        'schedule': crontab(hour=22, minute=18),
     },
 }
 
