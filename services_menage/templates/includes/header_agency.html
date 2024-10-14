@@ -1,0 +1,27 @@
+{% load static %}
+<!-- Header -->
+<style>
+  .banner-background {
+    height: 500px;
+    background-image: url('{% static header_bg_image %}');
+    background-size: cover;
+    background-repeat: no-repeat;
+    color: #333 !important;
+  }
+</style>
+
+<header>
+<div>
+    <div class="banner-background">
+        <div class="intro-text">
+            <div class="monstyle-italique text-light"> 
+                <h1> {{ banner_title }} </h1>
+            </div>
+            <div class="monstyle-italique text-light">
+                <h3> {{  banner_subtitle }} </h3>
+            </div>
+            <a href="/"  role="@todo" class="btn btn-primary btn-lg">AS-SHOPY</a>
+        </div>
+    </div>
+</div>
+</header>

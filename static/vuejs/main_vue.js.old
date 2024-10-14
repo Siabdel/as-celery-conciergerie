@@ -1,0 +1,136 @@
+var eventBus = new Vue()
+
+Vue.component(
+  'product-tabs',
+  {
+    props : {
+      reviews:{
+        type:Array,
+        requierd:false
+      }
+    },
+
+    data : function() {
+        return {
+        tabs : ['Reviews', 'Make review'],
+        selectedTab : 'Reviews',
+        activeTab : 'text-warning'
+      }
+    },
+
+    template : `
+  <div>
+		<span class="tabs" v-for="(tab, index) in tabs"
+              :key="index"
+              :class="{activeTab: tab===selectedTab}"
+              @click="selectedTab=tab" > <A hre="#"> ** {{tab}} ** </A>
+		</span>
+
+    <div v-show="selectedTab==='Reviews'">
+      <ul>
+        <li>of en retard </li>
+        <li>of lancés</li>
+      </ul>
+    </div>
+
+   </div>
+`
+
+  }
+)
+
+// composant produit
+Vue.component(  'product-item',
+{
+  props : {
+    article: Object,
+  },
+
+  methods: {
+     emitAddToCart(id) {
+          console.info("event add_to_card a été emit" + id)
+          eventBus.$emit("add_to_card",  id)
+      },
+
+      emitDelToCart() {
+
+          this.cart = this.cart > 0 ?  this.cart - 1 : 0
+      },
+      emitUpdateProduct(img) {
+          //console.info("image avant " + this.image)
+
+          this.image = img
+          //console.info("image " + img)
+      }
+  },
+
+  data : function(){
+    return {
+        reviews : [],
+        selectedArt  : this.selectedArt,
+        image : this.image,
+        cart : this.cart,
+        id : this.id,
+          }
+  },
+
+
+  template : "#prod_template"
+})
+
+//import axios from 'axios';
+
+var app = new Vue({
+    el: '#app',
+    delimiters: ['[[', ']]'],
+    data : {
+      counter: 0,
+      clients :[],
+      products_of : [],
+      message : "Bonjour à tous !!!**",
+      // panier cart
+      cart: [],
+      show_cart :false,
+    },  // fin data
+
+    methods: {
+        delToCart() {
+            this.cart = this.cart > 0 ?  this.cart - 1 : 0
+        },
+        updateProduct(img) {
+            this.image = img
+        }
+    },
+
+    mounted : function(id){
+      eventBus.$on('add_to_card', id => { this.cart.push(id)   , console.info("event add_to_card a été reçu " + id)} )
+      //fetch("https://api.myjson.com/bins/74l63").then(response => response.json())
+    },
+
+    mounted : function(){
+
+      var url = "/of/api/api_get_ofmonth/02/19/"
+
+      // fetch
+
+      fetch(url)
+      .then((response) => {
+        this.products_of = response
+        console.log("api fetch macthe data  !!" + this.products_of)
+        return response.json()
+      })
+      .then( (data) => {
+        this.products_of = data
+        console.log("api fetch macthe data  !!" + this.products_of )
+        return data;
+      })
+      .catch((err) =>{
+        console.error("erreur api fetch  !!" + err.message)
+      })
+
+      // axiom ajax
+      // axios .get(url) .then(response => ( this.products_of = response.data))
+
+    } // fin mounted
+
+});// fin de view

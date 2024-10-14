@@ -13,6 +13,8 @@ from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from collections import defaultdict
 
 
+def home(request):
+    return render(request, "home_page.html")
 
 ## Calendar reservations
 def calendar_reservation(request):

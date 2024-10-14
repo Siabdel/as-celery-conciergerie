@@ -10,11 +10,11 @@ from services_menage import models as serv_models
         
 # 5. Utilisez des signaux pour automatiser la création d'événements :
 
-@receiver(post_save, sender=serv_models.Reservation)
+## @receiver(post_save, sender=serv_models.Reservation)
 def reservation_created(sender, instance, created, **kwargs):
     if created:
         # Obtenir la date actuelle
-        date_actuelle = datetime.aujourdhui()
+        date_actuelle = timezone.aujourdhui()
         # Obtenir le dernier jour de l'année en cours
         fin_annee = datetime(date_actuelle.year, 12, 31)
         # Initialiser la date du mois en cours
@@ -37,12 +37,7 @@ def creer_tache_nettoyage(sender, instance, created, **kwargs):
 """ 
 
 
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
-from django.utils import timezone
-from .models import Reservation, ResaStatus
-
-@receiver(pre_save, sender=Reservation)
+##@receiver(pre_save, sender=Reservation)
 def update_reservation_status(sender, instance, **kwargs):
     aujourdhui = timezone.now()
 

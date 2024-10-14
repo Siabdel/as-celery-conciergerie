@@ -50,3 +50,23 @@ Traceback (most recent call last):
   File "/home/django/Depots/www/Back-end/Django/envCeleryConciergerie/lib/python3.9/site-packages/celery/worker/consumer/consumer.py", line 659, in on_task_received
     strategy = strategies[type_]
 KeyError: 'services_menage.tasks.cron_update_reservation_status'
+[I 241014 16:17:14 command:168] Visit me at http://0.0.0.0:5555
+[I 241014 16:17:14 command:176] Broker: redis://localhost:6379//
+[I 241014 16:17:14 command:177] Registered tasks: 
+    ['celery.accumulate',
+     'celery.backend_cleanup',
+     'celery.chain',
+     'celery.chord',
+     'celery.chord_unlock',
+     'celery.chunks',
+     'celery.group',
+     'celery.map',
+     'celery.starmap',
+     'services_menage.tasks.faire_etat_des_lieu_appart',
+     'services_menage.tasks.service_checkin_task',
+     'services_menage.tasks.service_menage_task']
+[I 241014 16:17:14 mixins:228] Connected to redis://localhost:6379//
+/home/django/Depots/www/Back-end/Django/envCeleryConciergerie/lib/python3.9/site-packages/celery/app/control.py:56: DuplicateNodenameWarning: Received multiple replies from node name: celery@debian-hpelite.
+Please make sure you give each node a unique nodename using
+the celery worker `-n` option.
+  warnings.warn(DuplicateNodenameWarning(

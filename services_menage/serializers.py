@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from schedule.models import Calendar, Event
 from django_celery_beat.models import PeriodicTask
-from services_menage.models import Employee, Reservation, ServiceTask
+from services_menage.models import Employee, Reservation, ServiceTask, Property
 from services_menage.models import ResaStatus, TaskTypeService
 
 class CustomPeriodicTaskSerializer(serializers.ModelSerializer):
@@ -16,12 +16,18 @@ class CalendarSerializer(serializers.ModelSerializer):
         model = Calendar
         fields = ['id', 'name', 'slug']
 
+class PropertySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Property
+        fields = '__all__'
+        fields__ = ['id', 'name', 'type', 'adresse', 'owner', 'price_per_night',]
+
 class EmployeeSerializer(serializers.ModelSerializer):
     calendar = CalendarSerializer(read_only=True)
 
     class Meta:
         model = Employee
-        fields = ['id', 'name', 'calendar']
+        fields = ['id', 'name', 'user', 'phone_number', 'calendar']
 
 class EventSerializer(serializers.ModelSerializer):
     
@@ -86,7 +92,8 @@ class ReservationSerializer(serializers.ModelSerializer):
  
     class Meta:
         model = Reservation
-        fields = [ 'id', 'title', 'start', 'end', 'guest_name', 'guest_email', 
+        fields = '__all__'
+        fields__ = [ 'id', 'title', 'start', 'end', 'guest_name', 'guest_email', 
                   'check_in', 'check_out', 'property',  
                   'reservation_status', 'number_of_guests', 'total_price',
                   ]

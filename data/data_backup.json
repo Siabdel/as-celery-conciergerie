@@ -1,0 +1,2246 @@
+[
+{
+  "model": "services_menage.property",
+  "pk": 1,
+  "fields": {
+    "name": "Appartement Centre-Ville",
+    "type": "apartment",
+    "address": "123 Rue Principale, Ville",
+    "owner": 1,
+    "price_per_night": "100.00"
+  }
+},
+{
+  "model": "services_menage.property",
+  "pk": 2,
+  "fields": {
+    "name": "Appartement Ain ZIT",
+    "type": "apartment",
+    "address": "123 Rue Principale, Ville",
+    "owner": 1,
+    "price_per_night": "100.00"
+  }
+},
+{
+  "model": "services_menage.property",
+  "pk": 3,
+  "fields": {
+    "name": "Villa Bord de Mer",
+    "type": "villa",
+    "address": "45 Avenue de la Plage, Ville Côtière",
+    "owner": 1,
+    "price_per_night": "250.00"
+  }
+},
+{
+  "model": "services_menage.property",
+  "pk": 5,
+  "fields": {
+    "name": "Appartement Five Centre-Ville",
+    "type": "apartment",
+    "address": "123 Rue Principale, Ville",
+    "owner": 1,
+    "price_per_night": "100.00"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 1,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 3,
+    "check_in": "2024-10-17T14:00:00",
+    "check_out": "2024-10-21T12:00:00",
+    "guest_name": "Alice Martin",
+    "guest_email": "alice@example.com",
+    "platform": "airbnb",
+    "number_of_guests": 2,
+    "total_price": "450.00",
+    "cleaning_fee": "50.00",
+    "service_fee": "20.00",
+    "guest_phone": "+33123456789",
+    "special_requests": "Vue sur la ville si possible",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "Flexible",
+    "booking_date": "2024-09-15T10:00:00"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 2,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 2,
+    "check_in": "2024-10-10T15:00:00",
+    "check_out": "2024-10-17T11:00:00",
+    "guest_name": "Bernard Dubois",
+    "guest_email": "bernard@example.com",
+    "platform": "booking",
+    "number_of_guests": 4,
+    "total_price": "1850.00",
+    "cleaning_fee": "100.00",
+    "service_fee": "50.00",
+    "guest_phone": "+33987654321",
+    "special_requests": "Lit bébé nécessaire",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "Modérée",
+    "booking_date": "2024-09-20T14:30:00"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 3,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 3,
+    "check_in": "2024-10-20T14:00:00",
+    "check_out": "2024-10-22T10:00:00",
+    "guest_name": "Claire Lefebvre",
+    "guest_email": "claire@example.com",
+    "platform": "direct",
+    "number_of_guests": 1,
+    "total_price": "220.00",
+    "cleaning_fee": "50.00",
+    "service_fee": "10.00",
+    "guest_phone": "+33654321987",
+    "special_requests": "",
+    "is_business_trip": true,
+    "guest_rating": null,
+    "cancellation_policy": "Stricte",
+    "booking_date": "2024-10-01T09:15:00"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 4,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 2,
+    "check_in": "2024-11-01T15:00:00",
+    "check_out": "2024-11-08T11:00:00",
+    "guest_name": "David Moreau",
+    "guest_email": "david@example.com",
+    "platform": "airbnb",
+    "number_of_guests": 6,
+    "total_price": "1950.00",
+    "cleaning_fee": "150.00",
+    "service_fee": "100.00",
+    "guest_phone": "+33123987456",
+    "special_requests": "Accès piscine demandé",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "Flexible",
+    "booking_date": "2024-10-05T11:30:00"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 5,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 2,
+    "check_in": "2024-11-10T14:00:00",
+    "check_out": "2024-11-15T10:00:00",
+    "guest_name": "Emilie Rousseau",
+    "guest_email": "emilie@example.com",
+    "platform": "AIRBNB",
+    "number_of_guests": 2,
+    "total_price": "550.00",
+    "cleaning_fee": "50.00",
+    "service_fee": "25.00",
+    "guest_phone": "+33789456123",
+    "special_requests": "Demande d'un étage élevé",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "Modérée",
+    "booking_date": "2024-10-20T16:45:00"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 6,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 2,
+    "check_in": "2024-11-20T15:00:00",
+    "check_out": "2024-11-27T11:00:00",
+    "guest_name": "François Dupuis",
+    "guest_email": "francois@example.com",
+    "platform": "direct",
+    "number_of_guests": 4,
+    "total_price": "1850.00",
+    "cleaning_fee": "100.00",
+    "service_fee": "50.00",
+    "guest_phone": "+33654789321",
+    "special_requests": "Demande de barbecue",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "Stricte",
+    "booking_date": "2024-11-01T10:00:00"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 7,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 1,
+    "check_in": "2024-12-01T14:00:00",
+    "check_out": "2024-12-05T10:00:00",
+    "guest_name": "Gabrielle Lemaire",
+    "guest_email": "gabrielle@example.com",
+    "platform": "airbnb",
+    "number_of_guests": 3,
+    "total_price": "470.00",
+    "cleaning_fee": "50.00",
+    "service_fee": "20.00",
+    "guest_phone": "+33123456780",
+    "special_requests": "Allergique aux acariens",
+    "is_business_trip": true,
+    "guest_rating": null,
+    "cancellation_policy": "Flexible",
+    "booking_date": "2024-11-15T14:20:00"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 8,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 2,
+    "check_in": "2024-12-10T15:00:00",
+    "check_out": "2024-12-17T11:00:00",
+    "guest_name": "Henri Bertrand",
+    "guest_email": "henri@example.com",
+    "platform": "booking",
+    "number_of_guests": 5,
+    "total_price": "1900.00",
+    "cleaning_fee": "150.00",
+    "service_fee": "100.00",
+    "guest_phone": "+33987654322",
+    "special_requests": "Demande de décoration de Noël",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "Modérée",
+    "booking_date": "2024-11-25T09:30:00"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 9,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 1,
+    "check_in": "2024-12-20T14:00:00",
+    "check_out": "2024-12-27T10:00:00",
+    "guest_name": "Isabelle Girard",
+    "guest_email": "isabelle@example.com",
+    "platform": "direct",
+    "number_of_guests": 2,
+    "total_price": "750.00",
+    "cleaning_fee": "50.00",
+    "service_fee": "30.00",
+    "guest_phone": "+33654321988",
+    "special_requests": "Demande d'un sapin de Noël",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "Stricte",
+    "booking_date": "2024-12-01T11:15:00"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 10,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 2,
+    "check_in": "2024-12-28T15:00:00",
+    "check_out": "2025-01-04T11:00:00",
+    "guest_name": "Jacques Mercier",
+    "guest_email": "jacques@example.com",
+    "platform": "airbnb",
+    "number_of_guests": 8,
+    "total_price": "2500.00",
+    "cleaning_fee": "200.00",
+    "service_fee": "150.00",
+    "guest_phone": "+33123987457",
+    "special_requests": "Demande de réveillon du Nouvel An",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "Stricte",
+    "booking_date": "2024-12-10T16:00:00"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 51,
+  "fields": {
+    "reservation_status": "NEED_ATTENTION",
+    "property": 1,
+    "check_in": "2024-10-08T11:27:36",
+    "check_out": "2024-10-10T18:00:00",
+    "guest_name": "Rayane",
+    "guest_email": "rayane@gmail.com",
+    "platform": "AIRBNB",
+    "number_of_guests": 1,
+    "total_price": "100.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-08T11:27:36.342"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 52,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 2,
+    "check_in": "2024-10-29T11:30:18",
+    "check_out": "2024-10-31T11:30:27",
+    "guest_name": "Rayane",
+    "guest_email": "rayane@gmail.com",
+    "platform": "airbnb",
+    "number_of_guests": 1,
+    "total_price": "333.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-08T11:42:03.513"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 53,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 3,
+    "check_in": "2024-11-01T11:47:04",
+    "check_out": "2024-11-05T11:47:20",
+    "guest_name": "Mehdi",
+    "guest_email": "mehdi@gmail.com",
+    "platform": "booking",
+    "number_of_guests": 1,
+    "total_price": "233.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-08T11:47:48.502"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 54,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 5,
+    "check_in": "2024-11-25T13:15:25",
+    "check_out": "2024-11-28T13:15:52",
+    "guest_name": "Yacine",
+    "guest_email": "Yacine@gmail.com",
+    "platform": "airbnb",
+    "number_of_guests": 1,
+    "total_price": "125.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-08T13:16:28.048"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 55,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 2,
+    "check_in": "2024-10-28T13:15:25",
+    "check_out": "2024-10-30T13:15:52",
+    "guest_name": "Abdel",
+    "guest_email": "abdel@gmail.com",
+    "platform": "airbnb",
+    "number_of_guests": 1,
+    "total_price": "125.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-08T13:31:48.466"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 56,
+  "fields": {
+    "reservation_status": "CONFIRMED",
+    "property": 2,
+    "check_in": "2024-12-01T15:52:39",
+    "check_out": "2024-12-04T15:52:50",
+    "guest_name": "Mehdi",
+    "guest_email": "mehdi@gmail.com",
+    "platform": "AIRBNB",
+    "number_of_guests": 1,
+    "total_price": "145.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-08T15:53:17.198"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 57,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 2,
+    "check_in": "2024-12-16T15:52:39",
+    "check_out": "2024-12-16T15:52:50",
+    "guest_name": "Mehdi",
+    "guest_email": "mehdi@gmail.com",
+    "platform": "airbnb",
+    "number_of_guests": 1,
+    "total_price": "144.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-08T15:55:51.941"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 58,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 1,
+    "check_in": "2024-12-06T15:52:39",
+    "check_out": "2024-12-10T15:52:50",
+    "guest_name": "Mehdi",
+    "guest_email": "mehdi@gmail.com",
+    "platform": "airbnb",
+    "number_of_guests": 1,
+    "total_price": "134.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-08T16:08:34.850"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 59,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 1,
+    "check_in": "2024-12-19T15:52:39",
+    "check_out": "2024-12-22T15:52:50",
+    "guest_name": "Rayane",
+    "guest_email": "rayane@gmail.com",
+    "platform": "airbnb",
+    "number_of_guests": 1,
+    "total_price": "134.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-08T16:12:45.339"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 60,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 1,
+    "check_in": "2024-12-05T15:52:39",
+    "check_out": "2024-12-09T15:52:50",
+    "guest_name": "Siham",
+    "guest_email": "siham@gmail.com",
+    "platform": "airbnb",
+    "number_of_guests": 1,
+    "total_price": "134.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-08T16:21:46.720"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 61,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 3,
+    "check_in": "2024-12-11T15:52:39",
+    "check_out": "2024-12-16T15:52:50",
+    "guest_name": "Yacine Ahmed",
+    "guest_email": "yacineah@gmail.com",
+    "platform": "airbnb",
+    "number_of_guests": 1,
+    "total_price": "99.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-08T17:19:38.809"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 63,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 2,
+    "check_in": "2024-12-03T15:52:39",
+    "check_out": "2024-12-06T15:52:50",
+    "guest_name": "Nadia Lamine",
+    "guest_email": "nadia@gmail.com",
+    "platform": "airbnb",
+    "number_of_guests": 1,
+    "total_price": "133.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-08T17:29:36.663"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 64,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 3,
+    "check_in": "2024-11-09T15:52:39",
+    "check_out": "2024-11-11T15:52:50",
+    "guest_name": "Albert Tom",
+    "guest_email": "albert@gmail.com",
+    "platform": "airbnb",
+    "number_of_guests": 1,
+    "total_price": "234.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-08T18:29:20.488"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 67,
+  "fields": {
+    "reservation_status": "INPROGESS",
+    "property": 1,
+    "check_in": "2024-11-28T13:15:25",
+    "check_out": "2024-11-30T13:15:52",
+    "guest_name": "Abdel",
+    "guest_email": "abdel@gmail.com",
+    "platform": "airbnb",
+    "number_of_guests": 1,
+    "total_price": "125.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-08T20:45:29.095"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 74,
+  "fields": {
+    "reservation_status": "COMPLETED",
+    "property": 2,
+    "check_in": "2024-10-09T06:07:14",
+    "check_out": "2024-10-14T06:07:31",
+    "guest_name": "Marie Gilbert",
+    "guest_email": "gmarie@gmail.com",
+    "platform": "AIRBNB",
+    "number_of_guests": 1,
+    "total_price": "177.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-09T06:11:27.094"
+  }
+},
+{
+  "model": "services_menage.reservation",
+  "pk": 75,
+  "fields": {
+    "reservation_status": "EXPIRED",
+    "property": 3,
+    "check_in": "2024-10-11T12:00:00",
+    "check_out": "2024-10-13T11:27:53",
+    "guest_name": "Isabelle robert",
+    "guest_email": "isa348@gmail.com",
+    "platform": "AIRBNB",
+    "number_of_guests": 1,
+    "total_price": "100.00",
+    "cleaning_fee": "0.00",
+    "service_fee": "0.00",
+    "guest_phone": "",
+    "special_requests": "",
+    "is_business_trip": false,
+    "guest_rating": null,
+    "cancellation_policy": "",
+    "booking_date": "2024-10-10T11:27:53.441"
+  }
+},
+{
+  "model": "services_menage.employee",
+  "pk": 1,
+  "fields": {
+    "name": "Mme Marie Therez",
+    "calendar": 2,
+    "user": 4,
+    "role": "cleaner",
+    "phone_number": "+212672870412",
+    "hire_date": "2024-10-03",
+    "is_active": true
+  }
+},
+{
+  "model": "services_menage.employee",
+  "pk": 2,
+  "fields": {
+    "name": "Mme Nazha Kattani",
+    "calendar": 2,
+    "user": 3,
+    "role": "cleaner",
+    "phone_number": "+212662870312",
+    "hire_date": "2024-10-03",
+    "is_active": true
+  }
+},
+{
+  "model": "services_menage.employee",
+  "pk": 3,
+  "fields": {
+    "name": "Amoucha Nadia",
+    "calendar": 2,
+    "user": 1,
+    "role": "maintenance",
+    "phone_number": "+212672870412",
+    "hire_date": "2024-10-01",
+    "is_active": true
+  }
+},
+{
+  "model": "services_menage.employee",
+  "pk": 4,
+  "fields": {
+    "name": "Abdelaziz SADQUAOUI",
+    "calendar": 2,
+    "user": 2,
+    "role": "cleaner",
+    "phone_number": "+33677870312",
+    "hire_date": "2024-10-08",
+    "is_active": true
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 890,
+  "fields": {
+    "employee": null,
+    "property": 2,
+    "reservation": 74,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-10-09 06:07:14",
+    "start_date": "2024-10-09T06:07:14",
+    "end_date": "2024-10-14T07:07:31",
+    "status": "PEND",
+    "type_service": "ERROR",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 891,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 74,
+    "description": "Check_out",
+    "start_date": "2024-10-14T06:07:31",
+    "end_date": "2024-10-14T07:07:31",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 892,
+  "fields": {
+    "employee": 3,
+    "property": 2,
+    "reservation": 74,
+    "description": "Ménage ",
+    "start_date": "2024-10-15T00:00:00",
+    "end_date": "2024-10-15T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 893,
+  "fields": {
+    "employee": 2,
+    "property": 2,
+    "reservation": 2,
+    "description": "Check_in",
+    "start_date": "2024-10-10T15:00:00",
+    "end_date": "2024-10-10T16:00:00",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 894,
+  "fields": {
+    "employee": 4,
+    "property": 2,
+    "reservation": 2,
+    "description": "Check_out",
+    "start_date": "2024-10-17T11:00:00",
+    "end_date": "2024-10-17T12:00:00",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 895,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 2,
+    "description": "Ménage ",
+    "start_date": "2024-10-18T00:00:00",
+    "end_date": "2024-10-18T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 896,
+  "fields": {
+    "employee": 2,
+    "property": 2,
+    "reservation": 55,
+    "description": "Check_in",
+    "start_date": "2024-10-28T13:15:25",
+    "end_date": "2024-10-28T14:15:25",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 897,
+  "fields": {
+    "employee": 3,
+    "property": 2,
+    "reservation": 55,
+    "description": "Check_out",
+    "start_date": "2024-10-30T13:15:52",
+    "end_date": "2024-10-30T14:15:52",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 898,
+  "fields": {
+    "employee": 4,
+    "property": 2,
+    "reservation": 55,
+    "description": "Ménage ",
+    "start_date": "2024-10-31T00:00:00",
+    "end_date": "2024-10-31T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 899,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 52,
+    "description": "Check_in",
+    "start_date": "2024-10-29T11:30:18",
+    "end_date": "2024-10-29T12:30:18",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 900,
+  "fields": {
+    "employee": 2,
+    "property": 2,
+    "reservation": 52,
+    "description": "Check_out",
+    "start_date": "2024-10-31T11:30:27",
+    "end_date": "2024-10-31T12:30:27",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 901,
+  "fields": {
+    "employee": null,
+    "property": 2,
+    "reservation": 52,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-10-29 11:30:18",
+    "start_date": "2024-10-29T11:30:18",
+    "end_date": "2024-10-31T12:30:27",
+    "status": "PEND",
+    "type_service": "ERROR",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 902,
+  "fields": {
+    "employee": 3,
+    "property": 3,
+    "reservation": 1,
+    "description": "Check_in",
+    "start_date": "2024-10-17T14:00:00",
+    "end_date": "2024-10-17T15:00:00",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 903,
+  "fields": {
+    "employee": 4,
+    "property": 3,
+    "reservation": 1,
+    "description": "Check_out",
+    "start_date": "2024-10-21T12:00:00",
+    "end_date": "2024-10-21T13:00:00",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 904,
+  "fields": {
+    "employee": 1,
+    "property": 3,
+    "reservation": 1,
+    "description": "Ménage ",
+    "start_date": "2024-10-22T00:00:00",
+    "end_date": "2024-10-22T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 905,
+  "fields": {
+    "employee": 2,
+    "property": 3,
+    "reservation": 3,
+    "description": "Check_in",
+    "start_date": "2024-10-20T14:00:00",
+    "end_date": "2024-10-20T15:00:00",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 906,
+  "fields": {
+    "employee": 3,
+    "property": 3,
+    "reservation": 3,
+    "description": "Check_out",
+    "start_date": "2024-10-22T10:00:00",
+    "end_date": "2024-10-22T11:00:00",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 907,
+  "fields": {
+    "employee": 4,
+    "property": 3,
+    "reservation": 3,
+    "description": "Ménage ",
+    "start_date": "2024-10-23T00:00:00",
+    "end_date": "2024-10-23T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 914,
+  "fields": {
+    "employee": 2,
+    "property": 2,
+    "reservation": 4,
+    "description": "Check_in",
+    "start_date": "2024-11-01T15:00:00",
+    "end_date": "2024-11-01T16:00:00",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 915,
+  "fields": {
+    "employee": 3,
+    "property": 2,
+    "reservation": 4,
+    "description": "Check_out",
+    "start_date": "2024-11-08T11:00:00",
+    "end_date": "2024-11-08T12:00:00",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 916,
+  "fields": {
+    "employee": 4,
+    "property": 2,
+    "reservation": 4,
+    "description": "Ménage ",
+    "start_date": "2024-11-09T00:00:00",
+    "end_date": "2024-11-09T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 917,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 6,
+    "description": "Check_in",
+    "start_date": "2024-11-20T15:00:00",
+    "end_date": "2024-11-20T16:00:00",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 918,
+  "fields": {
+    "employee": 2,
+    "property": 2,
+    "reservation": 6,
+    "description": "Check_out",
+    "start_date": "2024-11-27T11:00:00",
+    "end_date": "2024-11-27T12:00:00",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 919,
+  "fields": {
+    "employee": 3,
+    "property": 2,
+    "reservation": 6,
+    "description": "Ménage ",
+    "start_date": "2024-11-28T00:00:00",
+    "end_date": "2024-11-28T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 920,
+  "fields": {
+    "employee": 4,
+    "property": 3,
+    "reservation": 53,
+    "description": "Check_in",
+    "start_date": "2024-11-01T11:47:04",
+    "end_date": "2024-11-01T12:47:04",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 921,
+  "fields": {
+    "employee": 1,
+    "property": 3,
+    "reservation": 53,
+    "description": "Check_out",
+    "start_date": "2024-11-05T11:47:20",
+    "end_date": "2024-11-05T12:47:20",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 922,
+  "fields": {
+    "employee": 2,
+    "property": 3,
+    "reservation": 53,
+    "description": "Ménage ",
+    "start_date": "2024-11-06T00:00:00",
+    "end_date": "2024-11-06T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 923,
+  "fields": {
+    "employee": 3,
+    "property": 3,
+    "reservation": 64,
+    "description": "Check_in",
+    "start_date": "2024-11-09T15:52:39",
+    "end_date": "2024-11-09T16:52:39",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 924,
+  "fields": {
+    "employee": 4,
+    "property": 3,
+    "reservation": 64,
+    "description": "Check_out",
+    "start_date": "2024-11-11T15:52:50",
+    "end_date": "2024-11-11T16:52:50",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 925,
+  "fields": {
+    "employee": 1,
+    "property": 3,
+    "reservation": 64,
+    "description": "Ménage ",
+    "start_date": "2024-11-12T00:00:00",
+    "end_date": "2024-11-12T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 926,
+  "fields": {
+    "employee": 2,
+    "property": 5,
+    "reservation": 54,
+    "description": "Check_in",
+    "start_date": "2024-11-25T13:15:25",
+    "end_date": "2024-11-25T14:15:25",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 927,
+  "fields": {
+    "employee": 1,
+    "property": 5,
+    "reservation": 54,
+    "description": "Check_out",
+    "start_date": "2024-11-28T13:15:52",
+    "end_date": "2024-11-28T14:15:52",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 928,
+  "fields": {
+    "employee": 3,
+    "property": 5,
+    "reservation": 54,
+    "description": "Ménage ",
+    "start_date": "2024-11-29T00:00:00",
+    "end_date": "2024-11-29T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 944,
+  "fields": {
+    "employee": 4,
+    "property": 2,
+    "reservation": 56,
+    "description": "Check_in",
+    "start_date": "2024-12-01T15:52:39",
+    "end_date": "2024-12-01T16:52:39",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 945,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 56,
+    "description": "Check_out",
+    "start_date": "2024-12-04T15:52:50",
+    "end_date": "2024-12-04T16:52:50",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 946,
+  "fields": {
+    "employee": 3,
+    "property": 2,
+    "reservation": 56,
+    "description": "Ménage ",
+    "start_date": "2024-12-05T00:00:00",
+    "end_date": "2024-12-05T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 947,
+  "fields": {
+    "employee": 2,
+    "property": 2,
+    "reservation": 63,
+    "description": "Check_in",
+    "start_date": "2024-12-03T15:52:39",
+    "end_date": "2024-12-03T16:52:39",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 948,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 63,
+    "description": "Check_out",
+    "start_date": "2024-12-06T15:52:50",
+    "end_date": "2024-12-06T16:52:50",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 949,
+  "fields": {
+    "employee": 4,
+    "property": 2,
+    "reservation": 63,
+    "description": "Ménage ",
+    "start_date": "2024-12-07T00:00:00",
+    "end_date": "2024-12-07T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 950,
+  "fields": {
+    "employee": 4,
+    "property": 2,
+    "reservation": 8,
+    "description": "Check_in",
+    "start_date": "2024-12-10T15:00:00",
+    "end_date": "2024-12-10T16:00:00",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 951,
+  "fields": {
+    "employee": 2,
+    "property": 2,
+    "reservation": 8,
+    "description": "Check_out",
+    "start_date": "2024-12-17T11:00:00",
+    "end_date": "2024-12-17T12:00:00",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 952,
+  "fields": {
+    "employee": 3,
+    "property": 2,
+    "reservation": 8,
+    "description": "Ménage ",
+    "start_date": "2024-12-18T00:00:00",
+    "end_date": "2024-12-18T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 953,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 57,
+    "description": "Check_in",
+    "start_date": "2024-12-16T15:52:39",
+    "end_date": "2024-12-16T16:52:39",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 954,
+  "fields": {
+    "employee": 2,
+    "property": 2,
+    "reservation": 57,
+    "description": "Check_out",
+    "start_date": "2024-12-16T15:52:50",
+    "end_date": "2024-12-16T16:52:50",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 955,
+  "fields": {
+    "employee": 3,
+    "property": 2,
+    "reservation": 57,
+    "description": "Ménage ",
+    "start_date": "2024-12-17T00:00:00",
+    "end_date": "2024-12-17T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 956,
+  "fields": {
+    "employee": 4,
+    "property": 2,
+    "reservation": 10,
+    "description": "Check_in",
+    "start_date": "2024-12-28T15:00:00",
+    "end_date": "2024-12-28T16:00:00",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 957,
+  "fields": {
+    "employee": null,
+    "property": 2,
+    "reservation": 10,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-12-28 15:00:00",
+    "start_date": "2024-12-28T15:00:00",
+    "end_date": "2025-01-04T12:00:00",
+    "status": "PEND",
+    "type_service": "ERROR",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 958,
+  "fields": {
+    "employee": null,
+    "property": 2,
+    "reservation": 10,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-12-28 15:00:00",
+    "start_date": "2024-12-28T15:00:00",
+    "end_date": "2025-01-04T12:00:00",
+    "status": "PEND",
+    "type_service": "ERROR",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 959,
+  "fields": {
+    "employee": 2,
+    "property": 3,
+    "reservation": 61,
+    "description": "Check_in",
+    "start_date": "2024-12-11T15:52:39",
+    "end_date": "2024-12-11T16:52:39",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 960,
+  "fields": {
+    "employee": 3,
+    "property": 3,
+    "reservation": 61,
+    "description": "Check_out",
+    "start_date": "2024-12-16T15:52:50",
+    "end_date": "2024-12-16T16:52:50",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 961,
+  "fields": {
+    "employee": 1,
+    "property": 3,
+    "reservation": 61,
+    "description": "Ménage ",
+    "start_date": "2024-12-17T00:00:00",
+    "end_date": "2024-12-17T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1018,
+  "fields": {
+    "employee": null,
+    "property": 2,
+    "reservation": 74,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-10-09 06:07:14",
+    "start_date": "2024-10-09T06:07:14",
+    "end_date": "2024-10-14T07:07:31",
+    "status": "PEND",
+    "type_service": "ERROR",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1019,
+  "fields": {
+    "employee": 3,
+    "property": 2,
+    "reservation": 74,
+    "description": "Check_out",
+    "start_date": "2024-10-14T06:07:31",
+    "end_date": "2024-10-14T07:07:31",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1020,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 74,
+    "description": "Ménage ",
+    "start_date": "2024-10-15T00:00:00",
+    "end_date": "2024-10-15T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1021,
+  "fields": {
+    "employee": 3,
+    "property": 2,
+    "reservation": 2,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-10-10 15:00:00",
+    "start_date": "2024-10-10T15:00:00",
+    "end_date": "2024-10-17T12:00:00",
+    "status": "PENDING",
+    "type_service": "CHECKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1022,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 2,
+    "description": "Check_out",
+    "start_date": "2024-10-17T11:00:00",
+    "end_date": "2024-10-17T12:00:00",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1023,
+  "fields": {
+    "employee": 4,
+    "property": 2,
+    "reservation": 2,
+    "description": "Ménage ",
+    "start_date": "2024-10-18T00:00:00",
+    "end_date": "2024-10-18T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1024,
+  "fields": {
+    "employee": 3,
+    "property": 2,
+    "reservation": 55,
+    "description": "Check_in",
+    "start_date": "2024-10-28T13:15:25",
+    "end_date": "2024-10-28T14:15:25",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1025,
+  "fields": {
+    "employee": 2,
+    "property": 2,
+    "reservation": 55,
+    "description": "Check_out",
+    "start_date": "2024-10-30T13:15:52",
+    "end_date": "2024-10-30T14:15:52",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1026,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 55,
+    "description": "Ménage ",
+    "start_date": "2024-10-31T00:00:00",
+    "end_date": "2024-10-31T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1027,
+  "fields": {
+    "employee": 4,
+    "property": 2,
+    "reservation": 52,
+    "description": "Check_in",
+    "start_date": "2024-10-29T11:30:18",
+    "end_date": "2024-10-29T12:30:18",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1028,
+  "fields": {
+    "employee": 3,
+    "property": 2,
+    "reservation": 52,
+    "description": "Check_out",
+    "start_date": "2024-10-31T11:30:27",
+    "end_date": "2024-10-31T12:30:27",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1029,
+  "fields": {
+    "employee": null,
+    "property": 2,
+    "reservation": 52,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-10-29 11:30:18",
+    "start_date": "2024-10-29T11:30:18",
+    "end_date": "2024-10-31T12:30:27",
+    "status": "PEND",
+    "type_service": "ERROR",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1030,
+  "fields": {
+    "employee": null,
+    "property": 3,
+    "reservation": 1,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-10-17 14:00:00",
+    "start_date": "2024-10-17T14:00:00",
+    "end_date": "2024-10-21T13:00:00",
+    "status": "PEND",
+    "type_service": "ERROR",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1031,
+  "fields": {
+    "employee": 2,
+    "property": 3,
+    "reservation": 1,
+    "description": "Check_out",
+    "start_date": "2024-10-21T12:00:00",
+    "end_date": "2024-10-21T13:00:00",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1032,
+  "fields": {
+    "employee": 4,
+    "property": 3,
+    "reservation": 1,
+    "description": "Ménage ",
+    "start_date": "2024-10-22T00:00:00",
+    "end_date": "2024-10-22T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1033,
+  "fields": {
+    "employee": 1,
+    "property": 3,
+    "reservation": 3,
+    "description": "Check_in",
+    "start_date": "2024-10-20T14:00:00",
+    "end_date": "2024-10-20T15:00:00",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1034,
+  "fields": {
+    "employee": 2,
+    "property": 3,
+    "reservation": 3,
+    "description": "Check_out",
+    "start_date": "2024-10-22T10:00:00",
+    "end_date": "2024-10-22T11:00:00",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1035,
+  "fields": {
+    "employee": 3,
+    "property": 3,
+    "reservation": 3,
+    "description": "Ménage ",
+    "start_date": "2024-10-23T00:00:00",
+    "end_date": "2024-10-23T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1042,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 4,
+    "description": "Check_in",
+    "start_date": "2024-11-01T15:00:00",
+    "end_date": "2024-11-01T16:00:00",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1043,
+  "fields": {
+    "employee": 2,
+    "property": 2,
+    "reservation": 4,
+    "description": "Check_out",
+    "start_date": "2024-11-08T11:00:00",
+    "end_date": "2024-11-08T12:00:00",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1044,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 4,
+    "description": "Ménage ",
+    "start_date": "2024-11-09T00:00:00",
+    "end_date": "2024-11-09T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1045,
+  "fields": {
+    "employee": 3,
+    "property": 2,
+    "reservation": 6,
+    "description": "Check_in",
+    "start_date": "2024-11-20T15:00:00",
+    "end_date": "2024-11-20T16:00:00",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1046,
+  "fields": {
+    "employee": 4,
+    "property": 2,
+    "reservation": 6,
+    "description": "Check_out",
+    "start_date": "2024-11-27T11:00:00",
+    "end_date": "2024-11-27T12:00:00",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1047,
+  "fields": {
+    "employee": 2,
+    "property": 2,
+    "reservation": 6,
+    "description": "Ménage ",
+    "start_date": "2024-11-28T00:00:00",
+    "end_date": "2024-11-28T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1048,
+  "fields": {
+    "employee": 3,
+    "property": 3,
+    "reservation": 53,
+    "description": "Check_in",
+    "start_date": "2024-11-01T11:47:04",
+    "end_date": "2024-11-01T12:47:04",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1049,
+  "fields": {
+    "employee": 4,
+    "property": 3,
+    "reservation": 53,
+    "description": "Check_out",
+    "start_date": "2024-11-05T11:47:20",
+    "end_date": "2024-11-05T12:47:20",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1050,
+  "fields": {
+    "employee": 1,
+    "property": 3,
+    "reservation": 53,
+    "description": "Ménage ",
+    "start_date": "2024-11-06T00:00:00",
+    "end_date": "2024-11-06T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1051,
+  "fields": {
+    "employee": 2,
+    "property": 3,
+    "reservation": 64,
+    "description": "Check_in",
+    "start_date": "2024-11-09T15:52:39",
+    "end_date": "2024-11-09T16:52:39",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1052,
+  "fields": {
+    "employee": 3,
+    "property": 3,
+    "reservation": 64,
+    "description": "Check_out",
+    "start_date": "2024-11-11T15:52:50",
+    "end_date": "2024-11-11T16:52:50",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1053,
+  "fields": {
+    "employee": 4,
+    "property": 3,
+    "reservation": 64,
+    "description": "Ménage ",
+    "start_date": "2024-11-12T00:00:00",
+    "end_date": "2024-11-12T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1054,
+  "fields": {
+    "employee": 1,
+    "property": 5,
+    "reservation": 54,
+    "description": "Check_in",
+    "start_date": "2024-11-25T13:15:25",
+    "end_date": "2024-11-25T14:15:25",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1055,
+  "fields": {
+    "employee": null,
+    "property": 5,
+    "reservation": 54,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-11-25 13:15:25",
+    "start_date": "2024-11-25T13:15:25",
+    "end_date": "2024-11-28T14:15:52",
+    "status": "PEND",
+    "type_service": "ERROR",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1056,
+  "fields": {
+    "employee": 2,
+    "property": 5,
+    "reservation": 54,
+    "description": "Ménage ",
+    "start_date": "2024-11-29T00:00:00",
+    "end_date": "2024-11-29T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1072,
+  "fields": {
+    "employee": 2,
+    "property": 2,
+    "reservation": 56,
+    "description": "Check_in",
+    "start_date": "2024-12-01T15:52:39",
+    "end_date": "2024-12-01T16:52:39",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1073,
+  "fields": {
+    "employee": 4,
+    "property": 2,
+    "reservation": 56,
+    "description": "Check_out",
+    "start_date": "2024-12-04T15:52:50",
+    "end_date": "2024-12-04T16:52:50",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1074,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 56,
+    "description": "Ménage ",
+    "start_date": "2024-12-05T00:00:00",
+    "end_date": "2024-12-05T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1075,
+  "fields": {
+    "employee": 3,
+    "property": 2,
+    "reservation": 63,
+    "description": "Check_in",
+    "start_date": "2024-12-03T15:52:39",
+    "end_date": "2024-12-03T16:52:39",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1076,
+  "fields": {
+    "employee": 2,
+    "property": 2,
+    "reservation": 63,
+    "description": "Check_out",
+    "start_date": "2024-12-06T15:52:50",
+    "end_date": "2024-12-06T16:52:50",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1077,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 63,
+    "description": "Ménage ",
+    "start_date": "2024-12-07T00:00:00",
+    "end_date": "2024-12-07T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1078,
+  "fields": {
+    "employee": 1,
+    "property": 2,
+    "reservation": 8,
+    "description": "Check_in",
+    "start_date": "2024-12-10T15:00:00",
+    "end_date": "2024-12-10T16:00:00",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1079,
+  "fields": {
+    "employee": 4,
+    "property": 2,
+    "reservation": 8,
+    "description": "Check_out",
+    "start_date": "2024-12-17T11:00:00",
+    "end_date": "2024-12-17T12:00:00",
+    "status": "PEND",
+    "type_service": "CKOUT",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1080,
+  "fields": {
+    "employee": 4,
+    "property": 2,
+    "reservation": 8,
+    "description": "Ménage ",
+    "start_date": "2024-12-18T00:00:00",
+    "end_date": "2024-12-18T02:00:00",
+    "status": "PEND",
+    "type_service": "CLEAN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1081,
+  "fields": {
+    "employee": 4,
+    "property": 2,
+    "reservation": 57,
+    "description": "Check_in",
+    "start_date": "2024-12-16T15:52:39",
+    "end_date": "2024-12-16T16:52:39",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1082,
+  "fields": {
+    "employee": null,
+    "property": 2,
+    "reservation": 57,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-12-16 15:52:39",
+    "start_date": "2024-12-16T15:52:39",
+    "end_date": "2024-12-16T16:52:50",
+    "status": "PEND",
+    "type_service": "ERROR",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1083,
+  "fields": {
+    "employee": null,
+    "property": 2,
+    "reservation": 57,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-12-16 15:52:39",
+    "start_date": "2024-12-16T15:52:39",
+    "end_date": "2024-12-16T16:52:50",
+    "status": "PEND",
+    "type_service": "ERROR",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1084,
+  "fields": {
+    "employee": 2,
+    "property": 2,
+    "reservation": 10,
+    "description": "Check_in",
+    "start_date": "2024-12-28T15:00:00",
+    "end_date": "2024-12-28T16:00:00",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1085,
+  "fields": {
+    "employee": null,
+    "property": 2,
+    "reservation": 10,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-12-28 15:00:00",
+    "start_date": "2024-12-28T15:00:00",
+    "end_date": "2025-01-04T12:00:00",
+    "status": "PEND",
+    "type_service": "ERROR",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1086,
+  "fields": {
+    "employee": null,
+    "property": 2,
+    "reservation": 10,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-12-28 15:00:00",
+    "start_date": "2024-12-28T15:00:00",
+    "end_date": "2025-01-04T12:00:00",
+    "status": "PEND",
+    "type_service": "ERROR",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1087,
+  "fields": {
+    "employee": 3,
+    "property": 3,
+    "reservation": 61,
+    "description": "Check_in",
+    "start_date": "2024-12-11T15:52:39",
+    "end_date": "2024-12-11T16:52:39",
+    "status": "PEND",
+    "type_service": "CKIN",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1088,
+  "fields": {
+    "employee": null,
+    "property": 3,
+    "reservation": 61,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-12-11 15:52:39",
+    "start_date": "2024-12-11T15:52:39",
+    "end_date": "2024-12-16T16:52:50",
+    "status": "PEND",
+    "type_service": "ERROR",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.servicetask",
+  "pk": 1089,
+  "fields": {
+    "employee": null,
+    "property": 3,
+    "reservation": 61,
+    "description": "Erreur Impossible d'assigner un employé pour le check-in à 2024-12-11 15:52:39",
+    "start_date": "2024-12-11T15:52:39",
+    "end_date": "2024-12-16T16:52:50",
+    "status": "PEND",
+    "type_service": "ERROR",
+    "completed": false
+  }
+},
+{
+  "model": "services_menage.absence",
+  "pk": 5,
+  "fields": {
+    "type_absence": "CONG",
+    "employee": 2,
+    "start_date": "2024-10-14T11:03:39",
+    "end_date": "2024-10-17T11:03:41"
+  }
+},
+{
+  "model": "services_menage.absence",
+  "pk": 6,
+  "fields": {
+    "type_absence": "MALD",
+    "employee": 1,
+    "start_date": "2024-10-11T09:07:35",
+    "end_date": "2024-10-13T09:07:42"
+  }
+}
+]

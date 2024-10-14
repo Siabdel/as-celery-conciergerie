@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "name": "Appartement Centre-Ville",
+        "type": "apartment",
+        "address": "123 Rue Principale, Ville",
+        "price_per_night": "100.00",
+        "owner": 1
+    },
+    {
+        "id": 2,
+        "name": "Appartement Ain ZIT",
+        "type": "apartment",
+        "address": "123 Rue Principale, Ville",
+        "price_per_night": "100.00",
+        "owner": 1
+    },
+    {
+        "id": 3,
+        "name": "Villa Bord de Mer",
+        "type": "villa",
+        "address": "45 Avenue de la Plage, Ville Côtière",
+        "price_per_night": "250.00",
+        "owner": 1
+    },
+    {
+        "id": 5,
+        "name": "Appartement Five Centre-Ville",
+        "type": "apartment",
+        "address": "123 Rue Principale, Ville",
+        "price_per_night": "100.00",
+        "owner": 1
+    }
+]

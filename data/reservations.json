@@ -1,426 +1,366 @@
 [
-{
-  "model": "services_menage.property",
-  "pk": 1,
-  "fields": {
-    "name": "Appartement Centre-Ville",
-    "type": "apartment",
-    "address": "123 Rue Principale, Ville",
-    "owner": 1,
-    "price_per_night": "100.00"
-  }
-},
-{
-  "model": "services_menage.property",
-  "pk": 2,
-  "fields": {
-    "name": "Appartement Centre-Ville",
-    "type": "apartment",
-    "address": "123 Rue Principale, Ville",
-    "owner": 1,
-    "price_per_night": "100.00"
-  }
-},
-{
-  "model": "services_menage.property",
-  "pk": 3,
-  "fields": {
-    "name": "Villa Bord de Mer",
-    "type": "villa",
-    "address": "45 Avenue de la Plage, Ville Côtière",
-    "owner": 1,
-    "price_per_night": "250.00"
-  }
-},
-{
-  "model": "services_menage.reservation",
-  "pk": 1,
-  "fields": {
-    "property": 1,
-    "check_in": "2024-10-01T14:00:00Z",
-    "check_out": "2024-10-05T10:00:00Z",
-    "guest_name": "Alice Martin",
-    "guest_email": "alice@example.com",
-    "platform": "airbnb",
-    "reservation_status": "confirmed",
-    "number_of_guests": 2,
-    "total_price": "450.00",
-    "cleaning_fee": "50.00",
-    "service_fee": "20.00",
-    "guest_phone": "+33123456789",
-    "special_requests": "Vue sur la ville si possible",
-    "is_business_trip": false,
-    "guest_rating": null,
-    "cancellation_policy": "Flexible",
-    "booking_date": "2024-09-15T10:00:00Z"
-  }
-},
-{
-  "model": "services_menage.reservation",
-  "pk": 2,
-  "fields": {
-    "property": 2,
-    "check_in": "2024-10-10T15:00:00Z",
-    "check_out": "2024-10-17T11:00:00Z",
-    "guest_name": "Bernard Dubois",
-    "guest_email": "bernard@example.com",
-    "platform": "booking",
-    "reservation_status": "confirmed",
-    "number_of_guests": 4,
-    "total_price": "1850.00",
-    "cleaning_fee": "100.00",
-    "service_fee": "50.00",
-    "guest_phone": "+33987654321",
-    "special_requests": "Lit bébé nécessaire",
-    "is_business_trip": false,
-    "guest_rating": null,
-    "cancellation_policy": "Modérée",
-    "booking_date": "2024-09-20T14:30:00Z"
-  }
-},
-{
-  "model": "services_menage.reservation",
-  "pk": 3,
-  "fields": {
-    "property": 1,
-    "check_in": "2024-10-20T14:00:00Z",
-    "check_out": "2024-10-22T10:00:00Z",
-    "guest_name": "Claire Lefebvre",
-    "guest_email": "claire@example.com",
-    "platform": "direct",
-    "reservation_status": "pending",
-    "number_of_guests": 1,
-    "total_price": "220.00",
-    "cleaning_fee": "50.00",
-    "service_fee": "10.00",
-    "guest_phone": "+33654321987",
-    "special_requests": "",
-    "is_business_trip": true,
-    "guest_rating": null,
-    "cancellation_policy": "Stricte",
-    "booking_date": "2024-10-01T09:15:00Z"
-  }
-},
-{
-  "model": "services_menage.reservation",
-  "pk": 4,
-  "fields": {
-    "property": 2,
-    "check_in": "2024-11-01T15:00:00Z",
-    "check_out": "2024-11-08T11:00:00Z",
-    "guest_name": "David Moreau",
-    "guest_email": "david@example.com",
-    "platform": "airbnb",
-    "reservation_status": "confirmed",
-    "number_of_guests": 6,
-    "total_price": "1950.00",
-    "cleaning_fee": "150.00",
-    "service_fee": "100.00",
-    "guest_phone": "+33123987456",
-    "special_requests": "Accès piscine demandé",
-    "is_business_trip": false,
-    "guest_rating": null,
-    "cancellation_policy": "Flexible",
-    "booking_date": "2024-10-05T11:30:00Z"
-  }
-},
-{
-  "model": "services_menage.reservation",
-  "pk": 5,
-  "fields": {
-    "property": 1,
-    "check_in": "2024-11-10T14:00:00Z",
-    "check_out": "2024-11-15T10:00:00Z",
-    "guest_name": "Emilie Rousseau",
-    "guest_email": "emilie@example.com",
-    "platform": "booking",
-    "reservation_status": "confirmed",
-    "number_of_guests": 2,
-    "total_price": "550.00",
-    "cleaning_fee": "50.00",
-    "service_fee": "25.00",
-    "guest_phone": "+33789456123",
-    "special_requests": "Demande d'un étage élevé",
-    "is_business_trip": false,
-    "guest_rating": null,
-    "cancellation_policy": "Modérée",
-    "booking_date": "2024-10-20T16:45:00Z"
-  }
-},
-{
-  "model": "services_menage.reservation",
-  "pk": 6,
-  "fields": {
-    "property": 2,
-    "check_in": "2024-11-20T15:00:00Z",
-    "check_out": "2024-11-27T11:00:00Z",
-    "guest_name": "François Dupuis",
-    "guest_email": "francois@example.com",
-    "platform": "direct",
-    "reservation_status": "confirmed",
-    "number_of_guests": 4,
-    "total_price": "1850.00",
-    "cleaning_fee": "100.00",
-    "service_fee": "50.00",
-    "guest_phone": "+33654789321",
-    "special_requests": "Demande de barbecue",
-    "is_business_trip": false,
-    "guest_rating": null,
-    "cancellation_policy": "Stricte",
-    "booking_date": "2024-11-01T10:00:00Z"
-  }
-},
-{
-  "model": "services_menage.reservation",
-  "pk": 7,
-  "fields": {
-    "property": 1,
-    "check_in": "2024-12-01T14:00:00Z",
-    "check_out": "2024-12-05T10:00:00Z",
-    "guest_name": "Gabrielle Lemaire",
-    "guest_email": "gabrielle@example.com",
-    "platform": "airbnb",
-    "reservation_status": "pending",
-    "number_of_guests": 3,
-    "total_price": "470.00",
-    "cleaning_fee": "50.00",
-    "service_fee": "20.00",
-    "guest_phone": "+33123456780",
-    "special_requests": "Allergique aux acariens",
-    "is_business_trip": true,
-    "guest_rating": null,
-    "cancellation_policy": "Flexible",
-    "booking_date": "2024-11-15T14:20:00Z"
-  }
-},
-{
-  "model": "services_menage.reservation",
-  "pk": 8,
-  "fields": {
-    "property": 2,
-    "check_in": "2024-12-10T15:00:00Z",
-    "check_out": "2024-12-17T11:00:00Z",
-    "guest_name": "Henri Bertrand",
-    "guest_email": "henri@example.com",
-    "platform": "booking",
-    "reservation_status": "confirmed",
-    "number_of_guests": 5,
-    "total_price": "1900.00",
-    "cleaning_fee": "150.00",
-    "service_fee": "100.00",
-    "guest_phone": "+33987654322",
-    "special_requests": "Demande de décoration de Noël",
-    "is_business_trip": false,
-    "guest_rating": null,
-    "cancellation_policy": "Modérée",
-    "booking_date": "2024-11-25T09:30:00Z"
-  }
-},
-{
-  "model": "services_menage.reservation",
-  "pk": 9,
-  "fields": {
-    "property": 1,
-    "check_in": "2024-12-20T14:00:00Z",
-    "check_out": "2024-12-27T10:00:00Z",
-    "guest_name": "Isabelle Girard",
-    "guest_email": "isabelle@example.com",
-    "platform": "direct",
-    "reservation_status": "confirmed",
-    "number_of_guests": 2,
-    "total_price": "750.00",
-    "cleaning_fee": "50.00",
-    "service_fee": "30.00",
-    "guest_phone": "+33654321988",
-    "special_requests": "Demande d'un sapin de Noël",
-    "is_business_trip": false,
-    "guest_rating": null,
-    "cancellation_policy": "Stricte",
-    "booking_date": "2024-12-01T11:15:00Z"
-  }
-},
-{
-  "model": "services_menage.reservation",
-  "pk": 10,
-  "fields": {
-    "property": 2,
-    "check_in": "2024-12-28T15:00:00Z",
-    "check_out": "2025-01-04T11:00:00Z",
-    "guest_name": "Jacques Mercier",
-    "guest_email": "jacques@example.com",
-    "platform": "airbnb",
-    "reservation_status": "confirmed",
-    "number_of_guests": 8,
-    "total_price": "2500.00",
-    "cleaning_fee": "200.00",
-    "service_fee": "150.00",
-    "guest_phone": "+33123987457",
-    "special_requests": "Demande de réveillon du Nouvel An",
-    "is_business_trip": false,
-    "guest_rating": null,
-    "cancellation_policy": "Stricte",
-    "booking_date": "2024-12-10T16:00:00Z"
-  }
-},
-{
-  "model": "services_menage.reservation",
-  "pk": 11,
-  "fields": {
-    "property": 3,
-    "check_in": "2024-10-01T10:45:24Z",
-    "check_out": "2024-10-06T10:45:37Z",
-    "guest_name": "Hajar",
-    "guest_email": "hajar69@gmail.com",
-    "platform": "airbnb",
-    "reservation_status": "confirmed",
-    "number_of_guests": 1,
-    "total_price": "120.00",
-    "cleaning_fee": "0.00",
-    "service_fee": "0.00",
-    "guest_phone": "",
-    "special_requests": "",
-    "is_business_trip": false,
-    "guest_rating": null,
-    "cancellation_policy": "",
-    "booking_date": "2024-09-28T11:08:20.510Z"
-  }
-},
-{
-  "model": "services_menage.employee",
-  "pk": 1,
-  "fields": {
-    "name": "Mme Marie Therez",
-    "calendar": 2,
-    "property": 1
-  }
-},
-{
-  "model": "services_menage.employee",
-  "pk": 2,
-  "fields": {
-    "name": "Mme Nazha Kattani",
-    "calendar": 2,
-    "property": 1
-  }
-},
-{
-  "model": "services_menage.ServiceTask",
-  "pk": 1,
-  "fields": {
-    "employee": 1,
-    "property": 1,
-    "description": "",
-    "end_date": "2024-10-05T12:00:00Z",
-    "status": "pending",
-    "completed": false
-  }
-},
-{
-  "model": "services_menage.ServiceTask",
-  "pk": 2,
-  "fields": {
-    "employee": 1,
-    "property": 2,
-    "description": "",
-    "end_date": "2024-10-17T13:00:00Z",
-    "status": "pending",
-    "completed": false
-  }
-},
-{
-  "model": "services_menage.ServiceTask",
-  "pk": 3,
-  "fields": {
-    "employee": 1,
-    "property": 1,
-    "description": "",
-    "end_date": "2024-10-22T12:00:00Z",
-    "status": "pending",
-    "completed": false
-  }
-},
-{
-  "model": "services_menage.ServiceTask",
-  "pk": 4,
-  "fields": {
-    "employee": 1,
-    "property": 2,
-    "description": "",
-    "end_date": "2024-11-08T13:00:00Z",
-    "status": "pending",
-    "completed": false
-  }
-},
-{
-  "model": "services_menage.ServiceTask",
-  "pk": 5,
-  "fields": {
-    "employee": 1,
-    "property": 1,
-    "description": "",
-    "end_date": "2024-11-15T12:00:00Z",
-    "status": "pending",
-    "completed": false
-  }
-},
-{
-  "model": "services_menage.ServiceTask",
-  "pk": 6,
-  "fields": {
-    "employee": 1,
-    "property": 2,
-    "description": "",
-    "end_date": "2024-11-27T13:00:00Z",
-    "status": "pending",
-    "completed": false
-  }
-},
-{
-  "model": "services_menage.ServiceTask",
-  "pk": 7,
-  "fields": {
-    "employee": 1,
-    "property": 1,
-    "description": "",
-    "end_date": "2024-12-05T12:00:00Z",
-    "status": "pending",
-    "completed": false
-  }
-},
-{
-  "model": "services_menage.ServiceTask",
-  "pk": 8,
-  "fields": {
-    "employee": 1,
-    "property": 2,
-    "description": "",
-    "end_date": "2024-12-17T13:00:00Z",
-    "status": "pending",
-    "completed": false
-  }
-},
-{
-  "model": "services_menage.ServiceTask",
-  "pk": 9,
-  "fields": {
-    "employee": 1,
-    "property": 1,
-    "description": "",
-    "end_date": "2024-12-27T12:00:00Z",
-    "status": "pending",
-    "completed": false
-  }
-},
-{
-  "model": "services_menage.ServiceTask",
-  "pk": 10,
-  "fields": {
-    "employee": 1,
-    "property": 2,
-    "description": "",
-    "end_date": "2025-01-04T13:00:00Z",
-    "status": "pending",
-    "completed": false
-  }
-}
+    {
+        "id": 51,
+        "title": "Reservation for Appartement Centre-Ville",
+        "start": "2024-10-08T11:27:36",
+        "end": "2024-10-10T18:00:00",
+        "guest_name": "Rayane",
+        "guest_email": "rayane@gmail.com",
+        "check_in": "2024-10-08T11:27:36",
+        "check_out": "2024-10-10T18:00:00",
+        "property": 1,
+        "reservation_status": "NEED_ATTENTION",
+        "number_of_guests": 1,
+        "total_price": "100.00"
+    },
+    {
+        "id": 67,
+        "title": "Reservation for Appartement Centre-Ville",
+        "start": "2024-11-28T13:15:25",
+        "end": "2024-11-30T13:15:52",
+        "guest_name": "Abdel",
+        "guest_email": "abdel@gmail.com",
+        "check_in": "2024-11-28T13:15:25",
+        "check_out": "2024-11-30T13:15:52",
+        "property": 1,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 1,
+        "total_price": "125.00"
+    },
+    {
+        "id": 7,
+        "title": "Reservation for Appartement Centre-Ville",
+        "start": "2024-12-01T14:00:00",
+        "end": "2024-12-05T10:00:00",
+        "guest_name": "Gabrielle Lemaire",
+        "guest_email": "gabrielle@example.com",
+        "check_in": "2024-12-01T14:00:00",
+        "check_out": "2024-12-05T10:00:00",
+        "property": 1,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 3,
+        "total_price": "470.00"
+    },
+    {
+        "id": 60,
+        "title": "Reservation for Appartement Centre-Ville",
+        "start": "2024-12-05T15:52:39",
+        "end": "2024-12-09T15:52:50",
+        "guest_name": "Siham",
+        "guest_email": "siham@gmail.com",
+        "check_in": "2024-12-05T15:52:39",
+        "check_out": "2024-12-09T15:52:50",
+        "property": 1,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 1,
+        "total_price": "134.00"
+    },
+    {
+        "id": 58,
+        "title": "Reservation for Appartement Centre-Ville",
+        "start": "2024-12-06T15:52:39",
+        "end": "2024-12-10T15:52:50",
+        "guest_name": "Mehdi",
+        "guest_email": "mehdi@gmail.com",
+        "check_in": "2024-12-06T15:52:39",
+        "check_out": "2024-12-10T15:52:50",
+        "property": 1,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 1,
+        "total_price": "134.00"
+    },
+    {
+        "id": 59,
+        "title": "Reservation for Appartement Centre-Ville",
+        "start": "2024-12-19T15:52:39",
+        "end": "2024-12-22T15:52:50",
+        "guest_name": "Rayane",
+        "guest_email": "rayane@gmail.com",
+        "check_in": "2024-12-19T15:52:39",
+        "check_out": "2024-12-22T15:52:50",
+        "property": 1,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 1,
+        "total_price": "134.00"
+    },
+    {
+        "id": 9,
+        "title": "Reservation for Appartement Centre-Ville",
+        "start": "2024-12-20T14:00:00",
+        "end": "2024-12-27T10:00:00",
+        "guest_name": "Isabelle Girard",
+        "guest_email": "isabelle@example.com",
+        "check_in": "2024-12-20T14:00:00",
+        "check_out": "2024-12-27T10:00:00",
+        "property": 1,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 2,
+        "total_price": "750.00"
+    },
+    {
+        "id": 74,
+        "title": "Reservation for Appartement Ain ZIT",
+        "start": "2024-10-09T06:07:14",
+        "end": "2024-10-14T06:07:31",
+        "guest_name": "Marie Gilbert",
+        "guest_email": "gmarie@gmail.com",
+        "check_in": "2024-10-09T06:07:14",
+        "check_out": "2024-10-14T06:07:31",
+        "property": 2,
+        "reservation_status": "COMPLETED",
+        "number_of_guests": 1,
+        "total_price": "177.00"
+    },
+    {
+        "id": 2,
+        "title": "Reservation for Appartement Ain ZIT",
+        "start": "2024-10-10T15:00:00",
+        "end": "2024-10-17T11:00:00",
+        "guest_name": "Bernard Dubois",
+        "guest_email": "bernard@example.com",
+        "check_in": "2024-10-10T15:00:00",
+        "check_out": "2024-10-17T11:00:00",
+        "property": 2,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 4,
+        "total_price": "1850.00"
+    },
+    {
+        "id": 55,
+        "title": "Reservation for Appartement Ain ZIT",
+        "start": "2024-10-28T13:15:25",
+        "end": "2024-10-30T13:15:52",
+        "guest_name": "Abdel",
+        "guest_email": "abdel@gmail.com",
+        "check_in": "2024-10-28T13:15:25",
+        "check_out": "2024-10-30T13:15:52",
+        "property": 2,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 1,
+        "total_price": "125.00"
+    },
+    {
+        "id": 52,
+        "title": "Reservation for Appartement Ain ZIT",
+        "start": "2024-10-29T11:30:18",
+        "end": "2024-10-31T11:30:27",
+        "guest_name": "Rayane",
+        "guest_email": "rayane@gmail.com",
+        "check_in": "2024-10-29T11:30:18",
+        "check_out": "2024-10-31T11:30:27",
+        "property": 2,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 1,
+        "total_price": "333.00"
+    },
+    {
+        "id": 4,
+        "title": "Reservation for Appartement Ain ZIT",
+        "start": "2024-11-01T15:00:00",
+        "end": "2024-11-08T11:00:00",
+        "guest_name": "David Moreau",
+        "guest_email": "david@example.com",
+        "check_in": "2024-11-01T15:00:00",
+        "check_out": "2024-11-08T11:00:00",
+        "property": 2,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 6,
+        "total_price": "1950.00"
+    },
+    {
+        "id": 5,
+        "title": "Reservation for Appartement Ain ZIT",
+        "start": "2024-11-10T14:00:00",
+        "end": "2024-11-15T10:00:00",
+        "guest_name": "Emilie Rousseau",
+        "guest_email": "emilie@example.com",
+        "check_in": "2024-11-10T14:00:00",
+        "check_out": "2024-11-15T10:00:00",
+        "property": 2,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 2,
+        "total_price": "550.00"
+    },
+    {
+        "id": 6,
+        "title": "Reservation for Appartement Ain ZIT",
+        "start": "2024-11-20T15:00:00",
+        "end": "2024-11-27T11:00:00",
+        "guest_name": "François Dupuis",
+        "guest_email": "francois@example.com",
+        "check_in": "2024-11-20T15:00:00",
+        "check_out": "2024-11-27T11:00:00",
+        "property": 2,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 4,
+        "total_price": "1850.00"
+    },
+    {
+        "id": 56,
+        "title": "Reservation for Appartement Ain ZIT",
+        "start": "2024-12-01T15:52:39",
+        "end": "2024-12-04T15:52:50",
+        "guest_name": "Mehdi",
+        "guest_email": "mehdi@gmail.com",
+        "check_in": "2024-12-01T15:52:39",
+        "check_out": "2024-12-04T15:52:50",
+        "property": 2,
+        "reservation_status": "CONFIRMED",
+        "number_of_guests": 1,
+        "total_price": "145.00"
+    },
+    {
+        "id": 63,
+        "title": "Reservation for Appartement Ain ZIT",
+        "start": "2024-12-03T15:52:39",
+        "end": "2024-12-06T15:52:50",
+        "guest_name": "Nadia Lamine",
+        "guest_email": "nadia@gmail.com",
+        "check_in": "2024-12-03T15:52:39",
+        "check_out": "2024-12-06T15:52:50",
+        "property": 2,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 1,
+        "total_price": "133.00"
+    },
+    {
+        "id": 8,
+        "title": "Reservation for Appartement Ain ZIT",
+        "start": "2024-12-10T15:00:00",
+        "end": "2024-12-17T11:00:00",
+        "guest_name": "Henri Bertrand",
+        "guest_email": "henri@example.com",
+        "check_in": "2024-12-10T15:00:00",
+        "check_out": "2024-12-17T11:00:00",
+        "property": 2,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 5,
+        "total_price": "1900.00"
+    },
+    {
+        "id": 57,
+        "title": "Reservation for Appartement Ain ZIT",
+        "start": "2024-12-16T15:52:39",
+        "end": "2024-12-16T15:52:50",
+        "guest_name": "Mehdi",
+        "guest_email": "mehdi@gmail.com",
+        "check_in": "2024-12-16T15:52:39",
+        "check_out": "2024-12-16T15:52:50",
+        "property": 2,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 1,
+        "total_price": "144.00"
+    },
+    {
+        "id": 10,
+        "title": "Reservation for Appartement Ain ZIT",
+        "start": "2024-12-28T15:00:00",
+        "end": "2025-01-04T11:00:00",
+        "guest_name": "Jacques Mercier",
+        "guest_email": "jacques@example.com",
+        "check_in": "2024-12-28T15:00:00",
+        "check_out": "2025-01-04T11:00:00",
+        "property": 2,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 8,
+        "total_price": "2500.00"
+    },
+    {
+        "id": 75,
+        "title": "Reservation for Villa Bord de Mer",
+        "start": "2024-10-11T12:00:00",
+        "end": "2024-10-13T11:27:53",
+        "guest_name": "Isabelle robert",
+        "guest_email": "isa348@gmail.com",
+        "check_in": "2024-10-11T12:00:00",
+        "check_out": "2024-10-13T11:27:53",
+        "property": 3,
+        "reservation_status": "EXPIRED",
+        "number_of_guests": 1,
+        "total_price": "100.00"
+    },
+    {
+        "id": 1,
+        "title": "Reservation for Villa Bord de Mer",
+        "start": "2024-10-17T14:00:00",
+        "end": "2024-10-21T12:00:00",
+        "guest_name": "Alice Martin",
+        "guest_email": "alice@example.com",
+        "check_in": "2024-10-17T14:00:00",
+        "check_out": "2024-10-21T12:00:00",
+        "property": 3,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 2,
+        "total_price": "450.00"
+    },
+    {
+        "id": 3,
+        "title": "Reservation for Villa Bord de Mer",
+        "start": "2024-10-20T14:00:00",
+        "end": "2024-10-22T10:00:00",
+        "guest_name": "Claire Lefebvre",
+        "guest_email": "claire@example.com",
+        "check_in": "2024-10-20T14:00:00",
+        "check_out": "2024-10-22T10:00:00",
+        "property": 3,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 1,
+        "total_price": "220.00"
+    },
+    {
+        "id": 53,
+        "title": "Reservation for Villa Bord de Mer",
+        "start": "2024-11-01T11:47:04",
+        "end": "2024-11-05T11:47:20",
+        "guest_name": "Mehdi",
+        "guest_email": "mehdi@gmail.com",
+        "check_in": "2024-11-01T11:47:04",
+        "check_out": "2024-11-05T11:47:20",
+        "property": 3,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 1,
+        "total_price": "233.00"
+    },
+    {
+        "id": 64,
+        "title": "Reservation for Villa Bord de Mer",
+        "start": "2024-11-09T15:52:39",
+        "end": "2024-11-11T15:52:50",
+        "guest_name": "Albert Tom",
+        "guest_email": "albert@gmail.com",
+        "check_in": "2024-11-09T15:52:39",
+        "check_out": "2024-11-11T15:52:50",
+        "property": 3,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 1,
+        "total_price": "234.00"
+    },
+    {
+        "id": 61,
+        "title": "Reservation for Villa Bord de Mer",
+        "start": "2024-12-11T15:52:39",
+        "end": "2024-12-16T15:52:50",
+        "guest_name": "Yacine Ahmed",
+        "guest_email": "yacineah@gmail.com",
+        "check_in": "2024-12-11T15:52:39",
+        "check_out": "2024-12-16T15:52:50",
+        "property": 3,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 1,
+        "total_price": "99.00"
+    },
+    {
+        "id": 54,
+        "title": "Reservation for Appartement Five Centre-Ville",
+        "start": "2024-11-25T13:15:25",
+        "end": "2024-11-28T13:15:52",
+        "guest_name": "Yacine",
+        "guest_email": "Yacine@gmail.com",
+        "check_in": "2024-11-25T13:15:25",
+        "check_out": "2024-11-28T13:15:52",
+        "property": 5,
+        "reservation_status": "INPROGESS",
+        "number_of_guests": 1,
+        "total_price": "125.00"
+    }
 ]

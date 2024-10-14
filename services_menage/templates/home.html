@@ -1,0 +1,43 @@
+{% extends "./bootstrap_agency/startboot_agency_base.html" %}
+{% load static i18n %}
+
+{% if category %}{{ category.name }} {% else %} Products {% endif %}
+
+{% block content %}
+<div class="container">
+  <div class="well well-sm">
+      <strong>Category Title {{category }}</strong>
+  </div>
+
+  <div class="container mt-5">
+    <div class="row">
+      {{ products }}
+      {% for product in products %}
+
+      <div class="col-md-3">
+          <div class="card mt-3">
+              <div class="card-head">
+                <img src="{% if product.images.all|length >= 1  %} {{ product.images.all.0.thumbnail_path.url }} {% else %} {% static 'img/thumbnail_100x100_plan-apprt-3d.jpg' %} {% endif %}" alt="..." style="height: 130px; width: auto">
+              </div>
+              <div class="card-body">
+                  <h5 class="card-title">
+                    <a href="{% url 'immoshop:product_immo_detail' product.pk %}">{{ product.name | slice:"0:30" }}</a>
+                  </h5>
+                  <div class="card-text">
+                      <p class="lead">
+                          <p class="text-center">{{ product.price }} Euro</p>
+                        </p>
+                  </div>
+                  <div class="col-xs-12 col-md-6">
+                    <a href="{% url 'cart:cart_add_item' product.id %}" class="btn btn-warning btn-lg"> Ajouter au panier </a> 
+                  </div>
+              </div>
+          </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

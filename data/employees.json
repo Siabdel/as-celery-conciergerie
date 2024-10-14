@@ -1,0 +1,46 @@
+[
+    {
+        "id": 1,
+        "name": "Mme Marie Therez",
+        "user": 4,
+        "phone_number": "+212672870412",
+        "calendar": {
+            "id": 2,
+            "name": "Calendrier Employee",
+            "slug": "calendrier-employee"
+        }
+    },
+    {
+        "id": 2,
+        "name": "Mme Nazha Kattani",
+        "user": 3,
+        "phone_number": "+212662870312",
+        "calendar": {
+            "id": 2,
+            "name": "Calendrier Employee",
+            "slug": "calendrier-employee"
+        }
+    },
+    {
+        "id": 3,
+        "name": "Amoucha Nadia",
+        "user": 1,
+        "phone_number": "+212672870412",
+        "calendar": {
+            "id": 2,
+            "name": "Calendrier Employee",
+            "slug": "calendrier-employee"
+        }
+    },
+    {
+        "id": 4,
+        "name": "Abdelaziz SADQUAOUI",
+        "user": 2,
+        "phone_number": "+33677870312",
+        "calendar": {
+            "id": 2,
+            "name": "Calendrier Employee",
+            "slug": "calendrier-employee"
+        }
+    }
+]

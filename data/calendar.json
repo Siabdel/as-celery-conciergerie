@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "name": "Reservations",
+        "slug": "reservations"
+    },
+    {
+        "id": 2,
+        "name": "Calendrier Employee",
+        "slug": "calendrier-employee"
+    }
+]

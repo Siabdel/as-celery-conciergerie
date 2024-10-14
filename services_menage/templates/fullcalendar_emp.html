@@ -71,17 +71,22 @@
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                     },
-                    events: '/service/api/maintenance_tasks/',  // Assurez-vous que cette URL est correcte
-                    eventClick: function(info) { alert("click Ok :")},
+                    //events: '/service/api/maintenance_tasks/',  // Assurez-vous que cette URL est correcte
+                    events: '/service/api/tasks/?year=2024&month=11',
+                    //eventClick: function(info) { alert("click Ok :", event)},
+                    eventClick: function(info) {
+                        var eventId = info.event.id;
+                        var adminUrl = '/admin/services_menage/servicetask/' + eventId + '/change/';
+                        window.location.href = adminUrl;
+                    },
                     // on Mouse enter
                     eventMouseEnter: function(info) {
                         var event = info.event;
                         var content = '<h5 class="card-title bg-secondary text-light" >' + event.title + '</h5>' +
                                         'Start: ' + event.start.toLocaleString() + '<br>' +
                                         'End: ' + event.end.toLocaleString() + '<br>' +
-                                        'Guest: ' + event.extendedProps.guest_name + '<br>' +
-                                        'Email: ' + event.extendedProps.guest_email + '<br>' +
-                                        'Total Price: $' + event.extendedProps.total_price;
+                                        'Employee: ' + event.extendedProps.employee.name + '<br>' +
+                                        'phone: ' + event.extendedProps.employee.phone_number + '<br>' 
 
                         tooltipEl.innerHTML = content;
                         tooltipEl.style.display = 'block';
@@ -92,8 +97,42 @@
                     eventMouseLeave: function() {
                             tooltipEl.style.display = 'none';
                     },
-        });
+                    
+                    editable: true, // Permet de déplacer les événements
+                    eventDrop: function(info) {
+                        var eventId = info.event.id;
+                        var newStart = info.event.start.toISOString();
+                        var newEnd = info.event.end.toISOString();
 
+                        // Envoyer une requête AJAX pour mettre à jour l'événement dans la base de données
+                        fetch(`/service/api/event/${eventId}/update/`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                //'X-CSRFToken': getCookie('csrftoken'), // Si vous utilisez CSRF
+                            },
+                            body: JSON.stringify({
+                                'start_date' : newStart,
+                                'end_date' : newEnd,
+                            })
+                        }).then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            alert("not ok update")
+                            }
+                            return response.json();
+                        }).then(data => {
+                            alert("ok update")
+                            console.log('Event updated:', data);
+                        }).catch(error => {
+                            console.error('Error updating event:', error);
+                            alert("not ok update")
+                            // Optionnel : gérez les erreurs ici
+                            //info.revert();  // Annuler le déplacement si l'update échoue
+             
+                        });
+                    },
+                });
         //--------------
         calendar.render();
         // Fermer le tooltip quand on clique ailleurs sur la page

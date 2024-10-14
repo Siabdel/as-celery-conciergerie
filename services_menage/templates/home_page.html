@@ -1,0 +1,78 @@
+{% extends 'base_agency.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Barre de recherche -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form action="{ url 'immoshopy:search' }" method="get" class="form-inline">
+                <div class="input-group w-100">
+                    <input type="text" name="q" class="form-control form-control-lg" placeholder="Rechercher un projet ou un produit...">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">Rechercher</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr>
+
+    <!-- Projets en vedette -->
+    <h2 class="mb-4">Projets en vedette</h2>
+    <div class="row">
+        {% for project in featured_projects %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                {% if project.default_image %}
+                    <img class="card-img-top rounded-lg img-fluid mx-auto d-block" src="{{ project.default_image.url }}" alt="{{ project.default_image}}"  style="height: 200px; width: 600px;">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-name">{{ project.name }}</h5>
+                    <p class="card-text">{{ project.description|truncatewords:20 }}</p>
+                    <a href="{ url 'immoshopy:project_detail' project.slug }" class="btn btn-primary">Voir le projet</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Produits récents -->
+    <h2 class="mb-4 mt-5">Produits récents</h2>
+    <div class="row">
+        {% for product in recent_products %}
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                {% if product.default_image %}
+                    <img src="{{ product.default_image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 400px; width: 600px;">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-name">{{ product.name }}</h5>
+                    <p class="card-text">Projet : {{ product.project.name }}</p>
+                    <a href="{ url 'shop:product_detail' product.pk }" class="btn btn-secondary">Voir le produit</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </divo
+
+    <!-- Tous les projets -->
+    <h2 class="mb-4 mt-5">Tous nos projets</h2>
+    <div class="row">
+        {% for project in all_projects %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                {% if project.default_image %}
+                <img class="card-img-top rounded-lg img-fluid mx-auto d-block" src="{{ project.default_image.url }}" alt="{{ project.default_image}}" style="height: 200px; width: 600px;">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-name">{{ project.name }}</h5>
+                    <p class="card-text">{{ project.description|truncatewords:15 }}</p>
+                    <a href="{ url 'immoshopy:project_detail' project.slug }" class="btn btn-outline-primary">En savoir plus</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
