@@ -18,13 +18,13 @@ from celery.schedules import crontab
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 #BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE_DIR = Path(__file__).resolve().parent.parent
-# Directory project au meme niveau de settings.py
-PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR    = Path(__file__).resolve().parent.parent
+# Directory project au meme niveau de settings.py
+PROJECT_DIR = Path(__file__).resolve().parent.parent.parent
+
+
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
@@ -188,18 +188,20 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
-STATIC_URL = "static/"
-# FullCalendar static files
-##STATICFILES_DIRS = [BASE_DIR / "static"]
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static" )
+
+STATIC_URL = "/static/"
+# Chemin où les fichiers statiques seront collectés (utilisé pour le déploiement)
+STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
+
 # Additional locations of static files
-STATICFILES_DIRS__ = [
-    os.path.join(BASE_DIR, 'staticfiles'),
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'static', 'bootstrap_agency'),
     os.path.join(BASE_DIR, 'media'),
     os.path.join(BASE_DIR, 'media', 'upload'),
 ]
