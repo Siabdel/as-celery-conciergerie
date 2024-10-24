@@ -1,61 +1,20 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib import messages
-from schedule.models import Event, Calendar
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, IntegrityError
-from schedule.models import Calendar as BaseCalendar
-
-class ResaStatus(models.TextChoices):
-    """
-    PENDING : État initial d'une réservation, en attente de confirmation.
-    CONFIRMED : La réservation a été confirmée mais le séjour n'a pas encore commencé.
-    IN_PROGRESS : Indique que le séjour est en cours.
-    CHECKED_IN : Le client est arrivé et a pris possession du logement.
-    CHECKED_OUT : Le client a quitté le logement à la fin de son séjour.
-    COMPLETED : La réservation est terminée, tous les services ont été fournis.
-    CANCELLED : La réservation a été annulée.
-    EXPIRED : La réservation n'a pas été confirmée dans le délai imparti.
-    """
-    PENDING = 'PENDING', _('Pending')
-    NEED_ATTENTION = 'NEED_ATTENTION', _('Need_attention')
-    IN_PROGRESS = 'INPROGESS', _('In progress')
-    COMPLETED = 'COMPLETED', _('Completed')
-    CONFIRMED = 'CONFIRMED', _('Confirmed')
-    CHECKED_IN = 'CHECKIN', _('Checked In')
-    CHECKED_OUT= 'CHCKOUT', _('Checked Out')
-    CANCELLED = 'CANCEL', _('Cancelled')
-    EXPIRED = 'EXPIRED', _('Expired')
-
-    
-class PlatformChoices(models.TextChoices) :
-    AIRBNB = 'AIRBNB', _('Airbnb')
-    BOOKING = 'BOOKING', _('booking')
-    DIRECT = 'DIRECT' , _('Direct Booking')
-    
- 
-class TaskTypeService(models.TextChoices):
-    CHECKED_IN = 'CHECKIN', _('Checked In')
-    CHECKED_OUT= 'CHCKOUT', _('Checked Out')
-    CLEANING = 'CLEAN', _('Cleanning')
-    MAINTENANCE = 'MAINT', _('Maintenance')
-    ERROR = 'ERROR', _('Affectation en erreur !')
+from django.contrib.auth import get_user_model
+from django.db.models import Sum, F
+from phonenumber_field.modelfields import PhoneNumberField
+from staff.models import Employee
+from core.models import ASBaseTimestampMixin
+from django.conf import settings    
+from core.models import ResaStatus, TaskTypeService, PlatformChoices
 
 
-class Calendar(BaseCalendar):
-    class Meta:
-        proxy = True
-
-    @classmethod
-    def create_unique(cls, name, slug):
-        if not cls.objects.filter(name=name).exists():
-            return cls.objects.create(name=name, slug=slug)
-        return cls.objects.get(name=name)
-
-class Property(models.Model):
+class Property(ASBaseTimestampMixin):
     PROPERTY_TYPES = [
         ('apartment', 'Apartment'),
         ('house', 'House'),
@@ -67,6 +26,10 @@ class Property(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='properties')
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2, default=0) # Ajoutez cette ligne
 
+    class Meta:
+        verbose_name = 'Property'
+        verbose_name_plural = 'Properties'
+
     def __str__(self):
         return f"{self.name} ({self.type})"
         
@@ -76,7 +39,12 @@ class Property(models.Model):
     def get_upcoming_reservations(self):
         return self.reservations.filter(check_in__gte=timezone.now().date())
 
-class Reservation(models.Model):
+
+
+
+
+  
+class Reservation(ASBaseTimestampMixin):
     
     reservation_status = models.CharField(max_length=20, 
                                           choices=ResaStatus.choices, 
@@ -167,27 +135,7 @@ class Reservation(models.Model):
     def __str__(self):
         return f"Reservation for {self.property} from {self.check_in} to {self.check_out}"
 
-
-
-class Employee(models.Model):
-    ROLE_CHOICES = [
-        ('cleaner', 'Cleaner'),
-        ('maintenance', 'Maintenance'),
-        ('concierge', 'Concierge'),
-        ('manager', 'Manager'),
-    ]
-    name = models.CharField(max_length=100)
-    calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
-    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='cleaner')
-    phone_number = models.CharField(max_length=15, null=True)
-    hire_date = models.DateField() # date d'embauche
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return f"{self.name} - {self.get_role_display()}"
-
-class ServiceTask(models.Model):
+class ServiceTask(ASBaseTimestampMixin):
    
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, 
                                  null=True, related_name='%(class)s_tasks')
@@ -205,7 +153,7 @@ class ServiceTask(models.Model):
     completed = models.BooleanField(default=False)
     
     class Meta:
-        unique_together = ("start_date", "end_date", "employee", "property", )
+        unique_together = ("property", "start_date", "type_service")
         ordering = ['property', 'end_date',]
 
     def __str__(self):
@@ -216,20 +164,6 @@ class ServiceTask(models.Model):
         self.status = self.TaskStatus.COMPLETED
         self.save()
 
-        
-class Absence(models.Model):
-    class TypeAbsence(models.TextChoices):
-        CONGES = 'CONG', _('En conges')
-        MALADIE = 'MALD', _('En maladie')
-        INCONNU = 'NJSU', _('Non justifier')
-    
-    type_absence = models.CharField(max_length=200, 
-                                    choices=TypeAbsence.choices,
-                                    default=TypeAbsence.INCONNU)
+ 
 
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
-    
-    def __str__(self) -> str:
-        return f"Absence for {self.employee} - {self.start_date}"
+

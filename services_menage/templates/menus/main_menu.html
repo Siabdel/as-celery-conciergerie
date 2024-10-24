@@ -1,6 +1,9 @@
+ {% load static %}
  <nav class="navbar navbar-default navbar-expand-lg navbar-light bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="/">AtlasRDV web agency</a>
+            <a class="navbar-brand pt-1" href="{% url 'agence:home' %}" >Happy Bee</a>
+            <img stye="height:50%" class="pr-2" src="{% static 'img/Happy_Bee_100x100.jpg' %}"  > 
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
                 aria-expanded="false" aria-label="Toggle navigation">

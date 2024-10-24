@@ -1,0 +1,52 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %} Employees: Main user dashboard {% endblock %}
+{% block content %}
+
+    <h3 class="text-center"> Recent Employees</h3>
+
+    <a href="{% url "new-Employee" %}" class="btn btn-success">New Employee</a>
+    {% if object_list %}
+        {% for object in objects %}
+            {{ object }}
+        {% endfor %}
+
+
+            {% if user.is_authenticated %}
+                <h3 class="text-center"> All Employees </h3>
+
+               
+                <div class="Employees-list">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Service</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Date embauche</th>
+                                <th scope="col">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+
+                            {% for Employee in object_list %}
+
+                                    <tr class="table-row table-row-clickable" data-href="{% url 'Employee-detail' Employee.pk %}">
+                                        <th scope="row"><a href="{% url 'Employee-detail' Employee.pk %}" class="stretched-link">#{{ forloop.counter }}</a></th>
+                                        <td>{{ Employee.client }}</td>
+                                        <td>{{ Employee.Employee_total }}</td>
+                                        <td> {{ Employee.create_date }} </td>
+                                    </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+
+    {% else %}
+        <p>You have not created any Employees yet.</p>
+    {% endif %}
+{% endblock content %}

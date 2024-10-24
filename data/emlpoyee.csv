@@ -1,0 +1,5 @@
+,id,name,user,phone_number,calendar
+0,1,Mme Marie Therez,4,212672870412,"{'id': 2, 'name': 'Calendrier Employee', 'slug': 'calendrier-employee'}"
+1,2,Mme Nazha Kattani,3,212662870312,"{'id': 2, 'name': 'Calendrier Employee', 'slug': 'calendrier-employee'}"
+2,3,Amoucha Nadia,1,212672870412,"{'id': 2, 'name': 'Calendrier Employee', 'slug': 'calendrier-employee'}"
+3,4,Abdelaziz SADQUAOUI,2,33677870312,"{'id': 2, 'name': 'Calendrier Employee', 'slug': 'calendrier-employee'}"

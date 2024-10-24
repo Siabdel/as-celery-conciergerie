@@ -4,19 +4,21 @@ from django.utils.dateparse import parse_date
 from django.utils.timezone import make_naive
 from django.utils.dateparse import parse_datetime
 from django.http import JsonResponse
+from schedule.models import Event
 # autre contrib 
 from django_celery_beat.models import PeriodicTask
-from schedule.models import Calendar, Event
 # DRF api rest
 from rest_framework import viewsets, permissions, generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 ## 
 from services_menage import models as sm_models
+from core import models as core_models
 from services_menage import serializers 
 from services_menage.serializers import PeriodicTaskSerializer
 from rest_framework import status
 from rest_framework.views import APIView
+from core.models import CustomCalendar
 
 class PeriodicTaskListCreate(generics.ListCreateAPIView):
     queryset = PeriodicTask.objects.all()
@@ -39,7 +41,7 @@ class ServiceTaskViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ServiceTaskSerializer
 
 class CalendarViewSet(viewsets.ModelViewSet):
-    queryset = sm_models.Calendar.objects.all()
+    queryset = core_models.CustomCalendar.objects.all()
     serializer_class = serializers.CalendarSerializer
 
 # Events

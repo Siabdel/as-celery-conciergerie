@@ -1,0 +1,21 @@
+
+{% extends 'base.html' %}
+
+{% block title %}{{ object.nom }}{% endblock %}
+
+{% block content %}
+    <h1>{{ object.nom }}</h1>
+    <p><strong>Adresse:</strong> {{ object.adresse }}</p>
+    <p><strong>Nombre de lots:</strong> {{ object.nombre_lots }}</p>
+
+    <h2>Copropriétaires</h2>
+    <ul>
+        {% for coproprietaire in object.coproprietaire_set.all %}
+            <li>{{ coproprietaire.nom }} - {{ coproprietaire.email }}</li>
+        {% empty %}
+            <li>Aucun copropriétaire enregistré.</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'copropriete_list' %}" class="btn btn-secondary">Retour à la liste</a>
+{% endblock %}

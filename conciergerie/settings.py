@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 from celery.schedules import crontab
 
@@ -72,8 +73,10 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     # local
-    'schedule',  # ou le nom correct de votre application
     'django_celery_beat',
+    'schedule',  # ou le nom correct de votre application
+    'core', # common models 
+    'staff',
     'services_menage',
 ]
 
@@ -238,10 +241,10 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'  # Assurez-vous que le fuseau horaire 
 #
 # Ancienne configuration (encore supportée jusqu'à Celery 6.0)
-CELERY_BROKER_CONNECTION_RETRY = True
+CELERY_BROKER_CONNECTION_RETRY = False
 
 # Nouvelle configuration pour Celery 6.0 et au-delà
-CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = False
 
 
 CELERY_BEAT_SCHEDULE = {

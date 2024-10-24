@@ -1,0 +1,19 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Liste des Copropriétaires{% endblock %}
+
+{% block content %}
+    <h1>Liste des Copropriétaires</h1>
+    <ul class="list-group">
+        {% for coproprietaire in object_list %}
+            <li class="list-group-item">
+                {{ coproprietaire.nom }} - {{ coproprietaire.email }}
+                <br>
+                <small>Copropriété: {{ coproprietaire.copropriete.nom }}</small>
+            </li>
+        {% empty %}
+            <li class="list-group-item">Aucun copropriétaire enregistré.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -10,13 +10,13 @@ from services_menage import models as serv_models
         
 # 5. Utilisez des signaux pour automatiser la création d'événements :
 
-## @receiver(post_save, sender=serv_models.Reservation)
+@receiver(post_save, sender=serv_models.Reservation)
 def reservation_created(sender, instance, created, **kwargs):
-    if created:
+    if not created:
         # Obtenir la date actuelle
-        date_actuelle = timezone.aujourdhui()
+        date_actuelle = timezone.now().date()
         # Obtenir le dernier jour de l'année en cours
-        fin_annee = datetime(date_actuelle.year, 12, 31)
+        fin_annee = datetime(date_actuelle.year, 12, 31).date()
         # Initialiser la date du mois en cours
         date_mois = date_actuelle.replace(day=1)
 

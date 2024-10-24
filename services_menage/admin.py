@@ -9,6 +9,7 @@ from django.db import models, IntegrityError
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from services_menage import models as cg_models
+from staff import models as staff_models
 # celery
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from schedule.models import Calendar, Event
@@ -128,15 +129,6 @@ class ReservationAdmin(ImportExportModelAdmin):
 
 
 
-@admin.register(cg_models.Employee)
-class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'get_calendar_name')
-    search_fields = ('name',)
-
-    def get_calendar_name(self, obj):
-        return obj.calendar.name if obj.calendar else "Pas de calendrier"
-    get_calendar_name.short_description = 'Calendrier'
-
 @admin.register(cg_models.ServiceTask)
 class ServiceTaskAdmin(admin.ModelAdmin):
     list_display = ('get_description', 'get_client', 'get_guestname',
@@ -168,15 +160,7 @@ class EventAdmin(admin.ModelAdmin):
     list_filter = ('start', 'end', 'calendar')
     search_fields = ('title',)
 
-@admin.register(cg_models.Absence)
-class AbsenceAdmin(admin.ModelAdmin):
-    list_display = ('get_employee', 'start_date', 'end_date', 'type_absence', )
-    list_filter = ('start_date', )
-    search_fields = ('employee',)
-    
-    def get_employee(self, obj):
-        return obj.employee
-        
+     
     
     
 # Réenregistrement des modèles de django-scheduler avec notre configuration personnalisée
