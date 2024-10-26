@@ -12,13 +12,20 @@ from rest_framework import viewsets, permissions, generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 ## 
-from services_menage import models as sm_models
-from core import models as core_models
 from services_menage import serializers 
 from services_menage.serializers import PeriodicTaskSerializer
 from rest_framework import status
 from rest_framework.views import APIView
 from core.models import CustomCalendar
+from django.views.generic import CreateView
+
+# Formulaire etat des lieu
+from rest_framework import viewsets
+from services_menage.serializers import CheckoutInventorySerializer
+from services_menage.forms import CheckoutInventoryForm
+#models
+from services_menage import models as sm_models
+from core import models as core_models
 
 class PeriodicTaskListCreate(generics.ListCreateAPIView):
     queryset = PeriodicTask.objects.all()
@@ -234,3 +241,9 @@ class ServiceTaskEventUpdateView(APIView):
         # Sérialiser et renvoyer l'événement mis à jour
         serializer = serializers.ServiceTaskSerializer(event)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+class CheckoutInventoryViewSet(viewsets.ModelViewSet):
+    queryset = sm_models.CheckoutInventory.objects.all()
+    serializer_class = CheckoutInventorySerializer

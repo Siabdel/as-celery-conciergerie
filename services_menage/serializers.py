@@ -138,3 +138,13 @@ class TaskSerializer(serializers.ModelSerializer):
         model = ServiceTask
         fields = ['id', 'description', 'start_date', 'end_date', 'employee', 'reservation']
         depth = 1  # Optionnel, si vous souhaitez inclure les détails des relations (employee, reservation)
+
+#-------------------
+# Formulaire serializers
+#-------------------
+from .models import CheckoutInventory
+
+class CheckoutInventorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CheckoutInventory
+        fields = '__all__'

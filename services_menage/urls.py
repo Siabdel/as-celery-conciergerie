@@ -15,6 +15,9 @@ router.register(r'reservations', api_views.ReservationViewSet)
 router.register(r'maintenance_tasks', api_views.ServiceTaskViewSet)
 router.register(r'calendars', api_views.CalendarViewSet)
 router.register(r'events', api_views.EventViewSet)
+# Formulaire 
+router.register(r'checkout-inventory', api_views.CheckoutInventoryViewSet)
+
 
 urlpatterns = [
     path('home/', views.home, name='home'),

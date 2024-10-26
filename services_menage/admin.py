@@ -90,12 +90,61 @@ class ReservationResource(resources.ModelResource):
 class ReservationAdmin(ImportExportModelAdmin):
     resource_class = ReservationResource
     #
-    list_display = ('property', 'guest_name', 'check_in', 'check_out', 'reservation_status', 'total_price')
-    list_filter = ('reservation_status', 'property', 'check_in')
-    search_fields = ('guest_name', 'guest_email', 'property__name')
     date_hierarchy = 'check_in'
     actions = [duplicate_reservation]  # Ajoutez l'action ici
+    ## readonly_fields = ('numero', 'created_at', 'invoice_total')
     
+    list_display = ('guest_name', 'property', 'check_in', 'check_out', 'reservation_status', 
+                    'platform', 'total_price')
+    list_filter = ('reservation_status', 'platform', 'is_business_trip')
+    search_fields = ('guest_name', 'guest_email', 'property__name')
+    readonly_fields = ('booking_date', 'created_at', )
+
+    fieldsets = (
+        ('Reservation Details', {
+            'fields': (
+                ('property', 'reservation_status'),
+                ('check_in', 'check_out'),
+                ('platform', 'is_business_trip'),
+            )
+        }),
+        ('Guest Information', {
+            'fields': (
+                ('guest_name', 'guest_email'),
+                ('guest_phone', 'number_of_guests'),
+                'special_requests',
+            )
+        }),
+        ('Financial Details', {
+            'fields': (
+                ('total_price', 'cleaning_fee', 'service_fee'),
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Additional Information', {
+            'fields': (
+                ('cancellation_policy', 'guest_rating'),
+            ),
+            'classes': ('collapse',)
+        }),
+        ('System Information', {
+            'fields': (
+                ('booking_date', 'created_at'),
+                ('created_by', ),
+            ),
+            'classes': ('collapse',)
+        }),
+    )
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # editing an existing object
+            return self.readonly_fields + ('property', 'check_in', 'check_out', 'guest_name', 'guest_email', 'platform', 'total_price')
+        return self.readonly_fields
+
+    def total_price_display(self, obj):
+        return format_html('<span style="color: green; font-weight: bold;">${}</span>', obj.total_price)
+    
+    total_price_display.short_description = 'Total Price'
+
     def save_model(self, request, obj, form, change):
         try:
             obj.save()

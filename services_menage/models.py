@@ -166,4 +166,33 @@ class ServiceTask(ASBaseTimestampMixin):
 
  
 
+ 
+#---------------------------------------
+#-Etat des lieux du bien               -
+#---------------------------------------
+class CheckoutInventory(models.Model):
+    reservation = models.OneToOneField(Reservation, on_delete=models.CASCADE, related_name='checkout_inventory')
+    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name='checkout_inventories')
+    date_performed = models.DateTimeField(auto_now_add=True)
+    
+    cleanliness_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    damage_description = models.TextField(blank=True)
+    missing_items = models.TextField(blank=True)
+    
+    additional_notes = models.TextField(blank=True)
+    photos = models.ManyToManyField('CheckoutPhoto', blank=True)
+    
+    is_completed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Checkout Inventory for {self.reservation}"
+
+class CheckoutPhoto(models.Model):
+    image = models.ImageField(upload_to='checkout_photos/')
+    description = models.CharField(max_length=255)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.description
+
 

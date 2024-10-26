@@ -1,0 +1,27 @@
+
+from django.shortcuts import render, redirect
+from django.views.generic import CreateView
+from .models import CheckoutInventory, CheckoutPhoto
+from .forms import CheckoutInventoryForm
+
+class CheckoutInventoryCreateView(CreateView):
+    model = CheckoutInventory
+    form_class = CheckoutInventoryForm
+    template_name = 'checkout_inventory_form.html'
+
+    def form_valid(self, form):
+        inventory = form.save(commit=False)
+        inventory.employee = self.request.user.employee
+        inventory.reservation = Reservation.objects.get(pk=self.kwargs['reservation_id'])
+        inventory.save()
+
+        # Gestion des photos
+        photos = self.request.FILES.getlist('photos')
+        for photo in photos:
+            CheckoutPhoto.objects.create(
+                image=photo,
+                description=f"Photo for {inventory}",
+                checkout_inventory=inventory
+            )
+
+        return redirect('inventory_detail', pk=inventory.pk)

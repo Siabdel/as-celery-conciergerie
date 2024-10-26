@@ -16,8 +16,11 @@ from django.db.models import Q
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.db import transaction
-from services_menage.models import ResaStatus, TaskTypeService
-
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.shortcuts import render, redirect
+from django.views.generic import CreateView
+from services_menage  import models as sm_models
+from .forms import CheckoutInventoryForm
 
 
 def home(request):
@@ -192,6 +195,30 @@ def assign_tasks_from_reservations_with_balancing(year, month):
     ## ---------------------
     ## create task default
     ## ---------------------
+    def create_task(employee, reservation, type_service, hours_plus, desc):
+            
+        try :
+            task = serv_models.ServiceTask.objects.get_or_create(
+                employee=employee_for_check_in,
+                type_service = type_service,
+                description = desc,
+                start_date=check_in_time,
+                end_date=check_in_time + timedelta(hours = hours_plus),
+                reservation=reservation,
+                property=reservation.property, # Associer la tâche à la réservation
+            )
+            return task
+            
+        except IntegrityError:
+            # En cas de doublon, on continue simplement avec la prochaine itération
+            return False
+        except Exception as err:
+            # Pour les autres types d'erreurs, on les lève
+            raise err
+        
+    ## ---------------------
+    ## create task default
+    ## ---------------------      
     def create_task_default(reservation):
         try :
             task = serv_models.ServiceTask.objects.get_or_create(
@@ -222,51 +249,21 @@ def assign_tasks_from_reservations_with_balancing(year, month):
         # Priorité 1 : Affecter la tâche de check-in
         employee_for_check_in = find_employee_for_task(check_in_time.date())
         if employee_for_check_in:
-            
-            try :
-                task = serv_models.ServiceTask.objects.create(
-                    employee=employee_for_check_in,
-                    type_service = TaskTypeService.CHECKED_IN,
-                    description=f"Check_in",
-                    start_date=check_in_time,
-                    end_date=check_in_time + timedelta(hours=1),
-                    reservation=reservation,
-                    property=reservation.property, # Associer la tâche à la réservation
-                )
+            if (task := create_task(employee_for_check_in, reservation, sm_models.TaskTypeService.CHECKED_IN, 1, 'Check-in')):
                 assigned_tasks.append(task)
                 task_count[employee_for_check_in.id] += 1  # Augmenter le nombre de tâches de cet employé
-                
-            except IntegrityError:
-                # En cas de doublon, on continue simplement avec la prochaine itération
-                break
-            except Exception as err:
-                # Pour les autres types d'erreurs, on les lève
-                raise err
-            
+          
         else:
             create_task_default(reservation)
                 
         # Priorité 2 : Affecter la tâche de check-out
         employee_for_check_out = find_employee_for_task(check_out_time.date())
         if employee_for_check_out:
-            try :
-                task = serv_models.ServiceTask.objects.create(
-                 employee=employee_for_check_out,
-                    description=f"Check_out",
-                    type_service = TaskTypeService.CHECKED_OUT,
-                    start_date=check_out_time,
-                    end_date=check_out_time + timedelta(hours=1),
-                    reservation=reservation,
-                    property=reservation.property, # Associer la tâche à la réservation
-                )
+            if (task := create_task(employee_for_check_out, reservation, sm_models.TaskTypeService.CHECKED_OUT, 1, 'Check-out')):
                 assigned_tasks.append(task)
                 task_count[employee_for_check_out.id] += 1  # Augmenter le nombre de tâches de cet employé
-            except IntegrityError:
-                # En cas de doublon, on continue simplement avec la prochaine itération
-                continue
-            except Exception as err:
-                # Pour les autres types d'erreurs, on les lève
-                raise err
+          
+            
         else:
             create_task_default(reservation)
 
@@ -274,10 +271,10 @@ def assign_tasks_from_reservations_with_balancing(year, month):
         employee_for_cleaning = find_employee_for_task(cleaning_day.date())
         if employee_for_cleaning:
             try :
-                task = serv_models.ServiceTask.objects.create(
+                task = serv_models.ServiceTask.objects.get_or_create(
                     employee=employee_for_cleaning,
                     description=f"Ménage ",
-                    type_service = TaskTypeService.CLEANING,
+                    type_service = sm_models.TaskTypeService.CLEANING,
                     start_date=datetime.combine(cleaning_day, datetime.min.time()),
                     end_date=datetime.combine(cleaning_day, datetime.min.time()) + timedelta(hours=2),
                     reservation=reservation,
@@ -295,3 +292,26 @@ def assign_tasks_from_reservations_with_balancing(year, month):
             create_task_default(reservation)
 
     return assigned_tasks
+
+
+class CheckoutInventoryCreateView(CreateView):
+    model = sm_models.CheckoutInventory
+    form_class = CheckoutInventoryForm
+    template_name = 'checkout_inventory_form.html'
+
+    def form_valid(self, form):
+        inventory = form.save(commit=False)
+        inventory.employee = self.request.user.employee
+        inventory.reservation = Reservation.objects.get(pk=self.kwargs['reservation_id'])
+        inventory.save()
+
+        # Gestion des photos
+        photos = self.request.FILES.getlist('photos')
+        for photo in photos:
+            CheckoutPhoto.objects.create(
+                image=photo,
+                description=f"Photo for {inventory}",
+                checkout_inventory=inventory
+            )
+
+        return redirect('inventory_detail', pk=inventory.pk)
