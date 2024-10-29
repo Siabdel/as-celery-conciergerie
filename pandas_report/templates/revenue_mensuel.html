@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revenue by Property and Month</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2> Data : {{ chart_data |length  }} </h2>
+    <div style="width: 80%; margin: auto;">
+        <canvas id="revenueChart"></canvas>
+    </div>
+
+    <script>
+        var ctx = document.getElementById('revenueChart').getContext('2d');
+        var chartData = {{ chart_data|safe }};
+
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: chartData.datasets.map((dataset, index) => ({
+                    label: dataset.label,
+                    data: dataset.data,
+                    backgroundColor: `hsl(${index * 360 / chartData.datasets.length}, 70%, 50%)`,
+                    borderColor: `hsl(${index * 360 / chartData.datasets.length}, 70%, 40%)`,
+                    borderWidth: 1
+                }))
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: true,
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Revenue'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Revenue by Property and Month'
+                    },
+                    legend: {
+                        position: 'top',
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{% load static %}
+<html>
+<head>
+    <title>Property Report</title>
+    <style>
+        /* Copiez ici le CSS fourni dans votre exemple */
+        body { font: 14px/1.4 Georgia, serif; }
+        table { border-collapse: collapse; width: 100%; }
+        table td, table th { border: 1px solid black; padding: 5px; }
+        #header { background: #222; color: white; text-align: center; padding: 10px; }
+        /* Ajoutez d'autres styles selon vos besoins */
+    </style>
+</head>
+<body>
+    <div id="page-wrap">
+        <p id="header">PROPERTY REPORT</p>
+        
+        <table id="items">
+            <tr>
+                <th>Property</th>
+                <th>Total Reservations</th>
+                <th>Total Revenue</th>
+            </tr>
+            {% for item in report_data.data %}
+            <tr class="item-row">
+                <td>{{ item.property__name }}</td>
+                <td class="center">{{ item.total_reservations }}</td>
+                <td class="center">${{ item.total_revenue }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        
+        <div id="terms">
+            <h5>Report Generated on: {{ report_data.generated_date }}</h5>
+        </div>
+    </div>
+</body>
+</html>

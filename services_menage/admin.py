@@ -21,12 +21,55 @@ from import_export import resources, fields, widgets
 
 
 
+from django.contrib import admin
+from django.utils.html import format_html
+from .models import Property
+
 @admin.register(cg_models.Property)
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'address', 'owner', 'reservation_count', 'total_revenue')
+    list_display = ('name', 'type', 'owner', 'price_per_night_display', 'address_preview')
     list_filter = ('type', 'owner')
-    search_fields = ('name', 'address')
+    search_fields = ('name', 'address', 'owner__username')
+    readonly_fields = ('created_at', 'update_at', 'created_by')
 
+    fieldsets = (
+        ('Property Information', {
+            'fields': (
+                'name',
+                ('type', 'owner'),
+                'price_per_night',
+            )
+        }),
+        ('Location', {
+            'fields': ('address',),
+        }),
+        ('System Information', {
+            'fields': (
+                ('created_at', 'update_at'),
+                'created_by',
+            ),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # editing an existing object
+            return self.readonly_fields + ('created_by',)
+        return self.readonly_fields
+
+    def price_per_night_display(self, obj):
+        return format_html('<span style="color: green; font-weight: bold;">${}</span>', obj.price_per_night)
+    price_per_night_display.short_description = 'Price per Night'
+
+    def address_preview(self, obj):
+        return obj.address[:50] + '...' if len(obj.address) > 50 else obj.address
+    address_preview.short_description = 'Address Preview'
+
+    def save_model(self, request, obj, form, change):
+        if not change:  # if creating a new object
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
+ 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser:

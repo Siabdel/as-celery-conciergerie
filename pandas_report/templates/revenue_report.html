@@ -1,0 +1,71 @@
+{% extends "base_agency.html" %}
+{% load static %}
+
+{% block header %} {% endblock %}
+
+{% block content %}
+<h1>Revenue Report </h1>
+
+<div id="report-table"></div>
+
+<div id="chart-container" style="width: 100%; height: 400px;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const reportData = JSON.parse('{{ report_data|safe }}');
+    //const reportData = {{ report_data|safe }};
+
+    // Créer le tableau
+    const table = document.createElement('table');
+    table.className = 'table table-striped';
+    
+    // En-tête
+    const thead = table.createTHead();
+    const headerRow = thead.insertRow();
+    headerRow.insertCell().textContent = 'Month';
+    reportData.columns.forEach(col => {
+        headerRow.insertCell().textContent = col;
+    });
+
+    // Corps
+    const tbody = table.createTBody();
+    reportData.data.forEach((row, index) => {
+        const tr = tbody.insertRow();
+        tr.insertCell().textContent = reportData.index[index];
+        row.forEach(cell => {
+            tr.insertCell().textContent = cell;
+        });
+    });
+
+    document.getElementById('report-table').appendChild(table);
+
+    // Créer le graphique
+    const ctx = document.getElementById('chart-container').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: reportData.index,
+            datasets: reportData.columns.map((col, index) => ({
+                label: col,
+                data: reportData.data.map(row => row[index]),
+                backgroundColor: `hsl(${index * 360 / reportData.columns.length}, 70%, 50%)`,
+            }))
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { stacked: true },
+                y: { 
+                    stacked: true,
+                    beginAtZero: true,
+                    title: { display: true, text: 'Revenue' }
+                }
+            },
+            plugins: {
+                title: { display: true, text: 'Revenue by Property and Month' },
+                legend: { position: 'top' }
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -60,6 +60,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
      ## import / Export
     'import_export',
+    ## Django Slick reportings
+    "slick_reporting",
+    "crispy_forms",
+    "crispy_bootstrap4",
     # 3rd-party apps
     'rest_framework', # new
     'rest_framework.authtoken',
@@ -72,12 +76,16 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    # sql explorer
+    'explorer',
     # local
     'django_celery_beat',
     'schedule',  # ou le nom correct de votre application
     'core', # common models 
     'staff',
     'services_menage',
+    'slick_report', 
+    'pandas_report',
 ]
 
 MIDDLEWARE = [
@@ -330,3 +338,9 @@ LOGGING = {
         },
     },
 }
+
+# Report + Crispy
+CRISPY_TEMPLATE_PACK = "bootstrap4"
+# SQL Explorer
+#EXPLORER_PERMISSION_VIEW = lambda u: u.is_staff
+#EXPLORER_PERMISSION_CHANGE = lambda u: u.is_superuser

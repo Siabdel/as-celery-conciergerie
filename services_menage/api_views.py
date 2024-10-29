@@ -247,3 +247,37 @@ class ServiceTaskEventUpdateView(APIView):
 class CheckoutInventoryViewSet(viewsets.ModelViewSet):
     queryset = sm_models.CheckoutInventory.objects.all()
     serializer_class = CheckoutInventorySerializer
+
+from dateutil import parser
+
+@api_view(['PATCH'])
+def update_event(request, pk):
+    """
+    Met à jour partiellement un événement via PATCH.
+    """
+    try:
+        event = Event.objects.get(pk=pk)
+    except Event.DoesNotExist:
+        return Response({"error": "Event not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    # On récupère les nouvelles valeurs depuis la requête
+    start_date_str = request.data.get('start_date')
+    end_date_str = request.data.get('end_date')
+
+    # Utiliser dateutil pour parser la date ISO 8601 avec fuseau horaire
+    if start_date_str:
+        start_date = parser.isoparse(start_date_str)  # Convertit automatiquement les dates ISO 8601
+        event.start_date = start_date
+
+    if end_date_str:
+        end_date = parser.isoparse(end_date_str)
+        event.end_date = end_date
+
+    try:
+        event.save()  # Enregistrer l'événement
+    except ValueError as err:
+        raise Exception("Erreur lors de l'enregistrement", err)
+
+    # Sérialiser et renvoyer l'événement mis à jour
+    serializer = serializers.EventSerializer(event)
+    return Response(serializer.data, status=status.HTTP_200_OK)
