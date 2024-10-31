@@ -68,3 +68,73 @@ Traceback (most recent call last):
   File "/home/django/Depots/www/Back-end/Django/envCeleryConciergerie/lib/python3.9/site-packages/celery/worker/consumer/consumer.py", line 659, in on_task_received
     strategy = strategies[type_]
 KeyError: 'services_menage.tasks.cron_update_reservation_status'
+[2024-10-30 05:53:20,964: INFO/MainProcess] Scheduler: Sending due task create-events-daily (services_menage.tasks.service_checkin_task)
+[2024-10-30 05:53:20,970: INFO/MainProcess] Scheduler: Sending due task update-resa-status (services_menage.tasks.cron_update_reservation_status)
+[2024-10-30 05:53:20,976: ERROR/MainProcess] Received unregistered task of type 'services_menage.tasks.cron_update_reservation_status'.
+The message has been ignored and discarded.
+
+Did you remember to import the module containing this task?
+Or maybe you're using relative imports?
+
+Please see
+https://docs.celeryq.dev/en/latest/internals/protocol.html
+for more information.
+
+The full contents of the message body was:
+b'[[], {}, {"callbacks": null, "errbacks": null, "chain": null, "chord": null}]' (77b)
+
+The full contents of the message headers:
+{'lang': 'py', 'task': 'services_menage.tasks.cron_update_reservation_status', 'id': '6cc7852b-b279-4b6e-886b-24d8abace827', 'shadow': None, 'eta': None, 'expires': None, 'group': None, 'group_index': None, 'retries': 0, 'timelimit': [None, None], 'root_id': '6cc7852b-b279-4b6e-886b-24d8abace827', 'parent_id': None, 'argsrepr': '()', 'kwargsrepr': '{}', 'origin': 'gen491575@debian-hpelite', 'ignore_result': False, 'replaced_task_nesting': 0, 'stamped_headers': None, 'stamps': {}}
+
+The delivery info for this task is:
+{'exchange': '', 'routing_key': 'celery'}
+Traceback (most recent call last):
+  File "/home/django/Depots/www/Back-end/Django/envCeleryConciergerie/lib/python3.9/site-packages/celery/worker/consumer/consumer.py", line 659, in on_task_received
+    strategy = strategies[type_]
+KeyError: 'services_menage.tasks.cron_update_reservation_status'
+[2024-10-30 05:53:40,433: ERROR/MainProcess] Received unregistered task of type 'services_menage.tasks.cron_update_reservation_status'.
+The message has been ignored and discarded.
+
+Did you remember to import the module containing this task?
+Or maybe you're using relative imports?
+
+Please see
+https://docs.celeryq.dev/en/latest/internals/protocol.html
+for more information.
+
+The full contents of the message body was:
+b'[[], {}, {"callbacks": null, "errbacks": null, "chain": null, "chord": null}]' (77b)
+
+The full contents of the message headers:
+{'lang': 'py', 'task': 'services_menage.tasks.cron_update_reservation_status', 'id': '28b40739-4a27-453b-8e63-e7da6482a5e8', 'shadow': None, 'eta': None, 'expires': None, 'group': None, 'group_index': None, 'retries': 0, 'timelimit': [None, None], 'root_id': '28b40739-4a27-453b-8e63-e7da6482a5e8', 'parent_id': None, 'argsrepr': '()', 'kwargsrepr': '{}', 'origin': 'gen491786@debian-hpelite', 'ignore_result': False, 'replaced_task_nesting': 0, 'stamped_headers': None, 'stamps': {}}
+
+The delivery info for this task is:
+{'exchange': '', 'routing_key': 'celery'}
+Traceback (most recent call last):
+  File "/home/django/Depots/www/Back-end/Django/envCeleryConciergerie/lib/python3.9/site-packages/celery/worker/consumer/consumer.py", line 659, in on_task_received
+    strategy = strategies[type_]
+KeyError: 'services_menage.tasks.cron_update_reservation_status'
+[2024-10-31 07:01:22,309: INFO/MainProcess] Scheduler: Sending due task create-events-daily (services_menage.tasks.service_checkin_task)
+[2024-10-31 07:01:22,319: INFO/MainProcess] Scheduler: Sending due task update-resa-status (services_menage.tasks.cron_update_reservation_status)
+[2024-10-31 07:01:22,320: ERROR/MainProcess] Received unregistered task of type 'services_menage.tasks.service_checkin_task'.
+The message has been ignored and discarded.
+
+Did you remember to import the module containing this task?
+Or maybe you're using relative imports?
+
+Please see
+https://docs.celeryq.dev/en/latest/internals/protocol.html
+for more information.
+
+The full contents of the message body was:
+b'[[], {}, {"callbacks": null, "errbacks": null, "chain": null, "chord": null}]' (77b)
+
+The full contents of the message headers:
+{'lang': 'py', 'task': 'services_menage.tasks.service_checkin_task', 'id': '873c5dc7-2297-404b-9b2a-e02e692aa88b', 'shadow': None, 'eta': None, 'expires': None, 'group': None, 'group_index': None, 'retries': 0, 'timelimit': [None, None], 'root_id': '873c5dc7-2297-404b-9b2a-e02e692aa88b', 'parent_id': None, 'argsrepr': '()', 'kwargsrepr': '{}', 'origin': 'gen491575@debian-hpelite', 'ignore_result': False, 'replaced_task_nesting': 0, 'stamped_headers': None, 'stamps': {}}
+
+The delivery info for this task is:
+{'exchange': '', 'routing_key': 'celery'}
+Traceback (most recent call last):
+  File "/home/django/Depots/www/Back-end/Django/envCeleryConciergerie/lib/python3.9/site-packages/celery/worker/consumer/consumer.py", line 659, in on_task_received
+    strategy = strategies[type_]
+KeyError: 'services_menage.tasks.service_checkin_task'

@@ -1,0 +1,108 @@
+{% extends "base_agency.html" %}
+{% load  static %}
+{% load l10n %}
+
+{% block header %} {% endblock header %}
+
+{% block extra_js %}
+    <script>
+        var vm = new Vue({
+            el: "#app",
+            delimiters: ['[[', ']]'],
+            data: { 
+                message : "Compare List",
+                dataset : [],
+                url : "",
+                filterKey : "",
+                sortedKey : "property_name",
+                sortBy : "property_name",
+                currentSort : "property_name",
+                order : 1 ,
+                entree : 0,
+            },
+            //----
+            created(){
+                // `this` est une référence à l'instance de vm
+                console.log('this is message: ' + this.message)
+                this.load_dataset()
+            },
+            //---
+            computed: {
+                // resultat
+                resultat(){
+                    return this.entree * 1.20 * 12
+                }, 
+                // sinon 
+                sorteddata(){
+                    return this.dataset.filter(property => property.property_name.includes(this.filterKey)).sort((a, b) =>  {
+                        if(a[this.currentSort] < b[this.currentSort]) return -1 * this.order
+                        if(a[this.currentSort] > b[this.currentSort]) return 1 * this.order
+                        return 0
+                    })
+                }
+            },
+            methods: {
+                load_dataset(){
+                    let url = `/pandas/api/revenue-report/`
+                    // ajax load
+                    fetch(url)
+                    .then(response => response.json())
+                    .then(json => {
+                        this.dataset = json;
+                        console.log(" data ok = "  )
+                        })  
+                    .catch(err => {
+                        console.log("erreur fetch load_dataset", err)
+                        })
+                    //console.log("vous chercher ...!" + this.filterKey)
+                },
+                //-------
+            }
+        });
+        // mount
+        vm.$mount('.app')
+    </script>
+{% endblock extra_js%}
+
+{% block content %}
+
+<hr>
+<div class="container row" id="app">
+    <div class="col-10">
+        <h3> [[ message ]] </h3>
+        <h3 v-show=""> [[ dataset ]] </h3>
+        <form class="d-flex" action="/admin/" method="post" @submit.prevent="">
+                {% csrf_token %}
+            <input v-show=""  class="form-control me-2" v-model="entree" type="text" placeholder="saisie un montant" >
+            <input class="form-control me-2" v-model="filterKey" type="text" placeholder="saisie un mot de recherche" >
+            <input class="btn btn-outline-success" type="submit" value="Rechercher" />
+        </form>
+        <hr/>
+
+        <table class="table table-striped">
+            <thead>
+                <tr> <th>Id</th> <th>property name </th> <th>Montant</th> </tr>
+            </thead>
+            <tbody v-if="sorteddata">
+                <tr v-for="(property, index) in sorteddata" :key=index>
+                    <td scope="row"> 
+                        <a :href="property.id"  target='_blanc'>
+                            [[ property.month ]]
+                        </a>  
+                    </td>
+                   
+                    <td v-if="property.offre_recu" > Oui </td>
+                    <td v-if="property.visite" > Oui </td>
+                    <td> [[ property.property_name ]] </td>
+                    <td> [[ property.total_revenue ]] </td>
+                </tr>
+                
+            </tbody>
+        </table> 
+    </div>
+    <div class="col-2">
+        <img src="/media/upload/prestigia_001.jpg" width="50%" />
+    </div>
+</div>
+ 
+{% endblock content %}
