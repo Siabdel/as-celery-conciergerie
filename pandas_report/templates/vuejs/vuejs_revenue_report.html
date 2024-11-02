@@ -10,7 +10,7 @@
             el: "#app",
             delimiters: ['[[', ']]'],
             data: { 
-                message : "Compare List",
+                message : "Revenues des properietes par mois ",
                 conciergerie_data :  { dataset: [] },
                 url : "",
                 filterKey : "",
@@ -33,8 +33,17 @@
                     return this.entree * 1.20 * 12
                 }, 
                 // sinon 
-                sorteddata(){
-                    return this.conciergerie_data.dataset;
+                sorteddata() {
+                    const dataset = this.conciergerie_data.dataset;
+                    const filterKeyLower = this.filterKey.toLowerCase();
+
+                    return dataset
+                        .filter(property => property.property_name.toLowerCase().includes(filterKeyLower))
+                        .sort((a, b) => {
+                            if (a[this.currentSort] < b[this.currentSort]) return -1 * this.order;
+                            if (a[this.currentSort] > b[this.currentSort]) return 1 * this.order;
+                            return 0;
+                        });
                 },
                 getMonths() {
                     const months = new Set();

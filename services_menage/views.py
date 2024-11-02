@@ -27,7 +27,13 @@ def home(request):
     return render(request, "home_page.html")
 
 def conciergerie_page(request):
-    return render(request, "conciergerie_page.html")
+    return render(request, "dashboard_page.html")
+
+def reporting_page(request):
+    return render(request, "dashboard_report.html")
+
+def planning_page(request):
+    return render(request, "planning_page.html")
 
 class PropretyList(ListView):
     template_name = "property_list.html"

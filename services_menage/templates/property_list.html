@@ -2,17 +2,29 @@
 {% extends 'base_agency.html' %}
 {% load static %}
 
-{% block title %}Liste des Copropriétaires{% endblock %}
+{% block title %}Happy Bee {% endblock %}
 {% block header %}{% endblock %}
 
 {% block content %}
-    <h1>Liste des Copropriétaires {{ message }} ***</h1>
+    <h1>Liste des propriétes </h1>
     <ul class="list-group">
-        {% for coproprietaire in object_list %}
+        {% for property in object_list %}
             <li class="list-group-item">
-                {{ coproprietaire.nom }} - {{ coproprietaire.email }}
-                <br>
-                <small>Copropriété: {{ coproprietaire.copropriete.nom }}</small>
+                <div class="card">
+                    <div class="card-header">
+                        <span class=""> <img  class="p-3 float-left" style="width:30%" src={% static 'img/appart_salon_008.jpg'  %} /> 
+                         <h3> {{ property.name }} </h3> </span>
+                        <span class="card-columns"> Type : {{ property.type }} <span>
+                    </div>
+
+                    <div class="card-body">
+                        Adresse : <small> {{ property.address }}</small>
+                        Localisation <smal>  {{ property.address }}</small>
+                        <span>Proprietaire : {{ property.owner.first_name }} {{ property.owner.last_name }} </span>
+                    </div>
+                    <div class="card-footer badge-info"> {{ property.price_per_night}} DH </div>
+                </div>
+
             </li>
         {% empty %}
             <li class="list-group-item">Aucun copropriétaire enregistré.</li>

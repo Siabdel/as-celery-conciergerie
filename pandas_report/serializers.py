@@ -6,11 +6,11 @@ from services_menage.models import ResaStatus, TaskTypeService
 
 
 class RevenuesSerializer(serializers.DictField):
-    child = serializers.FloatField()
+    child = serializers.FloatField() ## noeux 
 
 class DatasetSerializer(serializers.Serializer):
     property_name = serializers.CharField()
-    revenues = RevenuesSerializer()
+    revenues = RevenuesSerializer() ## noeux  ajouter
     total = serializers.FloatField()
 
 class RevenueReportSerializer(serializers.Serializer):

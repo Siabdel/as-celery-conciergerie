@@ -1,0 +1,30 @@
+{% extends 'base_agency.html' %}
+{% load static %}
+
+{% block title %}Accueil - Conciergerie {% endblock %}
+{% block header %}{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <main class="container-fluid">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Planning Schudler </h1>
+            </div>
+
+            <div class="col-5">
+                <h3> Fullcalendar </h3>
+                <ul class="list-group">
+                    <a class="list-group-item text-light active" href="{% url 'fullcalendar:calendar_resa' %}" target="_blank"> Planning des Reservations</a>
+                    <a class="list-group-item text-muted" href="{% url 'fullcalendar:calendar_empl' %}" target="_blank">  Planning du personnel</a>
+                </ul>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+{% endblock %}  

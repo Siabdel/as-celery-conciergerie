@@ -86,6 +86,7 @@ INSTALLED_APPS = [
     'services_menage',
     'slick_report', 
     'pandas_report',
+    'fullcalendar', # fullcalendar scheduler
 ]
 
 MIDDLEWARE = [

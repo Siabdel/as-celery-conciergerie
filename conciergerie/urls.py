@@ -29,6 +29,8 @@ urlpatterns = [
     path('explorer/', include('explorer.urls')),
     # pandas Report 
     path('pandas/', include('pandas_report.urls')),
+    # fullcalendar
+    path('calendar/', include('fullcalendar.urls')),
 ]
 
 # Ajoutez ces lignes pour servir les fichiers média en mode développement

@@ -12,7 +12,7 @@ from rest_framework import viewsets, permissions, generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 ## 
-from services_menage import serializers 
+from services_menage import serializers as sm_serializers
 from services_menage.serializers import PeriodicTaskSerializer
 from rest_framework import status
 from rest_framework.views import APIView
@@ -21,11 +21,13 @@ from django.views.generic import CreateView
 
 # Formulaire etat des lieu
 from rest_framework import viewsets
+from rest_framework import serializers
 from services_menage.serializers import CheckoutInventorySerializer
 from services_menage.forms import CheckoutInventoryForm
 #models
 from services_menage import models as sm_models
 from core import models as core_models
+
 
 class PeriodicTaskListCreate(generics.ListCreateAPIView):
     queryset = PeriodicTask.objects.all()
@@ -33,28 +35,28 @@ class PeriodicTaskListCreate(generics.ListCreateAPIView):
 
 class PropertyViewSet(viewsets.ModelViewSet):
     queryset = sm_models.Property.objects.all()
-    serializer_class = serializers.PropertySerializer
+    serializer_class = sm_serializers.PropertySerializer
 
 class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = sm_models.Employee.objects.all()
-    serializer_class = serializers.EmployeeSerializer
+    serializer_class = sm_serializers.EmployeeSerializer
 
 class ReservationViewSet(viewsets.ModelViewSet):
     queryset = sm_models.Reservation.objects.all()
-    serializer_class = serializers.ReservationSerializer
+    serializer_class = sm_serializers.ReservationSerializer
 
 class ServiceTaskViewSet(viewsets.ModelViewSet):
     queryset = sm_models.ServiceTask.objects.all()
-    serializer_class = serializers.ServiceTaskSerializer
+    serializer_class = sm_serializers.ServiceTaskSerializer
 
 class CalendarViewSet(viewsets.ModelViewSet):
     queryset = core_models.CustomCalendar.objects.all()
-    serializer_class = serializers.CalendarSerializer
+    serializer_class = sm_serializers.CalendarSerializer
 
 # Events
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
-    serializer_class = serializers.EventSerializer
+    serializer_class = sm_serializers.EventSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
@@ -145,7 +147,7 @@ def get_employee_tasks(request):
         tasks = tasks.filter(employee__id=employee_id)
 
     # Sérialiser les tâches
-    serializer = serializers.ServiceTaskSerializer(tasks, many=True)
+    serializer = sm_serializers.ServiceTaskSerializer(tasks, many=True)
     
     return Response(serializer.data)
 

@@ -4,6 +4,12 @@ from schedule.models import Calendar, Event
 from django_celery_beat.models import PeriodicTask
 from services_menage.models import Employee, Reservation, ServiceTask, Property
 from services_menage.models import ResaStatus, TaskTypeService
+from django.contrib.auth.models import User, Group, Permission
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta :
+        model = User
+        fields = '__all__'
 
 class CustomPeriodicTaskSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,10 +23,18 @@ class CalendarSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug']
 
 class PropertySerializer(serializers.ModelSerializer):
+    owner = UserSerializer()
     class Meta:
         model = Property
-        fields = '__all__'
-        fields__ = ['id', 'name', 'type', 'adresse', 'owner', 'price_per_night',]
+        fields__ = '__all__'
+        fields = ( "id", "update_at",
+            "created_at", "name", "type", "address",
+            "price_per_night", "created_by", "owner",
+        )
+
+    def get_client(self, obj):
+        return obj.owner.user.first_name
+
 
 class EmployeeSerializer(serializers.ModelSerializer):
     calendar = CalendarSerializer(read_only=True)

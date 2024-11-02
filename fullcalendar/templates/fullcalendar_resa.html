@@ -73,11 +73,12 @@
                     },
                     events: '/service/api/reservations/',  // Assurez-vous que cette URL est correcte
                     //eventClick: function(info) { alert("click Ok :")},
-                    eventDblClick: function(info) {
+                    eventClick: function(info) {
                         var eventId = info.event.id;
-                        var adminUrl = '/admin/service_admin/reservation/' + eventId + '/change/';
+                        var adminUrl = '/admin/services_menage/reservation/' + eventId + '/change/';
                         window.location.href = adminUrl;
                     },
+                    
                     // on Mouse enter
                     eventMouseEnter: function(info) {
                         var event = info.event;

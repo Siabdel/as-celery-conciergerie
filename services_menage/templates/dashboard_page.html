@@ -18,30 +18,39 @@
             </div>
 
             <div class="row">
-                <div class="col-md-4 mb-4">
+                <div class="col-md-3 mb-3">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">propriétés</h5>
                             <p class="card-text">Nombre total: 15</p>
-                            <a href="{% url 'agence:property_list' %}" class="btn btn-primary">Voir détails</a>
+                            <a href="{% url 'agence:property_list' %}" target="_blank" class="btn btn-primary">Voir détails</a>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-3 mb-3">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Reservations</h5>
                             <p class="card-text">Nombre total: 150</p>
-                            <a href="{% url 'agence:employee_list' %}" class="btn btn-primary">Voir détails</a>
+                            <a href="{% url 'agence:employee_list' %}" target="_blank" class="btn btn-primary">Voir détails</a>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col-md-3 mb-3">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Planning interventions à venir</h5>
                             <p class="card-text">Planning Employees: 16/10/2024</p>
-                            <a href="{% url 'agence:planning_list' %}" class="btn btn-primary">Voir calendrier</a>
+                            <a href="{% url 'fullcalendar:calendar_home' %}" target="_blank" class="btn btn-primary">Voir calendrier</a>
+                        </div>
+                    </div>
+                </div>
+                 <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Reports et statistique</h5>
+                            <p class="card-text"> Rapport des revenus par propriété et par mois en 2024</p>
+                            <a href="{% url 'agence:dashboard_report' %}"  target="_blank" class="btn btn-primary">Voir Reports</a>
                         </div>
                     </div>
                 </div>

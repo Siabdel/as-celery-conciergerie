@@ -21,12 +21,13 @@ router.register(r'checkout-inventory', api_views.CheckoutInventoryViewSet)
 
 urlpatterns = [
     path('home/', views.home, name='home'),
-    path('dashboard/', views.conciergerie_page, name='dashbord'),
-
+    path('dashboard/', views.conciergerie_page, name='dashboard'),
+    path('personnel/', views.conciergerie_page, name='employee_list'),
+    ##
     path('property/', views.PropretyList.as_view(), name='property_list'),
-    path('agence/', views.conciergerie_page, name='reservations'),
-    path('agence/', views.conciergerie_page, name='employee_list'),
-    path('agence/', views.conciergerie_page, name='planning_list'),
+    path('resa/', views.conciergerie_page, name='reservations'),
+    path('report/', views.reporting_page, name='dashboard_report'),
+    path('planning/', views.planning_page, name='planning_page'),
 ]
 
 #-------------------
@@ -34,9 +35,7 @@ urlpatterns = [
 #-------------------
 
 urlpatterns += [
-    path('api/', include(router.urls)),
-    path('cal/resa/', views.calendar_reservation, name='calendar_resa'),
-    path('cal/empl/', views.calendar_employee, name='calendar_empl'),
+    path('api/', include(router.urls), name='api_router'),
     ## path('api/v1/calendar/employee-tasks/', EmployeeTaskCalendarView.as_view(), name='employee_task_calendar'),
     path('api/tasks/', api_views.get_employee_tasks, name='get_employee_tasks'),
     path('api/event/<int:pk>/update/', api_views.ServiceTaskEventUpdateView.as_view(), name='event-update'),

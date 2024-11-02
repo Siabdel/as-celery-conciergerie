@@ -223,23 +223,48 @@ class ReservationAdmin(ImportExportModelAdmin):
 
 @admin.register(cg_models.ServiceTask)
 class ServiceTaskAdmin(admin.ModelAdmin):
-    list_display = ('get_description', 'get_client', 'get_guestname',
-                    'employee', 'start_date', 'end_date', 'reservation', )
-    #list_filter = ('scheduled_time', 'employee')
-    search_fields = ('property__client', 'employee__name')
-    list_filter = ('property', 'employee', 'start_date')
+    list_display = ('get_description', 'get_client', 'get_guestname', 'property', 
+                    'start_date', 'end_date', 'status', 'completed')
+    list_filter = ('status', 'completed', 'type_service')
+    search_fields = ('property__name', 'employee__user__username', 'reservation__guest_name')
+    date_hierarchy = 'start_date'
+    #readonly_fields = ('created_at', )
+
+    fieldsets = (
+        ('Task Details', {
+            'fields': (
+                'description',
+                ('property', 'reservation'),
+                ('employee', 'type_service'),
+                ('start_date', 'end_date'),
+            )
+        }),
+        ('Status Information', {
+            'fields': (
+                ('status', 'completed'),
+            )
+        }),
+        ('System Information', {
+            'fields': (
+                ('created_by',),
+            ),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+    def get_description(self, obj):
+        return obj.description[:50] + '...' if len(obj.description) > 50 else obj.description
+    get_description.short_description = 'Description'
 
     def get_client(self, obj):
-        return obj.property
+        return obj.property.owner.username if obj.property and obj.property.owner else '-'
     get_client.short_description = 'Client'
-    
-    def get_description(self, obj):
-        return obj.description[:20]
-    
+
     def get_guestname(self, obj):
-        # ServiceTask.objects.filter(reservation__guest_name__isnull=True).exists()
-        return obj.reservation.guest_name if obj.reservation else 'No guest name'
-      
+        return obj.reservation.guest_name if obj.reservation else '-'
+    get_guestname.short_description = 'Guest Name'
+
 
 # Personnalisation de l'admin pour Calendar et Event
 class CalendarAdmin(admin.ModelAdmin):
