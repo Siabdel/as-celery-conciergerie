@@ -7,6 +7,7 @@ from services_menage.models import Reservation, Property
 from django.http import JsonResponse
 from django.views.generic import TemplateView
 from .report import generate_revenue_data, generate_revenue_report
+from django.db.models import Q
 
 #-------------------------------------------
 #--- Revenue Chart View

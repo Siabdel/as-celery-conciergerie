@@ -15,6 +15,10 @@ import os
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from celery.schedules import crontab
+import environ
+# Initialise environment variables
+env = environ.Env()
+environ.Env.read_env()
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -38,12 +42,17 @@ MANAGERS = ADMINS
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-fumu!8#a64vb1b55&oum7bhexxp=u3o&(t-6b+qykitij(3wj*"
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'atlass.fr' ]
+
 SITE = 1
+SITE_ID = 1
+# email backend 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # new
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -104,7 +113,7 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware', # new
 ]
 
-ROOT_URLCONF = "conciergerie.urls"
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
@@ -124,7 +133,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "conciergerie.wsgi.application"
+WSGI_APPLICATION = "config.wsgi.application"
 
 
 # Database
@@ -132,10 +141,10 @@ WSGI_APPLICATION = "conciergerie.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'conciergeriedb',
-        'USER': 'postgres',
-        'PASSWORD': 'grutil001',
-        'HOST': 'localhost',
+        "NAME": env("DATABASE_NAME"),
+        "USER": env("DATABASE_USER"),
+        "PASSWORD": env("DATABASE_PASSWORD"), 
+        "HOST" : env( "HOST"),
         'PORT': '5432',
     }
 }
@@ -195,7 +204,7 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 # Lorsque USE_TZ vaut True et que la base de données ne gère pas les fuseaux horaires (par ex. SQLite, MySQL, Oracle), Django lit et écrit les dates/heures en heure locale en fonction de cette option quand elle est définie et en UTC si elle ne l’est pas.
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

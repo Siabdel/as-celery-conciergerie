@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import RevenueChartView, revenue_data, RevenueReportView, revenue_report_data
 from .views import ConciergerieRevenueView
-from .api_views import RevenueReportAPIView
+from .api_views import RevenueReportAPIView, TauxOccupationAPIView
 
 
 app_name = "report"
@@ -19,7 +19,17 @@ urlpatterns = [
 #-------------------------------------------
 urlpatterns += [
     # ... vos autres URLs ...
-    path('api/revenue-report/', RevenueReportAPIView.as_view(), name='revenue_report_api'),
     path('revenue/', ConciergerieRevenueView.as_view(), name='revenue_report'),
     path('revenue-report/', RevenueReportView.as_view(), name='revenue_report_chart'),
 ]
+#-------------------------------------------
+#--- API's            
+#-------------------------------------------
+
+urlpatterns += [
+    # taux occupation des proprietes par mois
+    path('api/taux-occupation/', TauxOccupationAPIView.as_view(), name='revenue_report_chart'),
+    # Revenue Report
+    path('api/revenue-report/', RevenueReportAPIView.as_view(), name='revenue_report_api'),
+]
+#-------------------------------------------
