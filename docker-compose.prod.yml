@@ -4,9 +4,10 @@ services:
   web:
     container_name: conciergerie_prod_web
     build: 
-      context: ./django
+      context: ./
       dockerfile: Dockerfile.prod
     command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
+    # commande :  python manage.py runserver 0.0.0.0:8000
     volumes: 
       - static_volume:/home/app/web/staticfiles
     ports:
@@ -15,9 +16,18 @@ services:
       - ./.env.prod
     depends_on:
       - db
+
+      ## Ajoutez des limites de ressources pour les conteneurs  
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+
   db:
     container_name: conciergerie_db
-    image: postgres:14.0-alpine
+    # image: postgres:14.0-alpine
+    image: postgres:14
     build:
       context: ./postgres
       dockerfile: Dockerfile
@@ -25,6 +35,7 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - ./.env.prod.db
+
  
   nginx:
     container_name: conciergerie_nginx
@@ -41,3 +52,7 @@ volumes:
   postgres_data:
   static_volume:
   media_volume:
+
+secrets:
+  db_password:
+    file: ./db_password.txt
