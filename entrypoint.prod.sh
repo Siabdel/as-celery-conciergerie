@@ -15,6 +15,7 @@ done
 # python manage.py migrate --noinput
 # rm -r staticfiles/*
 # python manage.py collectstatic --no-input --clear
+
 ## creation du superuser abdel et admin
 # echo "from django.contrib.auth.models import User; User.objects.create_superuser(username='admin', password='grutil001', email='admin@atlass.fr')" | python3 manage.py shell
 # echo "from django.contrib.auth.models import User; User.objects.create_superuser(username='abdel', password='grutil001', email='abdel@atlass.fr')" | python3 manage.py shell

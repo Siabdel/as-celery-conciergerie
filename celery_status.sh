@@ -1,2 +1,2 @@
-celery -A conciergerie beat -l info
-celery -A conciergerie worker -l info
+celery -A django beat -l info
+celery -A django worker -l info

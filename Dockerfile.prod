@@ -4,7 +4,7 @@
 FROM python:3.11-slim
 
 # set work directory
-WORKDIR /usr/src/app
+WORKDIR  /home/app/web
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -22,7 +22,9 @@ RUN  apt update && apt -y upgrade \
         && rm -rf /var/lib/apt/lists/* \
         && apt -y autoclean && apt autoremove
 #
-RUN apt clean
+RUN apt update && apt -y upgrade && apt install -y nano \ 
+        && apt install -y bash vim \ 
+        && apt clean
 # install dependencies
 RUN pip install --upgrade pip
 COPY ./requirements.txt .
@@ -33,13 +35,22 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 ##
 # Nettoyage des fichiers .pyc et du cache
-RUN find /usr/src/app -type f -name "*.pyc" -delete && \
-    find /usr/src/app -type d -name "__pycache__" -delete && \
+RUN find  /home/app/web -type f -name "*.pyc" -delete && \
+    find  /home/app/web -type d -name "__pycache__" -delete && \
     rm -rf /root/.cache/pip && \
     rm -rf /tmp/*
 ##  les fichiers temporaires sont supprimés,
 RUN rm -rf /tmp/*
 # run entrypoint.sh
-#RUN useradd -m appuser
-#USER appuser
-#ENTRYPOINT [ "/usr/src/app/entrypoint.prod.sh" ]
+# add user django
+RUN useradd -m django
+RUN useradd -m abdel
+RUN useradd -m nginx
+#RUN echo "root:grutil001" | chpasswd
+#RUN mkdir -p  /home/app/web/staticfiles
+RUN chown -R django:django  /home/app/web/
+RUN chmod 755 -R  /home/app/web/
+RUN chown -R nginx:nginx  /home/app/web/staticfiles
+# add user django
+USER django
+#ENTRYPOINT [ " /home/app/web/entrypoint.prod.sh" ]

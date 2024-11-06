@@ -16,6 +16,7 @@ services:
       - ./.env.prod
     depends_on:
       - db
+    user: django
 
       ## Ajoutez des limites de ressources pour les conteneurs  
     deploy:
@@ -42,16 +43,33 @@ services:
     build: ./nginx
     volumes:
       - static_volume:/home/app/web/staticfiles
-      - media_volume:/home/app/web/mediafiles
+      - media_volume:/home/app/web/media
     ports:
       - 1338:80
     depends_on:
       - web
 
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-siabdel58@gmail.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+        - pgadmin:/home/app/.pgadmin:rw
+
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    
+    restart: always
+
+
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+  pgadmin:
 
 secrets:
   db_password:

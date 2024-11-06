@@ -211,11 +211,11 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 
-STATIC_URL = "/static/"
+STATIC_URL = "static/"
 # Chemin où les fichiers statiques seront collectés (utilisé pour le déploiement)
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
 
-MEDIA_URL = '/media/'
+MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 
