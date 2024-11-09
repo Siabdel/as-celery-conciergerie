@@ -1,0 +1,76 @@
+version: '3.9'
+
+services:
+  web:
+    container_name: conciergerie_prod_web
+    build: 
+      context: ./
+      dockerfile: Dockerfile.prod
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
+    # commande :  python manage.py runserver 0.0.0.0:8000
+    volumes: 
+      - static_volume:/home/app/web/staticfiles
+    ports:
+      - 8800:8000
+    env_file:
+      - ./.env.prod
+    depends_on:
+      - db
+    user: django
+
+      ## Ajoutez des limites de ressources pour les conteneurs  
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+
+  db:
+    container_name: conciergerie_db
+    # image: postgres:14.0-alpine
+    image: postgres:14
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env.prod.db
+
+ 
+  nginx:
+    container_name: conciergerie_nginx
+    build: ./nginx
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+      - media_volume:/home/app/web/media
+    ports:
+      - 1338:80
+    depends_on:
+      - web
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-siabdel58@gmail.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+        - pgadmin:/home/app/.pgadmin:rw
+
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    
+    restart: always
+
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+  pgadmin:
+
+secrets:
+  db_password:
+    file: ./db_password.txt
