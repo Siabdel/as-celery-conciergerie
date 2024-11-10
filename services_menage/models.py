@@ -14,13 +14,24 @@ from core.models import ASBaseTimestampMixin
 from django.conf import settings    
 from core.models import ResaStatus, TaskTypeService, PlatformChoices, BaseImage
 from core import models as cr_models 
+from django.utils.text import slugify
+
 
 class PropertyImage(cr_models.BaseImage):
     property = models.ForeignKey('Property', related_name="images", on_delete=models.CASCADE)
 
     def get_absolute_url(self):
-        return super().get_absolute_url()
+        if self.slug:
+            return reverse('image-detail', kwargs={'slug': self.slug})
+        else:
+            # Si le slug n'est pas défini, on le crée à partir du titre
+            self.slug = slugify(self.title)
+            self.save()
+            return reverse('image-detail', kwargs={'slug': self.slug}) 
 
+## -------------------------
+##-
+## -------------------------
 class Property(ASBaseTimestampMixin):
     PROPERTY_TYPES = [
         ('apartment', 'Apartment'),

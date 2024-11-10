@@ -1,0 +1,85 @@
+
+{% extends "property_detail.html" %}
+{% load  static %}
+
+
+{% block revenue_report %}
+<div>
+    <h4>Rapport de revenus</h4>
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr class="bg-info">
+                <th>Mois / Année</th>
+                <th>Revenu</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="item in revenueData">
+                <td>[[ item.month ]]</td>
+                <td>[[ item.revenue ]]</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block taux_occupation %}
+<div id="occupation-report">
+    <h4>Taux occupation</h4>
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr class="bg-info">
+                <th>Mois / Année</th>
+                <th>Taux occupation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="item in tauxData">
+                <td>[[ item.month ]]</td>
+                <td>[[ item.occupancy_rate ]] %</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    new Vue({
+        el: '#app',
+        delimiters: ['[[', ']]'],
+        data: {
+            revenueData: {},
+            tauxData: {},
+        },
+        mounted() {
+            this.fetchRevenueData();
+            this.fetchTauxOccupData();
+        },
+        methods: {
+            fetchRevenueData() {
+                let url = `{% url "report:api_property_revenue_by_month"  property.pk  %}`
+                fetch(url)
+                    .then(response => response.json())
+                    .then(json => {
+                        this.revenueData = json.dataset;
+                        console.log("datset=", this.revenueData)
+                    });
+            },
+            // taux occupation
+            fetchTauxOccupData() {
+                let url = `{% url "report:api_property_occupancy_rate_by_month" property.pk  %}`
+                fetch(url)
+                    .then(response => response.json())
+                    .then(json => {
+                        this.tauxData = json.dataset;
+                        console.log("datset=", this.tauxData)
+                    });
+            }
+        }
+    });
+</script>
+{% endblock %}

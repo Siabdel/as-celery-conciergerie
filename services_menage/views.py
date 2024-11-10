@@ -60,7 +60,7 @@ class PropretyList(ListView):
 
 
 class PropertyDetail(DetailView):
-    template_name = "property_detail.html"
+    template_name = "property_revenue_vue.html"
     #template_name = "property_list.html"
     model = sm_models.Property
     context_object_name = "property"

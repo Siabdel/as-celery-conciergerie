@@ -77,11 +77,26 @@ class ConciergerieRevenueView(TemplateView):
 
 
 #-------------------------------------------
-#--- vue.js Proerty Revenue per Property
+#--- vue.js Revenue per Property
 #-------------------------------------------
 class PropertyRevenueView(TemplateView):
-    ##template_name = 'vuejs/property_revenue_report.html'
-    template_name = 'property_revenue_vue.html'
+    template_name = 'vuejs/property_revenue_report.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        propert_id =  kwargs.get('property_id')
+        context['name '] = "Son nom est Ain ZET"
+        context['property'] = Property.objects.get(pk=propert_id)
+        #raise Exception("propertt = ", context['property'])
+        return context
+
+
+
+#-------------------------------------------
+#--- vue.js  taux  occupation  per month
+#-------------------------------------------
+class TauxOccupationMoisView(TemplateView):
+    template_name = 'vuejs/property_revenue_report.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
