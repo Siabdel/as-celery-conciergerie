@@ -1,0 +1,92 @@
+{% extends 'base_agency.html' %}
+{% load i18n static %}
+
+{% block header %} {% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <h3 class="mb-4">Détails de la propriété</h3>
+            
+            <div class="row">
+                <h2> {{ property.name }}</h2>
+                <p> {{ property.description}} </p>
+                <h3> {{ property.localisation }} </h3>
+                <p>Adresse de la propriété: {{ property.address }}</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            {% include "includes/images_card.html" %}
+        </div>
+    </div>
+</div>
+
+<hr/> <br>
+<div class="container mt-4">
+        <h2 class="mt-5 mb-4">Dashboard</h2>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Revenue par mois</h5>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Taux d'occupation</h5>
+
+
+                        {% block revenue_report %}
+                        <!-- Le contenu de property_revenue_report.html sera injecté ici -->
+                        {% endblock %}
+                        
+                        <canvas id="occupationChart">
+                        </canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Liens rapides</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item"><a href="#">Calendrier des réservations</a></li>
+                            <li class="list-group-item"><a href="#">Calendrier des services</a></li>
+                            <li class="list-group-item"><a href="#">Rapport financier</a></li>
+                            <li class="list-group-item"><a href="#">Frais annexes mensuels</a></li>
+                            <li class="list-group-item">
+                                <a href="{% url 'report:property_revenue_report' property.pk %}">
+                                    Relevé de revenus/charges</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+     <div class="row mt-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Derniers incidents relevés</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item">Incident 1...</li>
+                            <li class="list-group-item">Incident 2...</li>
+                            <li class="list-group-item">Incident 3...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+   
+
+{% endblock %}

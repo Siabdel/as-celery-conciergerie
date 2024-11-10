@@ -1,13 +1,18 @@
-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import os
 import json
 import random
 import pandas as pd
 import numpy as np
+from PIL import Image
+from io import BytesIO
+from django.core.files import File
+from django.conf import settings
 from datetime import datetime, timedelta
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.timezone import make_aware, is_naive
 from decimal import Decimal
-from .models import Reservation
 
 
 """_summary_Pandas pour l’analyse des données
@@ -122,3 +127,101 @@ with open('reservation_fixtures.json', 'w') as f:
     json.dump(reservations, f, indent=2)
 
 print("Fixtures generated and saved to reservation_fixtures.json")
+
+
+
+class Dict2Obj(object):
+    """
+    Turns a dictionary into a class
+    """
+    #----------------------------------------------------------------------
+    def __init__(self, dictionary):
+        """Constructor"""
+        for key in dictionary:
+            setattr(self, key, dictionary[key])
+
+
+
+def make_thumbnail(image, size=(100, 100)):
+    """Makes thumbnails of given size from given image"""
+
+    im = Image.open(image)
+
+    im.convert('RGB') # convert mode
+
+    im.thumbnail(size) # resize image
+
+    thumb_io = BytesIO() # create a BytesIO object
+
+    im.save(thumb_io, 'JPEG', quality=85) # save image to BytesIO object
+
+    thumbnail = File(thumb_io, name=image.name) # create a django friendly File object
+
+    return thumbnail
+
+##  
+
+def process_resize_image(image, output_dir, thumbnail_size=(100, 100), large_size=(800, 600)):
+    """
+    Traite une images de produit en créant des miniatures de taille uniforme
+    et une grande image.
+
+    Args:
+        image :  ProductImage instance
+        output_dir (str): Le répertoire de sortie où les images traitées seront enregistrées.
+        thumbnail_size (tuple): Taille de la miniature (largeur, hauteur). Par défaut: (100, 100).
+        large_size (tuple): Taille de la grande image (largeur, hauteur). Par défaut: (800, 600).
+    """
+
+    # Ouvre l'image
+    with Image.open(image.image.path) as img:
+        # Crée une miniature
+        thumbnail = img.copy()
+        thumbnail.thumbnail(thumbnail_size)
+
+        # Crée une grande image avec un rapport d'aspect préservé
+        large_img = img.copy()
+        
+        # Size of the image in pixels (size of original image) 
+        # (This is not mandatory) 
+        width, height = large_img.size 
+ 
+       
+        # Enregistre les images traitées
+        base_name = os.path.basename(image.image.path)
+        thumbnail_path = os.path.join(output_dir, 
+                                  f"thumbnail_{thumbnail_size[0]}x{thumbnail_size[1]}_{base_name}")
+        large_path = os.path.join(output_dir,
+                                  f"large_{large_size[0]}x{large_size[1]}_{base_name}")
+
+        thumbnail.save(thumbnail_path)
+        #large_img.save(large_path)
+        large_img.save(large_path)
+
+        # Retourne les chemins des images traitées
+        return thumbnail_path, large_path
+
+
+def process_default_image(image, output_dir, thumbnail_size=(100, 100), large_size=(800, 600)):
+    """
+    """
+    # Ouvre l'image
+    with Image.open(image.path) as img:
+        # Crée une miniature
+        thumbnail = img.copy()
+        thumbnail.thumbnail(thumbnail_size)
+
+        # Crée une grande image avec un rapport d'aspect préservé
+        large_img = img.copy()
+        large_img.thumbnail(large_size)
+
+        # Enregistre les images traitées
+        base_name = os.path.basename(image.path)
+        thumbnail_path = os.path.join(output_dir, f"thumbnail_{base_name}")
+        large_path = os.path.join(output_dir, f"large_{base_name}")
+
+        thumbnail.save(thumbnail_path)
+        large_img.save(large_path)
+
+        # Retourne les chemins des images traitées
+        return thumbnail_path, large_path

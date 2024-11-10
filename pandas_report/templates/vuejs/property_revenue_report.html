@@ -1,0 +1,118 @@
+{% extends "base_agency.html" %}
+{% load  static %}
+{% load l10n %}
+
+{% block header %} {% endblock header %}
+
+{% block extra_js %}
+    <script>
+        var vm = new Vue({
+            el: "#app",
+            delimiters: ['[[', ']]'],
+            data: { 
+                message : "Revenues des properietes par mois ",
+                conciergerie_data :  {  },
+                url : "",
+                filterKey : "",
+                sortedKey : "property_name",
+                sortBy : "property_name",
+                currentSort : "property_name",
+                order : 1 ,
+                entree : 0,
+            },
+            //----
+            created(){
+                // `this` est une référence à l'instance de vm
+                console.log('this is message: ' + this.message)
+                this.load_dataset();
+            },
+            //---
+            computed: {
+                // resultat
+                resultat(){
+                    return this.entree * 1.20 * 12
+                }, 
+                // sinon 
+                sorteddata() {
+                    const dataset = this.conciergerie_data;
+                    const filterKeyLower = this.filterKey.toLowerCase();
+                    return dataset
+                },
+                
+            },
+            methods: {
+                load_dataset(){
+                    let url = `{% url "report:api_property_revenue_by_month"  10  %}`
+                    // ajax load
+                    fetch(url)
+                    .then(response => response.json())
+                    .then(json => {
+                        this.conciergerie_data = json.dataset;
+                        console.log(" data ok = ", this.conciergerie_data.length )
+                        })  
+                    .catch(err => {
+                        console.log("erreur fetch load_dataset", err)
+                        })
+                    //console.log("vous chercher ...!" + this.filterKey)
+                },
+                //-------
+                
+                // calculateGrandTotal
+                calculateMonthTotal(month) {
+                    // Calcule le total pour un mois donné pour toutes les propriétés
+                    return this.sorteddata.reduce((total, property) => {
+                        return total + (property.revenues[month] || 0);
+                    }, 0);
+                },
+                //calcumateGrandtotal
+                calculateGrandTotal() {
+                    // Calcule le grand total de tous les revenus
+                    return this.sorteddata.reduce((total, property) => total + property.total, 0);
+                }
+                }
+
+                //-------
+        });
+        // mount
+        vm.$mount('.app')
+    </script>
+{% endblock extra_js%}
+
+{% block content %}
+
+<hr>
+<div class="container row" id="app">
+    <div class="col-10">
+        <h3> {{ property }} ***  </h3>
+        <h3 v-show=""> [[ conciergerie_data.length ]] </h3>
+        <form class="d-flex" action="/admin/" method="post" @submit.prevent="">
+                {% csrf_token %}
+            <input v-show=""  class="form-control me-2" v-model="entree" type="text" placeholder="saisie un montant" >
+            <input class="form-control me-2" v-model="filterKey" type="text" placeholder="saisie un mot de recherche" >
+            <input class="btn btn-outline-success" type="submit" value="Rechercher" />
+        </form>
+        <hr/>
+
+        <table class="table table-striped">
+            <thead>
+                <tr class="bg-secondary text-light"> <th> Mois / Annee </th> <th> Revenue </th> </tr>
+            </thead>
+
+            <tbody v-if="sorteddata">
+
+                <tr v-for="(property, e_index) in sorteddata" :key="e_index">
+                    <td> [[ property.month ]] </td>
+                    <td  v-for="(elem, r_index) in property.revenues" :key="r_index"> [[ elem ]]  </td>
+                    <td> [[ property.revenue ]] </td>
+
+                </tr>
+                
+            </tbody>
+        </table>
+    </div>
+    <div class="col-2">
+        <img src="{%  static '/img/Happy_Bee_100x100.jpg'  %}" width="50%" />
+    </div>
+</div>
+ 
+{% endblock content %}

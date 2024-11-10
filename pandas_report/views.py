@@ -66,9 +66,28 @@ class RevenueReportView(TemplateView):
 #-------------------------------------------
 class ConciergerieRevenueView(TemplateView):
     template_name = 'vuejs/vuejs_revenue_report.html'
-
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['dataset'] = generate_revenue_data()
+        return context
+
+
+
+#-------------------------------------------
+#--- vue.js Proerty Revenue per Property
+#-------------------------------------------
+class PropertyRevenueView(TemplateView):
+    ##template_name = 'vuejs/property_revenue_report.html'
+    template_name = 'property_revenue_vue.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        propert_id =  kwargs.get('property_id')
+        context['name '] = "Son nom est Ain ZET"
+        context['property'] = Property.objects.get(pk=propert_id)
+        #raise Exception("propertt = ", context['property'])
         return context
 

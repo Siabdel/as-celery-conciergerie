@@ -9,7 +9,7 @@ from services_menage import models as serv_models
 from django.utils.timezone import now
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from collections import defaultdict
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, DetailView
 from core.models import CustomCalendar
 from staff import models as staff_models
 from django.db.models import Q
@@ -36,6 +36,7 @@ def planning_page(request):
     return render(request, "planning_page.html")
 
 class PropretyList(ListView):
+    
     template_name = "property_list.html"
     context_object_name = "properties"
     paginate_by = 10
@@ -58,6 +59,22 @@ class PropretyList(ListView):
         return context
 
 
+class PropertyDetail(DetailView):
+    template_name = "property_detail.html"
+    #template_name = "property_list.html"
+    model = sm_models.Property
+    context_object_name = "property"
+    
+    def get_context_data(self, **kwargs):
+        context =  super().get_context_data(**kwargs)
+          # Récupérer les images associées à ce produit en utilisant la méthode que nous avons définie dans le modèle
+        property  = self.get_object()
+        context.update( {'property' : self.get_object()})
+        context.update( { 'property_images' : property.get_images()})
+         
+        #raise Exception("images : ", property_images)
+        return context
+    
 ## CustomCalendar reservations
 def calendar_reservation(request):
     return render(request, 'fullcalendar_resa.html')

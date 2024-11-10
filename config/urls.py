@@ -22,6 +22,8 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
+    path('home/', include('services_menage.urls')),
+
     path("admin/", admin.site.urls),
     path('service/', include('services_menage.urls')),
     path('report/', include('slick_report.urls')),

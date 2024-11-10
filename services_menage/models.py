@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.urls import reverse, resolve
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -11,8 +12,14 @@ from phonenumber_field.modelfields import PhoneNumberField
 from staff.models import Employee
 from core.models import ASBaseTimestampMixin
 from django.conf import settings    
-from core.models import ResaStatus, TaskTypeService, PlatformChoices
+from core.models import ResaStatus, TaskTypeService, PlatformChoices, BaseImage
+from core import models as cr_models 
 
+class PropertyImage(cr_models.BaseImage):
+    property = models.ForeignKey('Property', related_name="images", on_delete=models.CASCADE)
+
+    def get_absolute_url(self):
+        return super().get_absolute_url()
 
 class Property(ASBaseTimestampMixin):
     PROPERTY_TYPES = [
@@ -38,8 +45,19 @@ class Property(ASBaseTimestampMixin):
 
     def get_upcoming_reservations(self):
         return self.reservations.filter(check_in__gte=timezone.now().date())
+    
+    def get_images(self):
+        return self.images.all()
 
+    def get_absolute_url(self):
+        return reverse("shop:product_detail", kwargs={'pk': self.pk})
+    
+    def get_edit_url(self):
+        return reverse("shop:product_edit", kwargs={'pk': self.pk})
 
+    def get_delete_url(self):
+        return reverse("shop:product_delete", kwargs={'pk': self.pk})
+    
 
 
 

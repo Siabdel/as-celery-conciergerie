@@ -12,9 +12,11 @@
             <li class="list-group-item">
                 <div class="card">
                     <div class="card-header">
+                        <a href="{% url 'agence:property_detail' property.pk  %}" >
                         <span class=""> <img  class="p-3 float-left" style="width:30%" src={% static 'img/appart_salon_008.jpg'  %} /> 
                          <h3> {{ property.name }} </h3> </span>
                         <span class="card-columns"> Type : {{ property.type }} <span>
+                        </a>
                     </div>
 
                     <div class="card-body">

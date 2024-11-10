@@ -44,3 +44,24 @@ class DatasetOccupationSerializer(serializers.Serializer):
 class TauxOccupationSerializer(serializers.Serializer):
     # Champ pour la liste des données
     datatest = DatasetOccupationSerializer(many=True)
+
+##-----------------------------------
+##-- class 
+##-----------------------------------
+#--------------------------------------------------------
+#-- Rapport Analytique des revenues par mois / property
+#-------------------------------------------------------
+class DataPropretySerializer(serializers.Serializer):
+    month = serializers.CharField()
+    revenue = serializers.FloatField()
+
+class RevenuePropriotytSerializer(serializers.Serializer):
+    dataset = DatasetOccupationSerializer(many=True)
+    
+
+class OccupancyRateSerializer(serializers.Serializer):
+    month = serializers.CharField()
+    occupancy_rate = serializers.FloatField()
+
+class OccupancyDataSerializer(serializers.Serializer):
+    dataset = OccupancyRateSerializer(many=True)

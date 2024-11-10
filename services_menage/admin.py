@@ -18,19 +18,30 @@ from django.utils.html import format_html
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources, fields, widgets
+from django.contrib.admin import StackedInline
+from .models import Property, PropertyImage
+from core.models import BaseImage
 
 
+@admin.register(PropertyImage)
+class ProductImageAdmin(admin.ModelAdmin):
+    list_display =  [field.name for field in PropertyImage._meta.get_fields()]
 
-from django.contrib import admin
-from django.utils.html import format_html
-from .models import Property
-
+# Register your models here.
+class PropertyImageInline(StackedInline):
+    model = PropertyImage
+    readonly_fields = ('thumbnail_path', 'large_path',)
+    fields = ('title', 'image',  )
+    extra = 0
+    
+    
 @admin.register(cg_models.Property)
 class PropertyAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'owner', 'price_per_night_display', 'address_preview')
     list_filter = ('type', 'owner')
     search_fields = ('name', 'address', 'owner__username')
     readonly_fields = ('created_at', 'update_at', 'created_by')
+    inlines = [PropertyImageInline, ]
 
     fieldsets = (
         ('Property Information', {

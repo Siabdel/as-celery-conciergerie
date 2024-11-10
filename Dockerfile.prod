@@ -45,12 +45,11 @@ RUN rm -rf /tmp/*
 # add user django
 RUN useradd -m django
 RUN useradd -m abdel
-RUN useradd -m nginx
 #RUN echo "root:grutil001" | chpasswd
 #RUN mkdir -p  /home/app/web/staticfiles
 RUN chown -R django:django  /home/app/web/
 RUN chmod 755 -R  /home/app/web/
-RUN chown -R nginx:nginx  /home/app/web/staticfiles
+# RUN chown -R nginx:nginx  /home/app/web/staticfiles
 # add user django
 USER django
 #ENTRYPOINT [ " /home/app/web/entrypoint.prod.sh" ]

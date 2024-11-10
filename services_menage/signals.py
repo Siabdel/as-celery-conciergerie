@@ -37,7 +37,7 @@ def creer_tache_nettoyage(sender, instance, created, **kwargs):
 """ 
 
 
-##@receiver(pre_save, sender=Reservation)
+@receiver(pre_save, sender=Reservation)
 def update_reservation_status(sender, instance, **kwargs):
     aujourdhui = timezone.now()
 

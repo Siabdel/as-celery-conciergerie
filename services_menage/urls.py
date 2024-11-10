@@ -20,11 +20,13 @@ router.register(r'checkout-inventory', api_views.CheckoutInventoryViewSet)
 
 
 urlpatterns = [
+    path('', views.home, name='home'),
     path('home/', views.home, name='home'),
     path('dashboard/', views.conciergerie_page, name='dashboard'),
     path('personnel/', views.conciergerie_page, name='employee_list'),
     ##
     path('property/', views.PropretyList.as_view(), name='property_list'),
+    path('show/<int:pk>/', views.PropertyDetail.as_view(), name='property_detail'),
     path('resa/', views.conciergerie_page, name='reservations'),
     path('report/', views.reporting_page, name='dashboard_report'),
     path('planning/', views.planning_page, name='planning_page'),

@@ -1,0 +1,52 @@
+
+{% load  static %}
+
+{% extends "property_detail.html" %}
+
+{% block revenue_report %}
+    <div id="revenue-report">
+        <h2>Rapport de revenus</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Mois / Année</th>
+                    <th>Revenu</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in revenueData">
+                    <td>[[ item.month ]]</td>
+                    <td>[[ item.revenue ]]</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+new Vue({
+    el: '#revenue-report',
+    delimiters: ['[[', ']]'],
+    data: {
+        revenueData: { },
+    },
+    mounted() {
+        this.fetchRevenueData();
+    },
+    methods: {
+        fetchRevenueData() {
+            let url = `{% url "report:api_property_revenue_by_month"  10  %}`
+            fetch(url)
+                .then(response => response.json())
+                .then(json => {
+                    this.revenueData = json.dataset;
+                    console.log("datset=", this.revenueData)
+                });
+        }
+    }
+});
+</script>
+{% endblock %}
