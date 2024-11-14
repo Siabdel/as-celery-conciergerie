@@ -1,0 +1,64 @@
+
+@import url('https://fonts.googleapis.com/css?family=Lato');
+*{
+  font-family: 'Lato', sans-serif;
+  color:#3B6064;
+}
+
+.axis, .axis line, .axis path{
+  stroke: #3B6064;
+}
+
+.bar{
+  fill:#55828B;
+  transition:.5s;
+}
+.bar-selected{
+  fill:#87BBA2;
+  transition:.5s;
+}
+.bar-clicked{
+  fill:none;
+  stroke:white;
+  transition:.5s;
+}
+
+body{
+  background-color:#C9E4CA;
+}
+
+#container{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+p{
+  text-align:center;
+}
+
+input[type=range]{
+  width:100%;
+  outline: none;
+  -webkit-appearance: none;
+  transition:.5s;
+  background-color:rgba(255,255,255,0.3);
+}
+input[type=range]:hover{
+  background-color:white;
+  box-shadow:0 0 4px rgba(0,0,0,0.2);
+  transition:.5s;
+}
+
+input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 15px;
+    background: #3B6064;
+    cursor: pointer;
+    box-shadow:2px 2px 2px rgba(0,0,0,0.2);
+}
+
+h1{
+  text-shadow:2px 2px 2px rgba(0,0,0,0.2)
+}

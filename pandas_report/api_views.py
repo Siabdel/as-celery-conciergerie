@@ -23,7 +23,9 @@ def month_name_fr(month_number):
 class RevenueReportAPIView(APIView):
     ## get()
     def get(self, request):
-        reservations = Reservation.objects.annotate(
+        reservations = Reservation.objects.filter(
+                        reservation_status__in = ['CONFIRMED', 'COMPLETED', ])\
+        .annotate(
             month=TruncMonth('check_in')
         ).values(
             'month', 
@@ -32,60 +34,63 @@ class RevenueReportAPIView(APIView):
             total_revenue=Sum('total_price')
         ).order_by('property__name', 'month')
 
-        df = pd.DataFrame(reservations)
+        df = pd.DataFrame(list(reservations))
         
-        if not df.empty:
-            df['month'] = pd.to_datetime(df['month'])
-            pivot_df = df.pivot(index='property__name', columns='month', values='total_revenue')
-            pivot_df = pivot_df.fillna(0)
+       
+        df['month'] = pd.to_datetime(df['month'])
+        pivot_df = df.pivot(index='property__name', columns='month', values='total_revenue')
+        pivot_df = pivot_df.fillna(0)
 
-            # Ajouter une colonne de total par propriété
-            pivot_df['Total'] = pivot_df.sum(axis=1)  
+        # Ajouter une colonne de total par propriété
+        pivot_df['Total'] = pivot_df.sum(axis=1)  
+        
+        ## les libelles columns et index
+        json_data = []
+        data = []
+        libelles = {'columns' : pivot_df.columns , 'index' : pivot_df.index}
+
+
+        for property_name in pivot_df.index:
+            property_data = {
+                'property_name': property_name,
+                'revenues': [],
+                'total'  : 0,
+            }
+            lignes_revenue = {}
+            for month in pivot_df.columns:
+                if month != 'Total':
+                    month_str = f"{month.month} {month.year}"
+                    #raise Exception(month_str)
+                    lignes_revenue = {
+                                   "month" : month_str ,
+                                   "revenue": float(pivot_df.loc[property_name, month])
+                                }
+                    # total par ligne 
+                    property_data.update({'total' : float(pivot_df.loc[property_name].sum())}) 
+                    ## ajouter la ligne
+                    property_data.update({'revenues' : lignes_revenue}) 
+                    ##
+                    data.append(property_data)
+                    lignes_revenue = {}
             
-            ## les libelles columns et index
-            json_data = []
-            data = []
-            libelles = {'columns' : pivot_df.columns , 'index' : pivot_df.index}
-
-
-            for property_name in pivot_df.index:
-                property_data = {
-                    'property_name': property_name,
-                    'revenues': [],
-                    'total'  : 0,
-                }
-                lignes_revenue = {}
-                for month in pivot_df.columns:
-                    if month != 'Total':
-                        month_str = f"{month_name_fr(month.month)} {month.year}"
-                        lignes_revenue.update(
-                                    {
-                                     month_str : float(pivot_df.loc[property_name, month])
-                                    })
-                # total par ligne 
-                property_data['total'] = float(pivot_df.loc[property_name].sum()) 
-                ## ajouter la ligne
-                property_data['revenues'] = lignes_revenue 
-                ##
-                data.append(property_data)
-                
-          
-        # Ajouter une ligne de total pour tous les mois
-        else:
-            data = []
-
-        json_data.append({'dataset' : data})
-        json_data.append({'libelles' : libelles })
+        # Conversion du DataFrame en liste de dictionnaires
+        result_dict = { 'dataset': data}
         
-        serializer = pd_serializer.RevenueReportSerializer(data={'dataset':data })
+        #raise Exception("type de  data", data[0]['revenues'])
+           
         
-
+        ## to json 
+        # raise Exception("" , result)
+        serializer = pd_serializer.RevenueReportSerializer(data=result_dict)
+        
+     
         if serializer.is_valid():
             serialized_data = serializer.data
             # Utilisez serialized_data comme nécessaire
         else:
-            print(serializer.errors)
-            #raise Exception("mes data", data)
+            #print(serializer.errors)
+            #raise Exception("mes data", serializer.error_messages)
+            raise Exception("mes data", result_dict)
     
         return Response(serializer.data)
 
@@ -148,8 +153,7 @@ class TauxOccupationAPIView(APIView):
             serialized_data = serializer.data
             # Utilisez serialized_data comme nécessaire
         else:
-            print(serializer.errors)
-            #raise Exception("mes data", data)
+            raise Exception("mes data", serializer.error_messages)
         return Response(serializer.data)
 
 
@@ -219,7 +223,8 @@ def property_revenue_by_month(request, property_id):
 @api_view(['GET'])
 def property_occupancy_rate_by_month(request, property_id):
     # Récupérer toutes les réservations pour la propriété donnée
-    reservations = Reservation.objects.filter(property_id=property_id)
+    reservations = Reservation.objects.filter(property_id=property_id, 
+                                              reservation_status__in=['CONFIRMED', 'COMPLETED', 'PENDING']).order_by("-check_in")
     
     # Créer un DataFrame pandas à partir des réservations
     df = pd.DataFrame(list(reservations.values('check_in', 'check_out')))
@@ -246,7 +251,7 @@ def property_occupancy_rate_by_month(request, property_id):
         daily_occupancy.loc[mask, 'occupied'] = 1
     
     # Calculer le taux d'occupation mensuel
-    monthly_occupancy = daily_occupancy.resample('M').mean()
+    monthly_occupancy = daily_occupancy.resample('ME').mean()
     monthly_occupancy['occupancy_rate'] = monthly_occupancy['occupied'] * 100
     
     # Formater les résultats

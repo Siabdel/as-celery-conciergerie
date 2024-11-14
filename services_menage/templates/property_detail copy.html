@@ -1,0 +1,345 @@
+{% extends 'base_agency.html' %}
+{% load i18n static %}
+
+{% block header %} {% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="container">
+                <h2> {{ property.name }}</h2>
+                <ul class="list-group">
+                    <li class="list-group-item" >Ref Property_ID:  <span class="badge badge-danger m-2 p-2"> {{last_resa.check_in|date:'Y'}}-{{ property.id }}  </span></li>
+                    <li class="list-group-item"> Adresse de la propriété: 
+                             <h5>  {{ property.address }} </h5> </li>
+                    <li class="list-group-item">Dernier client  
+                        <span class=" bg-secondary text-light p-md-1 "> 
+                             {{ last_resa.guest_name }}  </span></li>
+                    <li class="list-group-item">Email
+                        <span class=" bg-secondary text-light p-md-1 "> 
+                              {{ last_resa.guest_email }} </span></li>
+
+                    <li class="list-group-item">Nombre de reservatios en {{ annees.0 }}: 
+                         <span class="badge bg-secondary text-light p-md-3 "> {{ nb_reservations_last_year }}</span> </li>
+                    <li class="list-group-item">Nombre de reservatios en {{ annees.1 }}: 
+                         <span class="badge bg-secondary text-light p-md-3 "> {{ nb_reservations_now }}</span> </li>
+                    <li class="list-group-item">Nombre de reservatios en {{ annees.2 }}: 
+                         <span class="badge bg-secondary text-light p-md-3 "> {{ nb_reservations_next_year  }}</span> </li>
+
+                    <li class="list-group-item">
+                        interventions avenir : </li>
+                    <li class="list-group-item">
+                        Avis : </li>
+                </ul>
+                
+            </div>
+        </div>
+        <div class="col-md-6">
+            {% include "includes/images_card.html" %}
+        </div>
+    </div>
+</div>
+
+<hr/> <br>
+<div id="app" class="container mt-4">
+    <h2 class="mt-5 mb-4">Dashboard</h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Liens rapides</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item"><a href="#">Calendrier des réservations</a></li>
+                        <li class="list-group-item"><a href="#">Calendrier des services</a></li>
+                        <li class="list-group-item"><a href="#">Rapport financier</a></li>
+                        <li class="list-group-item"><a href="#">Frais annexes mensuels</a></li>
+                        <li class="list-group-item">
+                            <a href="{% url 'report:property_revenue_report' property.pk %}">
+                                Relevé de revenus/charges</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    {% block revenue_report %}
+                    <!-- Le contenu de property_revenue_report.html sera injecté ici -->
+                    {% endblock %}
+                    <canvas id="revenueChart">
+                    </canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <!-- class="card-title">Taux d'occupation --> 
+                        {% block taux_occupation %}
+                    <!-- Le contenu de property_ taux occupation ici -->
+                    {% endblock %}
+                    <canvas id="occupationChart">
+                    </canvas>
+                </div>
+            </div>
+        </div>
+            
+    <HR class="border-2"> <br>
+    <div class="row mt-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Derniers incidents relevés</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item">Incident 1...</li>
+                            <li class="list-group-item">Incident 2...</li>
+                            <li class="list-group-item">Incident 3...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        {% block evolution %}
+        {% endblock %}
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block extra_js__ %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#app_chart',
+        data: {
+            chartData: [],
+            chart: null
+        },
+        mounted() {
+            this.fetchRevenueData();
+        },
+        methods: {
+            fetchRevenueData() {
+                axios.get('/api/revenue-data/')
+                    .then(response => {
+                        this.chartData = response.data;
+                        this.renderChart();
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de la récupération des données:', error);
+                    });
+            },
+            renderChart() {
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+                
+                // Préparer les données pour Chart.js
+                const labels = this.chartData.map(item => item.date);
+                const revenues = this.chartData.map(item => item.revenue);
+
+                // Détruire le graphique existant s'il y en a un
+                if (this.chart) {
+                    this.chart.destroy();
+                }
+
+                // Créer le nouveau graphique
+                this.chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Revenus mensuels',
+                            data: revenues,
+                            fill: false,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Revenus (€)'
+                                },
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Évolution des revenus sur les 3 dernières années'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(context.parsed.y);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            },
+            fetchRevenueData2() {
+                let url = `{% url "report:api_revenue_report" %}`
+
+                axios.get(url)
+                    .then(response => {
+                        this.dataset = response.dataset;
+                        /***
+                        this.dataset.map(d => ({
+                            date: new Date(d.date),
+                            revenue: +d.revenue // Le + convertit en nombre
+                        }));
+                        **/
+                        // Cahrt Render()
+                        this.renderChart();
+                         //---------.
+                        const elem = d3.select("#d3_svg_demo2");
+                        let fruits = ['Apple', 'Orange', 'Mango']
+                        let data = this.ChartData
+                        const svgWidth = 460
+                        const svgHeight = 300
+                        const margin = 50
+                        const barMargin = 10
+                        const chartWidth = svgWidth - margin * 2
+                        const chartHeight = svgHeight - margin * 2
+                        const barWidth = ((chartWidth - margin * 2) / data.length) - barMargin
+  
+
+                        const x_scale = d3.scaleBand().range([0, svgWidth])
+                        const y_scale = d3.scaleLinear().range([svgHeight, 0])
+
+                        //Here we selected our SVG element and set the height and width to our specified height and width. Next let's fetch the JSON data from our API:
+
+                        const svg = d3.select("#chartArea").append('svg')
+                        svg.attr('width',svgWidth).attr('height',svgHeight)
+                        .append('g')
+                        .attr('class','axis')
+                        .attr('transform',`translate(${25},${margin})`)
+
+
+                        //The fetched data comes in as a string but we need the Population field to be a number. So using the JavaScript `+` operator we convert each Population field to a number:
+                        data.forEach((d) => (d.revenue = +d.revenue))
+                        //scale Domain
+                        
+                        
+                        bar_scalex.domain(data.map((d) => d.date));
+                        bar_scaley.domain([0, d3.max(data, (d) => d.revenue)]);
+                        //-- 
+                        console.log("datset revenue data 2 ####  ", this.ChartData)
+                        //elem.selectAll("p").data(data).join("li").attr("class", "list-group-item text-info bg-light").text((d) => d.date)
+                        const bars = svg.selectAll(".bar")
+                        .data(data)
+                        .attr('class','bar')
+                        .style("background-color", "blue")
+                        .attr("class", "bar")
+                        .attr("x", (d) => bar_scalex(d.date))
+                        .attr("y", (d) => bar_scaley(d.revenue))
+                        .attr("width", bar_scalex.bandwidth())
+                        .attr("height", (d) => height - y_scale(d.revenue));
+
+                        
+                        // fin Chart
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de la récupération des données:', error);
+                    });
+            },
+            //-----
+            renderChart() {
+                // Définir les dimensions et les marges du graphique
+                const margin = {top: 20, right: 20, bottom: 30, left: 50};
+                const width = 960 - margin.left - margin.right;
+                const height = 500 - margin.top - margin.bottom;
+
+                // Parser pour les dates
+                const parseDate = d3.timeParse("%Y-%m");
+
+                // Définir les échelles
+                const x = d3.scaleTime().range([0, width]);
+                const y = d3.scaleLinear().range([height, 0]);
+
+                // Définir la ligne
+                const line = d3.line()
+                    .x(d => x(d.date))
+                    .y(d => y(d.revenue));
+
+                // Ajouter le SVG au DOM
+                const svg = d3.select("#chart").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                // Formater les données
+                this.ChartData.forEach(d => {
+                    d.date = parseDate(d.date);
+                    d.revenue = +d.revenue;
+                    //console.log("d : data", d.date)
+                });
+
+                 // Vérifiez que les domaines sont correctement définis
+                const xDomain = d3.extent(this.chartData, d => d.date);
+                const yDomain = [0, d3.max(this.chartData, d => d.revenue)];
+
+                console.log("Domaine X:", xDomain);
+                console.log("Domaine Y:", yDomain);
+
+                 // Définir les domaines des échelles
+                x.domain(d3.extent(this.chartData, d => d.date));
+                y.domain([0, d3.max(this.chartData, d => d.revenue)]);
+               
+
+                // Ajouter la ligne
+                svg.append("path")
+                    .datum(this.chartData)
+                    .attr("fill", "none")
+                    .attr("stroke", "steelblue")
+                    .attr("stroke-width", 1.5)
+                    .attr("d", line);
+
+                // Ajouter l'axe X
+                svg.append("g")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(d3.axisBottom(x));
+
+                // Ajouter l'axe Y
+                svg.append("g")
+                    .call(d3.axisLeft(y));
+
+                // Ajouter un titre
+                svg.append("text")
+                    .attr("x", (width / 2))             
+                    .attr("y", 0 - (margin.top / 2))
+                    .attr("text-anchor", "middle")  
+                    .style("font-size", "16px") 
+                    .text("Évolution des revenus sur les 3 dernières années");
+            }
+            
+        }
+    });
+</script>
+
+{% endblock %}

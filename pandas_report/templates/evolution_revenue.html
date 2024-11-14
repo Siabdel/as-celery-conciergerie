@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Évolution des revenus{% endblock %}
+
+{% block content %}
+<h1>Évolution des revenus des réservations</h1>
+<div>
+    [[ chartData ]]
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#app',
+        data: {
+            chartData: [],
+        },
+        mounted() {
+            this.fetchRevenueData();
+        },
+        methods: {
+            fetchRevenueData() {
+                let url = "{% url 'api_revenue_report_ap' %}"
+                axios.get('/api/revenue-data/')
+                    .then(response => {
+                        this.chartData = response.data;
+                        console.error(response.data)
+                        this.renderChart();
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de la récupération des données:', error);
+                    });
+            },
+            renderChart() {
+                // Utilisez Chart.js pour rendre le graphique ici
+                // en utilisant this.chartData
+            }
+        }
+    });
+</script>
+{% endblock %}

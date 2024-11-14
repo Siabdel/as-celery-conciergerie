@@ -4,82 +4,205 @@
 
 
 {% block revenue_report %}
-<div>
-    <h4>Rapport de revenus</h4>
-    <table class="table table-hover table-striped">
-        <thead>
-            <tr class="bg-info">
-                <th>Mois / Année</th>
-                <th>Revenu</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="item in revenueData">
-                <td>[[ item.month ]]</td>
-                <td>[[ item.revenue ]]</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-{% endblock %}
+    <div>
+        <h4>Rapport de revenus</h4>
+        <table class="table table-hover table-striped">
+            <thead>
+                <tr class="bg-info"> <th>Mois / Année</th> <th>Revenu</th> </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in revenueData">
+                    <td>[[ item.month ]]</td>
+                    <td>[[ item.revenue ]]</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock revenue_report%}
 
 {% block taux_occupation %}
-<div id="occupation-report">
-    <h4>Taux occupation</h4>
-    <table class="table table-hover table-striped">
-        <thead>
-            <tr class="bg-info">
-                <th>Mois / Année</th>
-                <th>Taux occupation</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="item in tauxData">
-                <td>[[ item.month ]]</td>
-                <td>[[ item.occupancy_rate ]] %</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-{% endblock %}
+    <div id="occupation-report">
+        <h4>Taux occupation</h4>
+        <table class="table table-hover table-striped">
+            <thead>
+                <tr class="bg-info">
+                    <th>Mois / Année</th>
+                    <th>Taux occupation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in tauxData">
+                    <td>[[ item.month ]]</td>
+                    <td>[[ item.occupancy_rate ]] %</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock taux_occupation %}
 
+{% block evolution %}
+    <div class="container">
+        <h3 class="card-header">Évolution des revenus des réservations</h3>
+        <div class="card">
+            <div class="card-body">
+                <div id="chartArea"></div>
+            <div>
+        </div
+    </div>
+{% endblock evolution %}
 
+{% block extra_css%}
+    <link href="{% static 'css/mychart_style.css' %}" rel="stylesheet">
+{% endblock extra_css%}
 
 {% block extra_js %}
-{{ block.super }}
-<script>
-    new Vue({
+<script> 
+    const myConsole = new Vue({
         el: '#app',
         delimiters: ['[[', ']]'],
         data: {
+            message : "Vue.js",
             revenueData: {},
             tauxData: {},
+            dataset: [],
+            revenus: [],
+            months: [],
+            chartData : [
+                {"date": "2023-01", "revenue": 1000},
+                {"date": "2023-02", "revenue": 1200},
+                {"date": "2023-03", "revenue": 1100},
+                {"date": "2023-04", "revenue": 1300},
+                {"date": "2023-05", "revenue": 1500},
+            ],
         },
         mounted() {
             this.fetchRevenueData();
             this.fetchTauxOccupData();
+            //--------------
+        },
+        updated(){
+            this.renderChart();
         },
         methods: {
-            fetchRevenueData() {
+            
+            async fetchRevenueData(){
                 let url = `{% url "report:api_property_revenue_by_month"  property.pk  %}`
-                fetch(url)
+                await fetch(url)
                     .then(response => response.json())
                     .then(json => {
                         this.revenueData = json.dataset;
-                        console.log("datset=", this.revenueData)
+                        this.revenueData.map(elem => parseFloat(elem.revenue))
+                        //- 
+                        this.revenus = this.revenueData.map(elem => parseFloat(elem.revenue))
+                        this.months = this.revenueData.map(item => item.month); // Supposons que chaque élément a une propriété 'month'
+                        console.log("datset= revenue", this.revenueData)
+                       
                     });
             },
             // taux occupation
-            fetchTauxOccupData() {
+            async fetchTauxOccupData() {
                 let url = `{% url "report:api_property_occupancy_rate_by_month" property.pk  %}`
                 fetch(url)
                     .then(response => response.json())
                     .then(json => {
                         this.tauxData = json.dataset;
-                        console.log("datset=", this.tauxData)
+                        console.log("datset taux occup=", this.tauxData)
                     });
-            }
+            },
+            //---------
+            renderChart() {
+                if (!this.revenueData || this.revenueData.length === 0) {
+                    console.error("Pas de données à afficher");
+                    return;
+                }
+
+                let mydata_ = d3.range(10).map(el=>
+                    Math.floor(Math.random() * 100)
+                )
+                let mydata = this.revenus
+                // mydata_.forEach(elem => console.error("revenus = ",  elem))
+
+                //initialization
+                const svgWidth = 400
+                const svgHeight = 350
+                const margin = 20
+                const barMargin = 10
+                const chartWidth = svgWidth - margin * 2
+                const chartHeight = svgHeight - margin * 2
+
+                //SVG initialization
+                const svg = d3.select('#chartArea').append('svg')
+
+                svg.attr('width',svgWidth)
+                    .attr('height',svgHeight)
+                    .append('g')
+                    .attr('class','axis')
+                    .attr('transform',`translate(${25},${margin})`)
+
+                // Échelles
+                const xScale = d3.scaleBand()
+                    .domain(this.months)
+                    .range([0, chartWidth])
+                    .padding(0.1);
+
+                const yScale = d3.scaleLinear()
+                    .domain([0, d3.max(mydata)])
+                    .range([chartHeight, 0]);
+
+                // Axes
+                const xAxis = d3.axisBottom(xScale);
+                const yAxis = d3.axisLeft(yScale);
+
+
+                // bars
+                // rendering
+                const bars = svg.selectAll('.bar').data(mydata)
+                    .enter()
+                    .append('g')
+                    .attr('class','bar')
+                //--
+                bars.append('rect')
+                bars.append('text')
+                
+                const barScaleX = d3.scaleLinear()
+                    .domain([0,mydata.length])
+                    .range([0 ,chartWidth])
+                
+                const barScaleY = d3.scaleLinear()
+                    .domain([0,Math.max(...mydata)])
+                    .range([0,chartHeight])
+                
+                const barWidth = ((chartWidth - margin * 2) / mydata.length) - barMargin
+                const fontScale = d3.scaleLinear()
+                    .domain([0,30])
+                    .range(['60px','11px'])
+                    
+                //update bars
+                svg.selectAll('.bar').data(mydata).select('rect')
+                    .transition()
+                    .attr("x", (d, i) => barScaleX(i))
+                    .attr('y',function(d,i){ return chartHeight - barScaleY(d) })
+                    .attr('width',function(d,i){ return barWidth})
+                    .attr('height',function(d,i){ return barScaleY(d) })
+                    .attr('transform',`translate(${30},${margin})`)
+                    
+                
+                //update texts
+                svg.selectAll('.bar').data(mydata).select('text')
+                    .transition()
+                    //.attr('x', function(d,i){ return barScaleX(i)})
+                    .attr("x", (d, i) => xScale(this.months[i]) + xScale.bandwidth() / 2)
+                    .attr('y', function(d,i){ return chartHeight - barScaleY(d)})
+                    //.attr('font-size',function(d,i){ return fontScale(myConsole.datasize)})
+                    .text(function(d){ return d})
+                    .attr('transform',`translate(${30},${margin})`)
+                    
+             
+               
+            },
         }
     });
 </script>
 {% endblock %}
+
+

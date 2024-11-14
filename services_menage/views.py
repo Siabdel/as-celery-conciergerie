@@ -64,14 +64,45 @@ class PropertyDetail(DetailView):
     #template_name = "property_list.html"
     model = sm_models.Property
     context_object_name = "property"
-    
+   
     def get_context_data(self, **kwargs):
         context =  super().get_context_data(**kwargs)
-          # Récupérer les images associées à ce produit en utilisant la méthode que nous avons définie dans le modèle
+        # Récupérer les images associées à ce produit en utilisant la méthode que nous avons définie dans le modèle
+
+        data = {}
+        aujourdhui = datetime.now()
+        nb_reservations = 0
         property  = self.get_object()
+        reservations = \
+            sm_models.Reservation.objects.filter(property__id=property.id, 
+                                                 reservation_status__in=['CONFIRMED', 'COMPLETED', 'PENDING']).order_by("-check_in")
+        #
+        for resa in reservations :
+            nb = len(pd.date_range(resa.check_in, resa.check_out))    
+            nb_reservations += len(pd.date_range(resa.check_in, resa.check_out))    
+            ##print(f"resa ckeckin : {resa.check_in} nb_reservation : {nb}" )
+        
+        nb_reservations = len(reservations)
         context.update( {'property' : self.get_object()})
         context.update( { 'property_images' : property.get_images()})
-         
+
+        ## nb reservations 
+        last_year = datetime(aujourdhui.year - 1, aujourdhui.month, aujourdhui.day)
+        context.update( { 'nb_reservations_last_year' : 
+            len(reservations.filter(check_in__year = last_year.year))})
+
+        #raise Exception(len(reservations.filter(check_out__year = last_year.year)))
+
+        context.update( { 'nb_reservations_now' : len(reservations.filter(check_in__year = aujourdhui.year))})
+        
+        next_year = datetime(aujourdhui.year + 1, aujourdhui.month, aujourdhui.day)
+        context.update( { 'nb_reservations_next_year' : len(reservations.filter(check_in__year = next_year.year))})
+        ## dernier client 
+        last_resa = reservations.last()
+        context.update( { 'last_resa' : last_resa})
+        context.update( { 'annees' : [last_year.year, aujourdhui.year, next_year.year  ]})
+        ## dernier client 
+        
         #raise Exception("images : ", property_images)
         return context
     

@@ -4,50 +4,47 @@
 {% block header %} {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-6">
-            
-            <div class="row">
-                <h2> {{ property.name }}</h2>
-                <p> {{ property.description}} </p>
-                <h3> {{ property.localisation }} </h3>
-                <p>Adresse de la propriété: {{ property.address }}</p>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="container">
+                    <h2> {{ property.name }}</h2>
+                    <ul class="list-group">
+                        <li class="list-group-item" >Ref Property_ID:  <span class="badge badge-danger m-2 p-2"> {{last_resa.check_in|date:'Y'}}-{{ property.pk }}  </span></li>
+                        <li class="list-group-item"> Adresse de la propriété: 
+                                <h5>  {{ property.address }} </h5> </li>
+                        <li class="list-group-item">Dernier client  
+                            <span class=" bg-secondary text-light p-md-1 "> 
+                                {{ last_resa.guest_name }}  </span></li>
+                        <li class="list-group-item">Email
+                            <span class=" bg-secondary text-light p-md-1 "> 
+                                {{ last_resa.guest_email }} </span></li>
+
+                        <li class="list-group-item">Nombre de reservatios en {{ annees.0 }}: 
+                            <span class="badge bg-secondary text-light p-md-3 "> {{ nb_reservations_last_year }}</span> </li>
+                        <li class="list-group-item">Nombre de reservatios en {{ annees.1 }}: 
+                            <span class="badge bg-secondary text-light p-md-3 "> {{ nb_reservations_now }}</span> </li>
+                        <li class="list-group-item">Nombre de reservatios en {{ annees.2 }}: 
+                            <span class="badge bg-secondary text-light p-md-3 "> {{ nb_reservations_next_year  }}</span> </li>
+
+                        <li class="list-group-item">
+                            interventions avenir : </li>
+                        <li class="list-group-item">
+                            Avis : </li>
+                    </ul>
+                    
+                </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            {% include "includes/images_card.html" %}
+            <div class="col-md-6">
+                {% include "includes/images_card.html" %}
+            </div>
         </div>
     </div>
-</div>
 
-<hr/> <br>
-<div class="container mt-4">
+    <hr/> <br>
+    <div id="app" class="container mt-4">
         <h2 class="mt-5 mb-4">Dashboard</h2>
-        <div id="app" class="row">
-            <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        {% block revenue_report %}
-                        <!-- Le contenu de property_revenue_report.html sera injecté ici -->
-                        {% endblock %}
-                        <canvas id="revenueChart">
-                        </canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <!-- class="card-title">Taux d'occupation --> 
-                         {% block taux_occupation %}
-                        <!-- Le contenu de property_ taux occupation ici -->
-                        {% endblock %}
-                        <canvas id="occupationChart">
-                        </canvas>
-                    </div>
-                </div>
-            </div>
+        <div class="row">
             <div class="col-md-4 mb-3">
                 <div class="card">
                     <div class="card-body">
@@ -64,28 +61,47 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-     <div class="row mt-3">
-            <div class="col-md-12">
+            <div class="col-md-4 mb-3">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Derniers incidents relevés</h5>
-                        <ul class="list-group">
-                            <li class="list-group-item">Incident 1...</li>
-                            <li class="list-group-item">Incident 2...</li>
-                            <li class="list-group-item">Incident 3...</li>
-                        </ul>
+                        {% block revenue_report %}
+                        <!-- Le contenu de property_revenue_report.html sera injecté ici -->
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- class="card-title">Taux d'occupation --> 
+                            {% block taux_occupation %}
+                            <!-- Le contenu de property_ taux occupation ici -->
+                            {% endblock %}
+                    </div>
+                </div>
+            </div>
+                
+        <HR class="border-2"> <br>
+       
+        <div class="row mt-3">
+            {% block evolution %}
+            {% endblock %}
+        </div>
+         <div class="row mt-3">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Derniers incidents relevés</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item">Incident 1...</li>
+                                <li class="list-group-item">Incident 2...</li>
+                                <li class="list-group-item">Incident 3...</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
-
-
-{% block extra_js__ %}
-   
 
 {% endblock %}

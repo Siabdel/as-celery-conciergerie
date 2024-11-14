@@ -32,7 +32,7 @@ urlpatterns += [
     # taux occupation des proprietes par mois
     path('api/taux-occupation/', TauxOccupationAPIView.as_view(), name='api_revenue_report_chart'),
     # Revenue Report
-    path('api/revenue-report/', RevenueReportAPIView.as_view(), name='api_revenue_report_api'),
+    path('api/revenue-report/', RevenueReportAPIView.as_view(), name='api_revenue_report'),
     # property revenue per month
     path('api/property/<int:property_id>/revenue/', api_views.property_revenue_by_month, name='api_property_revenue_by_month'),
     path('api/property/<int:property_id>/occupancy/', api_views.property_occupancy_rate_by_month, name='api_property_occupancy_rate_by_month'),  

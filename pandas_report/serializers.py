@@ -8,19 +8,21 @@ from services_menage.models import ResaStatus, TaskTypeService
 #--------------------------------------------------------
 #-- Rapport Analytique des revenues par mois / property
 #--------------------------------------------------------
-class RevenuesSerializer(serializers.DictField):
-    child = serializers.FloatField() ## noeux 
 
-class DatasetSerializer(serializers.Serializer):
+
+class RevenueSerializer(serializers.Serializer):
+    month = serializers.CharField()
+    revenue = serializers.FloatField()
+
+
+class DatasetItemSerializer(serializers.Serializer):
     property_name = serializers.CharField()
-    revenues = RevenuesSerializer() ## noeux  ajouter
+    revenues = RevenueSerializer()
     total = serializers.FloatField()
 
 class RevenueReportSerializer(serializers.Serializer):
-    dataset = DatasetSerializer()
+    dataset = DatasetItemSerializer(many=True)
 
-class RevenueReportListSerializer(serializers.ListSerializer):
-    child = RevenueReportSerializer()
 #--------------------------------------------------------
 #-- 
 """_summary_ * Taux d'occupation par propriété Montre le pourcentage de jours réservés par 

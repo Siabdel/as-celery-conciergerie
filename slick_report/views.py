@@ -6,7 +6,8 @@ from django.db.models import ExpressionWrapper, DecimalField
 from django.db.models import Count, Sum, F
 from slick_reporting.generator import ReportGenerator
 from django.utils import timezone
-
+from django.db.models import Sum
+from datetime import datetime, timedelta
 from services_menage.models import Reservation, Property, ServiceTask
 from staff.models import Employee
 
@@ -95,9 +96,9 @@ class EmployeePerformanceReport(ReportView):
 class PlatformReservationReport(ReportView):
     report_model = Reservation
     date_field = 'check_in'
-    group_by = 'platform'
+    group_by = 'property__name'
     columns = [
-        'platform',
+        'property__name',
         ComputationField.create(
             method=Count,
             field='id',
@@ -115,7 +116,7 @@ class PlatformReservationReport(ReportView):
         {
             'type': 'bar',
             'data_source': ['total_reservations', 'total_revenue'],
-            'title_source': ['platform'],
+            'title_source': ['property_name' ],
             'title': 'Réservations et revenus par plateforme'
         },
     ]
@@ -197,3 +198,39 @@ class ReservationRevenueReportView(ReportView):
             'title': 'Nombre de réservations par employé'
         },
     ]
+
+#--------------------------------------------
+#--
+#--------------------------------------------
+class RevenueEvolutionReport(SlickReportView):
+    report_model = Reservation
+    date_field = 'check_in'  # Supposons que c'est le champ de date pour les réservations
+    
+    # Calculer la date il y a 3 ans à partir d'aujourd'hui
+    start_date = datetime.now().date() - timedelta(days=3*365)
+    
+    # Définir la plage de dates pour le rapport
+    report_title = "Évolution des revenus des réservations sur les 3 dernières années"
+    
+    group_by = 'check_in'
+    columns = [
+        SlickReportField.create(Sum, 'total_price', name='revenue', verbose_name='Revenus')
+    ]
+    
+    
+    chart_settings = [
+        Chart(
+            "Évolution des revenus",
+            Chart.LINE,
+            data_source=['revenue'],
+            title_source=['check_in'],
+        ),
+    ]
+
+    def get_queryset(self):
+        return super().get_queryset().filter(check_in__gte=self.start_date)
+
+    def get_initial_config(self):
+        config = super().get_initial_config()
+        config['date_format'] = '%Y-%m'  # Format de date pour regrouper par mois
+        return config
