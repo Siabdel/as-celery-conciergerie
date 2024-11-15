@@ -45,9 +45,14 @@
         <h3 class="card-header">Évolution des revenus des réservations</h3>
         <div class="card">
             <div class="card-body">
-                <div id="chartArea"></div>
-            <div>
-        </div
+                <div id="chartAreaBar"></div>
+            </div>
+        </div>
+         <div class="card">
+            <div class="card-body">
+                <div id="chartAreaLine"></div>
+            </div>
+        </div>
     </div>
 {% endblock evolution %}
 
@@ -81,7 +86,8 @@
             //--------------
         },
         updated(){
-            this.renderChart();
+            this.renderChartBar();
+            this.renderChartLine();
         },
         methods: {
             
@@ -110,38 +116,32 @@
                     });
             },
             //---------
-            renderChart() {
+            renderChartBar() {
                 if (!this.revenueData || this.revenueData.length === 0) {
                     console.error("Pas de données à afficher");
                     return;
                 }
 
-                let mydata_ = d3.range(10).map(el=>
-                    Math.floor(Math.random() * 100)
-                )
-                let mydata = this.revenus
-                // mydata_.forEach(elem => console.error("revenus = ",  elem))
+                let mydata = this.revenus;
+                let months = this.months
 
-                //initialization
-                const svgWidth = 400
-                const svgHeight = 350
-                const margin = 20
-                const barMargin = 10
-                const chartWidth = svgWidth - margin * 2
-                const chartHeight = svgHeight - margin * 2
+                // Initialisation
+                const svgWidth = 600; // Augmenté pour plus d'espace
+                const svgHeight = 400; // Augmenté pour plus d'espace
+                const margin = { top: 20, right: 20, bottom: 60, left: 40 }; // Augmenté bottom pour les labels
+                const chartWidth = svgWidth - margin.left - margin.right;
+                const chartHeight = svgHeight - margin.top - margin.bottom;
 
-                //SVG initialization
-                const svg = d3.select('#chartArea').append('svg')
-
-                svg.attr('width',svgWidth)
-                    .attr('height',svgHeight)
+                // SVG initialization
+                const svg = d3.select('#chartAreaBar').append('svg')
+                    .attr('width', svgWidth)
+                    .attr('height', svgHeight)
                     .append('g')
-                    .attr('class','axis')
-                    .attr('transform',`translate(${25},${margin})`)
+                    .attr('transform', `translate(${margin.left},${margin.top})`);
 
                 // Échelles
                 const xScale = d3.scaleBand()
-                    .domain(this.months)
+                    .domain(months)
                     .range([0, chartWidth])
                     .padding(0.1);
 
@@ -153,53 +153,133 @@
                 const xAxis = d3.axisBottom(xScale);
                 const yAxis = d3.axisLeft(yScale);
 
+                // Ajout de l'axe X
+                svg.append("g")
+                    .attr("transform", `translate(0,${chartHeight})`)
+                    .call(xAxis)
+                    .selectAll("text")
+                    .attr("transform", "rotate(-45)")
+                    .style("text-anchor", "end");
 
-                // bars
-                // rendering
-                const bars = svg.selectAll('.bar').data(mydata)
-                    .enter()
-                    .append('g')
-                    .attr('class','bar')
-                //--
-                bars.append('rect')
-                bars.append('text')
-                
-                const barScaleX = d3.scaleLinear()
-                    .domain([0,mydata.length])
-                    .range([0 ,chartWidth])
-                
-                const barScaleY = d3.scaleLinear()
-                    .domain([0,Math.max(...mydata)])
-                    .range([0,chartHeight])
-                
-                const barWidth = ((chartWidth - margin * 2) / mydata.length) - barMargin
-                const fontScale = d3.scaleLinear()
-                    .domain([0,30])
-                    .range(['60px','11px'])
-                    
-                //update bars
-                svg.selectAll('.bar').data(mydata).select('rect')
-                    .transition()
-                    .attr("x", (d, i) => barScaleX(i))
-                    .attr('y',function(d,i){ return chartHeight - barScaleY(d) })
-                    .attr('width',function(d,i){ return barWidth})
-                    .attr('height',function(d,i){ return barScaleY(d) })
-                    .attr('transform',`translate(${30},${margin})`)
-                    
-                
-                //update texts
-                svg.selectAll('.bar').data(mydata).select('text')
-                    .transition()
-                    //.attr('x', function(d,i){ return barScaleX(i)})
-                    .attr("x", (d, i) => xScale(this.months[i]) + xScale.bandwidth() / 2)
-                    .attr('y', function(d,i){ return chartHeight - barScaleY(d)})
-                    //.attr('font-size',function(d,i){ return fontScale(myConsole.datasize)})
-                    .text(function(d){ return d})
-                    .attr('transform',`translate(${30},${margin})`)
-                    
-             
-               
+                // Ajout de l'axe Y
+                svg.append("g")
+                    .call(yAxis);
+
+                // Barres
+                svg.selectAll(".bar")
+                    .data(mydata)
+                    .enter().append("rect")
+                    .attr("class", "bar")
+                    .attr("x", (d, i) => xScale(months[i]))
+                    .attr("width", xScale.bandwidth())
+                    .attr("y", d => yScale(d))
+                    .attr("height", d => chartHeight - yScale(d));
+
+                // Textes sur les barres
+                svg.selectAll(".bar-text")
+                    .data(mydata)
+                    .enter().append("text")
+                    .attr("class", "bar-text")
+                    .attr("x", (d, i) => xScale(months[i]) + xScale.bandwidth() / 2)
+                    .attr("y", d => yScale(d) - 5)
+                    .attr("text-anchor", "middle")
+                    .text(d => d);
             },
+            // RENDER EN ligne
+            renderChartLine(){
+                if (!this.revenueData || this.revenueData.length === 0) {
+                    console.error("Pas de données à afficher");
+                    return;
+                }
+
+                let data = this.revenueData.map((item, index) => ({
+                    month: item.month,
+                    revenue: this.revenus[index]
+                }));
+
+                // Dimensions et marges
+                const margin = {top: 20, right: 30, bottom: 50, left: 60};
+                const width = 600 - margin.left - margin.right;
+                const height = 400 - margin.top - margin.bottom;
+
+                // Création du SVG
+                const svg = d3.select('#chartAreaLine').append('svg')
+                    .attr('width', width + margin.left + margin.right)
+                    .attr('height', height + margin.top + margin.bottom)
+                    .append('g')
+                    .attr('transform', `translate(${margin.left},${margin.top})`);
+
+                // Échelles
+                const x = d3.scalePoint()
+                    .domain(data.map(d => d.month))
+                    .range([0, width]);
+
+                const y = d3.scaleLinear()
+                    .domain([0, d3.max(data, d => d.revenue)])
+                    .range([height, 0]);
+
+                // Ligne
+                const line = d3.line()
+                    .x(d => x(d.month))
+                    .y(d => y(d.revenue));
+
+                // Ajout de la ligne au graphique
+                svg.append("path")
+                    .datum(data)
+                    .attr("fill", "none")
+                    .attr("stroke", "steelblue")
+                    .attr("stroke-width", 1.5)
+                    .attr("d", line);
+
+                // Ajout des points
+                svg.selectAll(".dot")
+                    .data(data)
+                    .enter().append("circle")
+                    .attr("class", "dot")
+                    .attr("cx", d => x(d.month))
+                    .attr("cy", d => y(d.revenue))
+                    .attr("r", 5)
+                    .attr("fill", "steelblue");
+
+                // Axe X
+                svg.append("g")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(d3.axisBottom(x))
+                    .selectAll("text")  
+                    .style("text-anchor", "end")
+                    .attr("dx", "-.8em")
+                    .attr("dy", ".15em")
+                    .attr("transform", "rotate(-45)");
+
+                // Axe Y
+                svg.append("g")
+                    .call(d3.axisLeft(y));
+
+                // Étiquettes des axes
+                svg.append("text")
+                    .attr("transform", `translate(${width/2}, ${height + margin.top + 20})`)
+                    .style("text-anchor", "middle")
+                    .text("Mois");
+
+                svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 0 - margin.left)
+                    .attr("x", 0 - (height / 2))
+                    .attr("dy", "1em")
+                    .style("text-anchor", "middle")
+                    .text("Revenus");
+
+                // Ajout des valeurs sur les points
+                svg.selectAll(".value-label")
+                    .data(data)
+                    .enter().append("text")
+                    .attr("class", "value-label")
+                    .attr("x", d => x(d.month))
+                    .attr("y", d => y(d.revenue) - 10)
+                    .attr("text-anchor", "middle")
+                    .text(d => d.revenue);
+            },
+
         }
     });
 </script>

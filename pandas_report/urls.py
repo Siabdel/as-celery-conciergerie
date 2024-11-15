@@ -36,6 +36,8 @@ urlpatterns += [
     # property revenue per month
     path('api/property/<int:property_id>/revenue/', api_views.property_revenue_by_month, name='api_property_revenue_by_month'),
     path('api/property/<int:property_id>/occupancy/', api_views.property_occupancy_rate_by_month, name='api_property_occupancy_rate_by_month'),  
+    ## Evolution des prix par property
+    path('api/property/<int:property_id>/price-evolution/', api_views.get_monthly_price_evolution_by_property, name='api_property_price_evolution'),
 
 ]
 #-------------------------------------------

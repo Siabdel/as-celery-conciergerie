@@ -1,15 +1,23 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.core.serializers.json import DjangoJSONEncoder
+from django.http import JsonResponse
 from django.db.models import Sum
 from django.db.models.functions import TruncMonth
 from services_menage.models import Reservation, Property
 import pandas_report.serializers as pd_serializer
 import pandas as pd
-from django.http import JsonResponse
 from rest_framework import serializers
 from django.db.models import F, Q
 from rest_framework.decorators import api_view
 from datetime import datetime, timedelta
+from django.db.models.functions import TruncMonth
+from django.db.models import Avg, F, DecimalField, DurationField
+from django.db.models.expressions import ExpressionWrapper
+from decimal import Decimal
+from django.db.models import F, ExpressionWrapper, DecimalField, DurationField
+from django.db.models.functions import Cast, ExtractDay
+
 
 
 def month_name_fr(month_number):
@@ -222,6 +230,7 @@ def property_revenue_by_month(request, property_id):
 
 @api_view(['GET'])
 def property_occupancy_rate_by_month(request, property_id):
+    
     # Récupérer toutes les réservations pour la propriété donnée
     reservations = Reservation.objects.filter(property_id=property_id, 
                                               reservation_status__in=['CONFIRMED', 'COMPLETED', 'PENDING']).order_by("-check_in")
@@ -268,4 +277,87 @@ def property_occupancy_rate_by_month(request, property_id):
     else:
         return Response(serializer.errors, status=400)
     
-    return Response(result_dict)
+class DecimalEncoder(DjangoJSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super().default(obj)
+
+
+## Définissez les seuils pour les saisons :
+
+def categorize_season(price, avg_price):
+    if price > float(avg_price) * 1.2:
+        return "Haute saison"
+    elif price < float(avg_price) * 0.8:
+        return "Basse saison"
+    else:
+        return "Moyenne saison"
+    
+@api_view(['GET'])
+def get_monthly_price_evolution_by_property(request, property_id):
+    """_summary_
+
+    Args:
+        request (_type_): _description_
+        property_id (_type_): _description_
+
+    Returns:
+        _type_: Cette approche vous permettra de :
+        Obtenir l'évolution des prix de nuitées pour une propriété spécifique sur une année.
+        Calculer le prix moyen par nuit pour chaque mois.
+        Catégoriser chaque mois en haute, moyenne ou basse saison en fonction du prix moyen annuel.
+        Visualiser ces données dans un graphique D3.js, où vous pourrez utiliser différentes couleurs ou 
+        styles pour représenter les différentes saisons.
+        Cette méthode vous donnera une vue claire de l'évolution des prix au fil des mois et vous aidera à 
+        identifier les périodes de haute, moyenne et basse saison pour chaque propriété.
+    """
+    # Calculer la date d'il y a un an
+    one_year_ago = datetime.now() - timedelta(days=365)
+
+    # Récupérer toutes les réservations pour la propriété donnée
+    # Requête pour obtenir l'évolution des prix par property
+    
+    price_evolution = Reservation.objects.filter(
+        property_id=property_id,
+        check_in__gte=one_year_ago,
+        reservation_status__in=['CONFIRMED', 'COMPLETED']
+    ).annotate(
+        month=TruncMonth('check_in'),
+        duration_days=ExpressionWrapper(
+            ExtractDay(F('check_out') - F('check_in')) + 1,
+            output_field=DecimalField(max_digits=10, decimal_places=2)
+        ),
+        nightly_price=ExpressionWrapper(
+            (F('total_price') - F('cleaning_fee') - F('service_fee')) / F('duration_days'),
+            output_field=DecimalField(max_digits=10, decimal_places=2)
+        )
+    ).values('month').annotate(
+        average_nightly_price=Avg('nightly_price')
+    ).order_by('month')
+
+
+
+    # Formater les données pour D3.js
+    # Calculer le prix moyen sur l'année
+    prices = [item['average_nightly_price'] for item in price_evolution]
+    avg_price = sum(prices) / len(prices) if prices else 0
+
+    chart_data = [
+        {
+            'date': item['month'].strftime('%Y-%m'),
+            'price': item['average_nightly_price'],
+            'season': categorize_season(item['average_nightly_price'], avg_price)
+        } for item in price_evolution
+    ]
+    
+    data = [{
+            'date': item['month'],
+            'price': item['average_nightly_price'],
+            'season': categorize_season(item['average_nightly_price'], avg_price)
+        } for item in price_evolution
+    ]
+
+    # return JsonResponse(chart_data, safe=False)
+    serializer = pd_serializer.PriceEvolutionSerializer(data, many=True)
+    return Response(serializer.data)

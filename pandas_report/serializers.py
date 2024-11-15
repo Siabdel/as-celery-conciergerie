@@ -67,3 +67,8 @@ class OccupancyRateSerializer(serializers.Serializer):
 
 class OccupancyDataSerializer(serializers.Serializer):
     dataset = OccupancyRateSerializer(many=True)
+
+class PriceEvolutionSerializer(serializers.Serializer):
+    date = serializers.DateTimeField()
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    season = serializers.CharField()
