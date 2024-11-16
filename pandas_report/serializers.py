@@ -58,7 +58,7 @@ class DataPropretySerializer(serializers.Serializer):
     revenue = serializers.FloatField()
 
 class RevenuePropriotytSerializer(serializers.Serializer):
-    dataset = DatasetOccupationSerializer(many=True)
+    dataset = DataPropretySerializer(many=True)
     
 
 class OccupancyRateSerializer(serializers.Serializer):
@@ -68,7 +68,10 @@ class OccupancyRateSerializer(serializers.Serializer):
 class OccupancyDataSerializer(serializers.Serializer):
     dataset = OccupancyRateSerializer(many=True)
 
-class PriceEvolutionSerializer(serializers.Serializer):
-    date = serializers.DateTimeField()
+class DataPriceEvolutionSerializer(serializers.Serializer):
+    month = serializers.CharField()
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
     season = serializers.CharField()
+
+class PriceEvolutionSerializer(serializers.Serializer):
+    dataset = DataPriceEvolutionSerializer(many=True)

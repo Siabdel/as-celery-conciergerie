@@ -48,6 +48,7 @@
                 <div id="chartAreaBar"></div>
             </div>
         </div>
+        <h3 class="card-header">Évolution des prix par mois de la property </h3>
          <div class="card">
             <div class="card-body">
                 <div id="chartAreaLine"></div>
@@ -68,9 +69,11 @@
         data: {
             message : "Vue.js",
             revenueData: {},
+            pricesData: {},
             tauxData: {},
             dataset: [],
             revenus: [],
+            prices: [],
             months: [],
             chartData : [
                 {"date": "2023-01", "revenue": 1000},
@@ -83,14 +86,31 @@
         mounted() {
             this.fetchRevenueData();
             this.fetchTauxOccupData();
+            this.fetchMonthlyPriceData();
             //--------------
         },
         updated(){
             this.renderChartBar();
-            this.renderChartLine();
+            this.renderChartEvolutionPrice();
+            //this.renderChartLine();
         },
         methods: {
-            
+            async fetchMonthlyPriceData(){
+                let url = `{% url "report:api_property_price_evolution" property.pk  %}`
+                await fetch(url)
+                    .then(response => response.json())
+                    .then(response => {
+                        this.pricesData = response.dataset;
+                        //- 
+                        this.prices = this.pricesData.map(elem => parseFloat(elem.price))
+                        this.months = this.pricesData.map(item => String(item.month)); // Supposons que chaque élément a une propriété 'month'
+                        //console.log("this.prices = ####", this.prices)
+                        //console.log("this.months = ####", this.months)
+                    })
+                    .catch(err => {
+                        console.log("err axios :",  err)
+                    });
+            },
             async fetchRevenueData(){
                 let url = `{% url "report:api_property_revenue_by_month"  property.pk  %}`
                 await fetch(url)
@@ -278,6 +298,160 @@
                     .attr("y", d => y(d.revenue) - 10)
                     .attr("text-anchor", "middle")
                     .text(d => d.revenue);
+            },
+
+            renderChartEvolutionPrice__(){
+                if (!this.revenueData || this.revenueData.length === 0) {
+                    console.error("Pas de données à afficher");
+                    return;
+                }
+
+                let dataset= this.pricesData.map((item, index) => ({
+                    date: item.date,
+                    price: this.price,
+                    season: this.season,
+                }));
+
+                const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+                const width = 600 - margin.left - margin.right;
+                const height = 400 - margin.top - margin.bottom;
+
+                // Nettoyer le graphique existant
+                const svg = d3.select('#chartAreaLine').append('svg')
+                    .attr('width', width + margin.left + margin.right)
+                    .attr('height', height + margin.top + margin.bottom)
+                    .append('g')
+                    .attr('transform', `translate(${margin.left},${margin.top})`);
+
+                const x = d3.scaleTime()
+                    .range([0, width]);
+
+                const y = d3.scaleLinear()
+                    .range([height, 0]);
+
+                const line = d3.line()
+                    .x(d => x(new Date(d.date)))
+                    .y(d => y(d.price));
+
+                x.domain(d3.extent(dataset, d => new Date(d.date)));
+                y.domain([0, d3.max(dataset, d => d.price)]);
+
+                svg.append('g')
+                    .attr('transform', `translate(0,${height})`)
+                    .call(d3.axisBottom(x));
+
+                svg.append('g')
+                    .call(d3.axisLeft(y));
+
+                svg.append('path')
+                    .datum(dataset)
+                    .attr('fill', 'none')
+                    .attr('stroke', 'steelblue')
+                    .attr('stroke-width', 1.5)
+                    .attr('d', line);
+
+                // Ajouter des points pour chaque donnée
+                svg.selectAll('.dot')
+                    .data(dataset)
+                    .enter().append('circle')
+                    .attr('class', 'dot')
+                    .attr('cx', d => x(new Date(d.date)))
+                    .attr('cy', d => y(d.price))
+                    .attr('r', 5)
+                    .attr('fill', d => {
+                    switch(d.season) {
+                        case 'Haute saison': return 'red';
+                        case 'Moyenne saison': return 'orange';
+                        case 'Basse saison': return 'green';
+                        default: return 'steelblue';
+                    }
+                    })
+                    .append('title')
+                    .text(d => `Date: ${d.date}\nPrix: ${d.price}\nSaison: ${d.season}`);
+
+            },
+            renderChartEvolutionPrice() {
+                if (!this.revenueData || this.revenueData.length === 0) {
+                    console.error("Pas de données à afficher");
+                    return;
+                }
+
+                let data_prices = this.prices;
+                let data_months = this.months;
+
+                // Initialization
+                const svgWidth = 600; // Augmenté pour plus d'espace
+                const svgHeight = 400; // Augmenté pour plus d'espace
+                const margin = { top: 20, right: 30, bottom: 60, left: 40 }; // Ajusté pour l'axe X
+                const chartWidth = svgWidth - margin.left - margin.right;
+                const chartHeight = svgHeight - margin.top - margin.bottom;
+
+                // SVG initialization
+                d3.select('#chartAreaLine').selectAll('*').remove(); // Nettoyer le contenu existant
+                const svg = d3.select('#chartAreaLine').append('svg')
+                    .attr('width', svgWidth)
+                    .attr('height', svgHeight)
+                    .append('g')
+                    .attr('transform', `translate(${margin.left},${margin.top})`);
+
+                // Échelles
+                const xScale = d3.scaleBand()
+                    .domain(data_months)
+                    .range([0, chartWidth])
+                    .padding(0.1);
+
+                const yScale = d3.scaleLinear()
+                    .domain([0, d3.max(data_prices)])
+                    .range([chartHeight, 0]);
+
+                // Axes
+                const xAxis = d3.axisBottom(xScale);
+                const yAxis = d3.axisLeft(yScale);
+
+                // Ajout de l'axe X
+                svg.append("g")
+                    .attr("transform", `translate(0,${chartHeight})`)
+                    .call(xAxis)
+                    .selectAll("text")
+                    .style("text-anchor", "end")
+                    .attr("dx", "-.8em")
+                    .attr("dy", ".15em")
+                    .attr("transform", "rotate(-45)");
+
+                // Ajout de l'axe Y
+                svg.append("g")
+                    .call(yAxis);
+
+                // Création des barres
+                const bars = svg.selectAll('.bar')
+                    .data(data_prices)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'bar');
+
+                bars.append('rect')
+                    .attr("x", (d, i) => xScale(data_months[i]))
+                    .attr("y", d => yScale(d))
+                    .attr("width", xScale.bandwidth())
+                    .attr("height", d => chartHeight - yScale(d))
+                    .attr("fill", "steelblue");
+
+                // Ajout des textes sur les barres
+                bars.append("text")
+                    .attr("class", "bar-text")
+                    .attr("x", (d, i) => xScale(data_months[i]) + xScale.bandwidth() / 2)
+                    .attr("y", d => yScale(d) - 5)
+                    .attr("text-anchor", "middle")
+                    .text(d => d);
+
+                // Ajout du titre du graphique
+                svg.append("text")
+                    .attr("x", chartWidth / 2)
+                    .attr("y", 0 - (margin.top / 2))
+                    .attr("text-anchor", "middle")
+                    .style("font-size", "16px")
+                    .style("text-decoration", "underline")
+                    .text("Évolution des prix");
             },
 
         }

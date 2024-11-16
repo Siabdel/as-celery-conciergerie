@@ -1,3 +1,4 @@
+import math
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core.serializers.json import DjangoJSONEncoder
@@ -170,7 +171,8 @@ class TauxOccupationAPIView(APIView):
 @api_view(['GET'])
 def property_revenue_by_month(request, property_id):
     # Récupérer toutes les réservations pour la propriété donnée
-    reservations = Reservation.objects.filter(property_id=property_id)
+    reservations = Reservation.objects.filter(property_id=property_id,
+                    reservation_status__in=['CONFIRMED', 'COMPLETED',]).order_by("-check_in")
     
     # Créer un DataFrame pandas à partir des réservations
     df = pd.DataFrame(list(reservations.values('check_in', 'check_out', 'total_price')))
@@ -208,9 +210,10 @@ def property_revenue_by_month(request, property_id):
 
     # Conversion du DataFrame en liste de dictionnaires
     result_dict = {
-        'dataset': result.rename(columns={
-            'Month': 'month',
-            'Revenue': 'revenue',
+        'dataset': 
+            result.rename(columns={
+                'Month': 'month',
+                'Revenue': 'revenue',
         }).to_dict(orient='records')
     }
 
@@ -220,10 +223,10 @@ def property_revenue_by_month(request, property_id):
     if serializer.is_valid():
         serialized_data = serializer.data
         # Utilisez serialized_data comme nécessaire
+        return Response(serializer.data)
     else:
         print(serializer.errors)
-        #raise Exception("mes data", data)
-    return Response(serializer.data)
+        raise Exception("serilizer.error message =", serializer.data)
 
 
 
@@ -233,7 +236,7 @@ def property_occupancy_rate_by_month(request, property_id):
     
     # Récupérer toutes les réservations pour la propriété donnée
     reservations = Reservation.objects.filter(property_id=property_id, 
-                                              reservation_status__in=['CONFIRMED', 'COMPLETED', 'PENDING']).order_by("-check_in")
+                    reservation_status__in=['CONFIRMED', 'COMPLETED', 'PENDING']).order_by("-check_in")
     
     # Créer un DataFrame pandas à partir des réservations
     df = pd.DataFrame(list(reservations.values('check_in', 'check_out')))
@@ -343,21 +346,24 @@ def get_monthly_price_evolution_by_property(request, property_id):
     prices = [item['average_nightly_price'] for item in price_evolution]
     avg_price = sum(prices) / len(prices) if prices else 0
 
-    chart_data = [
-        {
-            'date': item['month'].strftime('%Y-%m'),
-            'price': item['average_nightly_price'],
-            'season': categorize_season(item['average_nightly_price'], avg_price)
-        } for item in price_evolution
-    ]
-    
+   
+    ## result['revenue'] = result['revenue'].apply(lambda x: round(x, 1))  #
     data = [{
-            'date': item['month'],
-            'price': item['average_nightly_price'],
-            'season': categorize_season(item['average_nightly_price'], avg_price)
+            'month':  item['month'].strftime('%Y-%B'),
+            'price': round(item['average_nightly_price'], 2),
+            'season': categorize_season(item['average_nightly_price'], avg_price),
         } for item in price_evolution
     ]
+    ## formater les dates
+    # resultat  = map(lambda elem : elem['date'].strftime('%Y-%m'), data)
+    # Conversion du résultat en liste
+    # data = list(resultat)
+
 
     # return JsonResponse(chart_data, safe=False)
-    serializer = pd_serializer.PriceEvolutionSerializer(data, many=True)
-    return Response(serializer.data)
+    serializer =  pd_serializer.PriceEvolutionSerializer(data={'dataset': data })
+    if serializer.is_valid():
+        return Response(serializer.data)
+    else:
+        return Response(serializer.errors, status=400)
+    
