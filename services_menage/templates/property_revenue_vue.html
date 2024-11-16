@@ -41,13 +41,15 @@
 {% endblock taux_occupation %}
 
 {% block evolution %}
-    <div class="container">
+    <div class="col-md-6 mb-3">
         <h3 class="card-header">Évolution des revenus des réservations</h3>
         <div class="card">
             <div class="card-body">
                 <div id="chartAreaBar"></div>
             </div>
         </div>
+    </div>
+    <div class="col-md-6 mb-3">
         <h3 class="card-header">Évolution des prix par mois de la property </h3>
          <div class="card">
             <div class="card-body">
@@ -85,13 +87,13 @@
         },
         mounted() {
             this.fetchRevenueData();
-            this.fetchTauxOccupData();
             this.fetchMonthlyPriceData();
+            this.fetchTauxOccupData();
             //--------------
         },
         updated(){
-            this.renderChartBar();
-            this.renderChartEvolutionPrice();
+            this.renderChartEvolutionPrice("#chartAreaBar", this.months, this.revenus, "Revenues par mois");
+            this.renderChartEvolutionPrice("#chartAreaLine", this.months, this.prices, "Evolutions des prix par mois");
             //this.renderChartLine();
         },
         methods: {
@@ -136,75 +138,6 @@
                     });
             },
             //---------
-            renderChartBar() {
-                if (!this.revenueData || this.revenueData.length === 0) {
-                    console.error("Pas de données à afficher");
-                    return;
-                }
-
-                let mydata = this.revenus;
-                let months = this.months
-
-                // Initialisation
-                const svgWidth = 600; // Augmenté pour plus d'espace
-                const svgHeight = 400; // Augmenté pour plus d'espace
-                const margin = { top: 20, right: 20, bottom: 60, left: 40 }; // Augmenté bottom pour les labels
-                const chartWidth = svgWidth - margin.left - margin.right;
-                const chartHeight = svgHeight - margin.top - margin.bottom;
-
-                // SVG initialization
-                const svg = d3.select('#chartAreaBar').append('svg')
-                    .attr('width', svgWidth)
-                    .attr('height', svgHeight)
-                    .append('g')
-                    .attr('transform', `translate(${margin.left},${margin.top})`);
-
-                // Échelles
-                const xScale = d3.scaleBand()
-                    .domain(months)
-                    .range([0, chartWidth])
-                    .padding(0.1);
-
-                const yScale = d3.scaleLinear()
-                    .domain([0, d3.max(mydata)])
-                    .range([chartHeight, 0]);
-
-                // Axes
-                const xAxis = d3.axisBottom(xScale);
-                const yAxis = d3.axisLeft(yScale);
-
-                // Ajout de l'axe X
-                svg.append("g")
-                    .attr("transform", `translate(0,${chartHeight})`)
-                    .call(xAxis)
-                    .selectAll("text")
-                    .attr("transform", "rotate(-45)")
-                    .style("text-anchor", "end");
-
-                // Ajout de l'axe Y
-                svg.append("g")
-                    .call(yAxis);
-
-                // Barres
-                svg.selectAll(".bar")
-                    .data(mydata)
-                    .enter().append("rect")
-                    .attr("class", "bar")
-                    .attr("x", (d, i) => xScale(months[i]))
-                    .attr("width", xScale.bandwidth())
-                    .attr("y", d => yScale(d))
-                    .attr("height", d => chartHeight - yScale(d));
-
-                // Textes sur les barres
-                svg.selectAll(".bar-text")
-                    .data(mydata)
-                    .enter().append("text")
-                    .attr("class", "bar-text")
-                    .attr("x", (d, i) => xScale(months[i]) + xScale.bandwidth() / 2)
-                    .attr("y", d => yScale(d) - 5)
-                    .attr("text-anchor", "middle")
-                    .text(d => d);
-            },
             // RENDER EN ligne
             renderChartLine(){
                 if (!this.revenueData || this.revenueData.length === 0) {
@@ -300,95 +233,26 @@
                     .text(d => d.revenue);
             },
 
-            renderChartEvolutionPrice__(){
+          
+            renderChartEvolutionPrice(id_area='#chartAreaBar', data_x=[], data_y=[], title="" ) {
                 if (!this.revenueData || this.revenueData.length === 0) {
                     console.error("Pas de données à afficher");
                     return;
                 }
 
-                let dataset= this.pricesData.map((item, index) => ({
-                    date: item.date,
-                    price: this.price,
-                    season: this.season,
-                }));
-
-                const margin = { top: 20, right: 20, bottom: 30, left: 50 };
-                const width = 600 - margin.left - margin.right;
-                const height = 400 - margin.top - margin.bottom;
-
-                // Nettoyer le graphique existant
-                const svg = d3.select('#chartAreaLine').append('svg')
-                    .attr('width', width + margin.left + margin.right)
-                    .attr('height', height + margin.top + margin.bottom)
-                    .append('g')
-                    .attr('transform', `translate(${margin.left},${margin.top})`);
-
-                const x = d3.scaleTime()
-                    .range([0, width]);
-
-                const y = d3.scaleLinear()
-                    .range([height, 0]);
-
-                const line = d3.line()
-                    .x(d => x(new Date(d.date)))
-                    .y(d => y(d.price));
-
-                x.domain(d3.extent(dataset, d => new Date(d.date)));
-                y.domain([0, d3.max(dataset, d => d.price)]);
-
-                svg.append('g')
-                    .attr('transform', `translate(0,${height})`)
-                    .call(d3.axisBottom(x));
-
-                svg.append('g')
-                    .call(d3.axisLeft(y));
-
-                svg.append('path')
-                    .datum(dataset)
-                    .attr('fill', 'none')
-                    .attr('stroke', 'steelblue')
-                    .attr('stroke-width', 1.5)
-                    .attr('d', line);
-
-                // Ajouter des points pour chaque donnée
-                svg.selectAll('.dot')
-                    .data(dataset)
-                    .enter().append('circle')
-                    .attr('class', 'dot')
-                    .attr('cx', d => x(new Date(d.date)))
-                    .attr('cy', d => y(d.price))
-                    .attr('r', 5)
-                    .attr('fill', d => {
-                    switch(d.season) {
-                        case 'Haute saison': return 'red';
-                        case 'Moyenne saison': return 'orange';
-                        case 'Basse saison': return 'green';
-                        default: return 'steelblue';
-                    }
-                    })
-                    .append('title')
-                    .text(d => `Date: ${d.date}\nPrix: ${d.price}\nSaison: ${d.season}`);
-
-            },
-            renderChartEvolutionPrice() {
-                if (!this.revenueData || this.revenueData.length === 0) {
-                    console.error("Pas de données à afficher");
-                    return;
-                }
-
-                let data_prices = this.prices;
-                let data_months = this.months;
+                let data_prices = data_y
+                let data_months = data_x
 
                 // Initialization
-                const svgWidth = 600; // Augmenté pour plus d'espace
+                const svgWidth = 450; // Augmenté pour plus d'espace
                 const svgHeight = 400; // Augmenté pour plus d'espace
-                const margin = { top: 20, right: 30, bottom: 60, left: 40 }; // Ajusté pour l'axe X
+                const margin = { top: 50, right: 30, bottom: 60, left: 40 }; // Ajusté pour l'axe X
                 const chartWidth = svgWidth - margin.left - margin.right;
                 const chartHeight = svgHeight - margin.top - margin.bottom;
 
                 // SVG initialization
-                d3.select('#chartAreaLine').selectAll('*').remove(); // Nettoyer le contenu existant
-                const svg = d3.select('#chartAreaLine').append('svg')
+                d3.select(id_area).selectAll('*').remove(); // Nettoyer le contenu existant
+                const svg = d3.select(id_area).append('svg')
                     .attr('width', svgWidth)
                     .attr('height', svgHeight)
                     .append('g')
@@ -438,7 +302,8 @@
 
                 // Ajout des textes sur les barres
                 bars.append("text")
-                    .attr("class", "bar-text")
+                    .attr("class", "text-info")
+                    .style("font-size", "16px")
                     .attr("x", (d, i) => xScale(data_months[i]) + xScale.bandwidth() / 2)
                     .attr("y", d => yScale(d) - 5)
                     .attr("text-anchor", "middle")
@@ -450,8 +315,9 @@
                     .attr("y", 0 - (margin.top / 2))
                     .attr("text-anchor", "middle")
                     .style("font-size", "16px")
+                    .attr("class", "text-info")
                     .style("text-decoration", "underline")
-                    .text("Évolution des prix");
+                    .text(title)
             },
 
         }

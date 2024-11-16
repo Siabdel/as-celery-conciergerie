@@ -20,17 +20,19 @@
                             <span class=" bg-secondary text-light p-md-1 "> 
                                 {{ last_resa.guest_email }} </span></li>
 
-                        <li class="list-group-item">Nombre de reservatios en {{ annees.0 }}: 
-                            <span class="badge bg-secondary text-light p-md-3 "> {{ nb_reservations_last_year }}</span> </li>
-                        <li class="list-group-item">Nombre de reservatios en {{ annees.1 }}: 
-                            <span class="badge bg-secondary text-light p-md-3 "> {{ nb_reservations_now }}</span> </li>
-                        <li class="list-group-item">Nombre de reservatios en {{ annees.2 }}: 
-                            <span class="badge bg-secondary text-light p-md-3 "> {{ nb_reservations_next_year  }}</span> </li>
+                        <li class="list-group-item">Nombre de reservatios
+                            <span class=" bg-secondary text-light p-md-1 "> 
+                               {{ nb_reservations_now }}  </span>
+                             en {{ annees.1 }}: et
+                            <span class=" bg-secondary text-light p-md-1 "> 
+                                {{ nb_reservations_next_year  }} 
+                            </span>
+                                 en {{ annees.2 }} 
+                            </li>
 
                         <li class="list-group-item">
-                            interventions avenir : </li>
-                        <li class="list-group-item">
-                            Avis : </li>
+                         derniere interventions avenir : </li>
+                        <li class="list-group-item"> Avis : </li>
                     </ul>
                     
                 </div>
