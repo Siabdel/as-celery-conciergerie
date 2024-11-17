@@ -40,9 +40,11 @@ class Property(ASBaseTimestampMixin):
     ]
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=20, choices=PROPERTY_TYPES)
-    address = models.TextField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='properties')
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2, default=0) # Ajoutez cette ligne
+    address = models.CharField(max_length=255)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
 
     class Meta:
         verbose_name = 'Property'
