@@ -1,0 +1,152 @@
+[
+  {
+    "model": "services_menage.incident",
+    "pk": 1,
+    "fields": {
+      "type": "PANNE",
+      "description": "Panne d'électricité dans l'appartement 101",
+      "date_reported": "2023-11-17T10:00:00Z",
+      "reported_by": 1,
+      "status": "OUVERT",
+      "assigned_to": 2,
+      "resolution_notes": "",
+      "resolved_date": null,
+      "property": 1
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 2,
+    "fields": {
+      "type": "FUITE",
+      "description": "Fuite d'eau dans la salle de bain de l'appartement 205",
+      "date_reported": "2023-11-16T14:30:00Z",
+      "reported_by": 3,
+      "status": "EN_COURS",
+      "assigned_to": 2,
+      "resolution_notes": "Plombier contacté, intervention prévue demain",
+      "resolved_date": null,
+      "property": 2
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 3,
+    "fields": {
+      "type": "DEGRADATION",
+      "description": "Graffiti sur le mur extérieur du bâtiment B",
+      "date_reported": "2023-11-15T09:15:00Z",
+      "reported_by": 4,
+      "status": "RESOLU",
+      "assigned_to": 5,
+      "resolution_notes": "Nettoyage effectué par l'équipe d'entretien",
+      "resolved_date": "2023-11-17T11:00:00Z",
+      "property": 3
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 4,
+    "fields": {
+      "type": "AUTRE",
+      "description": "Odeur suspecte dans le couloir du 3ème étage",
+      "date_reported": "2023-11-18T08:45:00Z",
+      "reported_by": 2,
+      "status": "OUVERT",
+      "assigned_to": 3,
+      "resolution_notes": "",
+      "resolved_date": null,
+      "property": 4
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 5,
+    "fields": {
+      "type": "DOMMAGE",
+      "description": "Porte d'entrée endommagée dans l'appartement 302",
+      "date_reported": "2023-11-19T11:20:00Z",
+      "reported_by": 5,
+      "status": "EN_COURS",
+      "assigned_to": 1,
+      "resolution_notes": "Menuisier programmé pour demain",
+      "resolved_date": null,
+      "property": 5
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 6,
+    "fields": {
+      "type": "PANNE",
+      "description": "Ascenseur en panne dans le bâtiment A",
+      "date_reported": "2023-11-20T07:30:00Z",
+      "reported_by": 1,
+      "status": "RESOLU",
+      "assigned_to": 4,
+      "resolution_notes": "Réparation effectuée par le technicien",
+      "resolved_date": "2023-11-20T14:15:00Z",
+      "property": 1
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 7,
+    "fields": {
+      "type": "FUITE",
+      "description": "Fuite de gaz suspectée dans l'appartement 408",
+      "date_reported": "2023-11-21T09:00:00Z",
+      "reported_by": 3,
+      "status": "FERME",
+      "assigned_to": 2,
+      "resolution_notes": "Fausse alerte, vérification effectuée",
+      "resolved_date": "2023-11-21T10:30:00Z",
+      "property": 2
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 8,
+    "fields": {
+      "type": "DEGRADATION",
+      "description": "Tags sur les boîtes aux lettres",
+      "date_reported": "2023-11-22T16:45:00Z",
+      "reported_by": 4,
+      "status": "OUVERT",
+      "assigned_to": 5,
+      "resolution_notes": "",
+      "resolved_date": null,
+      "property": 3
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 9,
+    "fields": {
+      "type": "AUTRE",
+      "description": "Bruit excessif provenant de l'appartement 506",
+      "date_reported": "2023-11-23T22:00:00Z",
+      "reported_by": 2,
+      "status": "EN_COURS",
+      "assigned_to": 1,
+      "resolution_notes": "Discussion prévue avec le locataire",
+      "resolved_date": null,
+      "property": 4
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 10,
+    "fields": {
+      "type": "PANNE",
+      "description": "Interphone défectueux à l'entrée principale",
+      "date_reported": "2023-11-24T13:15:00Z",
+      "reported_by": 5,
+      "status": "RESOLU",
+      "assigned_to": 3,
+      "resolution_notes": "Remplacement de l'interphone effectué",
+      "resolved_date": "2023-11-25T11:00:00Z",
+      "property": 5
+    }
+  }
+]

@@ -171,8 +171,12 @@ class TauxOccupationAPIView(APIView):
 @api_view(['GET'])
 def property_revenue_by_month(request, property_id):
     # Récupérer toutes les réservations pour la propriété donnée
+    
     reservations = Reservation.objects.filter(property_id=property_id,
                     reservation_status__in=['CONFIRMED', 'COMPLETED',]).order_by("-check_in")
+    if len(reservations) == 0:                
+        ## raise(Exception(len(reservations)))
+        return JsonResponse({})
     
     # Créer un DataFrame pandas à partir des réservations
     df = pd.DataFrame(list(reservations.values('check_in', 'check_out', 'total_price')))

@@ -15,6 +15,7 @@ from django.conf import settings
 from core.models import ResaStatus, TaskTypeService, PlatformChoices, BaseImage
 from core import models as cr_models 
 from django.utils.text import slugify
+from staff.models import Employee
 
 
 class PropertyImage(cr_models.BaseImage):
@@ -227,3 +228,34 @@ class CheckoutPhoto(models.Model):
         return self.description
 
 
+
+class Incident(models.Model):
+    INCIDENT_TYPES = [
+        ('PANNE', 'Panne'),
+        ('DOMMAGE', 'Dommage'),
+        ('FUITE', 'Fuite'),
+        ('DEGRADATION', 'Dégradation'),
+        ('AUTRE', 'Autre'),
+    ]
+
+    STATUS_CHOICES = [
+        ('OUVERT', 'Ouvert'),
+        ('EN_COURS', 'En cours'),
+        ('RESOLU', 'Résolu'),
+        ('FERME', 'Fermé'),
+    ]
+
+    title = models.CharField(max_length=100, )
+
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='incidents')  # Nouvelle ligne
+    reported_by = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='reported_incidents')
+    assigned_to = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_incidents')
+    type = models.CharField(max_length=20, choices=INCIDENT_TYPES)
+    description = models.TextField()
+    date_reported = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='OUVERT')
+    resolution_notes = models.TextField(blank=True)
+    resolved_date = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.get_type_display()} - {self.status} - {self.property.name} - {self.date_reported}"

@@ -2,19 +2,35 @@
 {% load i18n static %}
 
 <div class="container">
-    <div class="card mt-3">
-        {% if property_images|length >= 0 %}
-            {% include 'includes/carousel.html' %}
-        {% elif  property.default_image %}
-            <img src="{{ property.default_image.url }}" 
-                class="card-img-top img-fluid rounded" alt="{{ property.property_name }}">
+    <div class="mt-2">
+        {% if property_images %}
+            <div id="propertyImageCarousel" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner">
+                    {% if property_images|length >= 0 %}
+                        {% include 'includes/carousel.html' %}
+                    {% endif %}
+                    
+                </div>
+                {% if property_images|length > 1 %}
+                    <a class="carousel-control-prev" href="#propertyImageCarousel" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#propertyImageCarousel" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                {% endif %}
+            </div>
         {% else %}
-            <div class="card-body"> 
-                <div class="property-image"> img :
-                    <img src="{% static 'img/default/large_800x600_plan-apprt.jpg' %}" 
-                        alt="{{ property_images }}" 
-                        class="rounded-lg img-fluid mx-auto d-block" id="property-image" 
-                        style="height:800px; width:600px;">
+            <div class="card">
+                <div class="card-body"> 
+                    <div class="property-image">
+                        <img src="{% static 'img/default/large_800x600_plan-apprt.jpg' %}" 
+                            alt="Default Property Image" 
+                            class="rounded-lg img-fluid mx-auto d-block" 
+                            style="max-height: 400px; width: auto;">
+                    </div>
                 </div>
             </div>
         {% endif %}

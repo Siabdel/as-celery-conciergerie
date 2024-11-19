@@ -32,6 +32,7 @@ class ResaStatus(models.TextChoices):
     CHECKED_OUT= 'CHCKOUT', _('Checked Out')
     CANCELLED = 'CANCEL', _('Cancelled')
     EXPIRED = 'EXPIRED', _('Expired')
+    NEEDS_ATTENTION = 'NEEDS_ATTENTION', ('Needs Attention')
 
     
 class PlatformChoices(models.TextChoices) :
@@ -52,7 +53,7 @@ class TaskTypeService(models.TextChoices):
 #---------------
 class ASBaseTimestampMixin(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, )
-    update_at = models.DateTimeField(auto_created=True, default=timezone.now)
+    updated_at = models.DateTimeField(auto_created=True, default=timezone.now)
     created_by = models.ForeignKey( get_user_model(), on_delete=models.CASCADE,default=1)
     
     def save(self, *args, **kwargs):

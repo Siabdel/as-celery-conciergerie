@@ -1,0 +1,227 @@
+[
+  {
+    "model": "services_menage.property",
+    "pk": 6,
+    "fields": {
+      "name": "Riad Luxe Médina",
+      "type": "house",
+      "owner": 1,
+      "price_per_night": 150.00,
+      "address": "Derb Zaouia 12, Médina, Marrakech",
+      "latitude": 31.6295,
+      "longitude": -7.9811,
+      "created_at": "2023-11-01T10:00:00Z",
+      "updated_at": "2023-11-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 7,
+    "fields": {
+      "name": "Appartement Gueliz Moderne",
+      "type": "apartment",
+      "owner": 2,
+      "price_per_night": 80.00,
+      "address": "Rue Ibn Toumert, Gueliz, Marrakech",
+      "latitude": 31.6336,
+      "longitude": -8.0129,
+      "created_at": "2023-11-02T11:00:00Z",
+      "updated_at": "2023-11-02T11:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 8,
+    "fields": {
+      "name": "Villa Palmeraie",
+      "type": "villa",
+      "owner": 3,
+      "price_per_night": 300.00,
+      "address": "Route de Fès, Palmeraie, Marrakech",
+      "latitude": 31.6542,
+      "longitude": -7.9582,
+      "created_at": "2023-11-03T12:00:00Z",
+      "updated_at": "2023-11-03T12:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 9,
+    "fields": {
+      "name": "Maison Traditionnelle Kasbah",
+      "type": "house",
+      "owner": 1,
+      "price_per_night": 120.00,
+      "address": "Rue de la Kasbah 45, Marrakech",
+      "latitude": 31.6203,
+      "longitude": -7.9866,
+      "created_at": "2023-11-04T13:00:00Z",
+      "updated_at": "2023-11-04T13:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 10,
+    "fields": {
+      "name": "Studio Hivernage Chic",
+      "type": "apartment",
+      "owner": 2,
+      "price_per_night": 70.00,
+      "address": "Avenue Mohammed VI, Hivernage, Marrakech",
+      "latitude": 31.6191,
+      "longitude": -8.0179,
+      "created_at": "2023-11-05T14:00:00Z",
+      "updated_at": "2023-11-05T14:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 11,
+    "fields": {
+      "name": "Villa de Luxe Agdal",
+      "type": "villa",
+      "owner": 3,
+      "price_per_night": 400.00,
+      "address": "Rue Al Mhamid, Agdal, Marrakech",
+      "latitude": 31.5889,
+      "longitude": -7.9993,
+      "created_at": "2023-11-06T15:00:00Z",
+      "updated_at": "2023-11-06T15:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 12,
+    "fields": {
+      "name": "Appartement Vue Koutoubia",
+      "type": "apartment",
+      "owner": 1,
+      "price_per_night": 100.00,
+      "address": "Rue Fatima Zohra, Médina, Marrakech",
+      "latitude": 31.6240,
+      "longitude": -7.9844,
+      "created_at": "2023-11-07T16:00:00Z",
+      "updated_at": "2023-11-07T16:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 13,
+    "fields": {
+      "name": "Maison d'Hôtes Riad El Fenn",
+      "type": "house",
+      "owner": 2,
+      "price_per_night": 200.00,
+      "address": "Derb Moullay Abdullah Ben Hezzian 2, Médina, Marrakech",
+      "latitude": 31.6314,
+      "longitude": -7.9854,
+      "created_at": "2023-11-08T17:00:00Z",
+      "updated_at": "2023-11-08T17:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 14,
+    "fields": {
+      "name": "Penthouse Moderne Guéliz",
+      "type": "apartment",
+      "owner": 3,
+      "price_per_night": 150.00,
+      "address": "Boulevard Mohammed V, Guéliz, Marrakech",
+      "latitude": 31.6361,
+      "longitude": -8.0122,
+      "created_at": "2023-11-09T18:00:00Z",
+      "updated_at": "2023-11-09T18:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 15,
+    "fields": {
+      "name": "Villa avec Piscine Targa",
+      "type": "villa",
+      "owner": 1,
+      "price_per_night": 250.00,
+      "address": "Route de l'Ourika, Targa, Marrakech",
+      "latitude": 31.6506,
+      "longitude": -8.0367,
+      "created_at": "2023-11-10T19:00:00Z",
+      "updated_at": "2023-11-10T19:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 16,
+    "fields": {
+      "name": "Riad de Charme Bab Doukkala",
+      "type": "house",
+      "owner": 2,
+      "price_per_night": 180.00,
+      "address": "Derb El Ferrane 39, Bab Doukkala, Marrakech",
+      "latitude": 31.6358,
+      "longitude": -7.9930,
+      "created_at": "2023-11-11T20:00:00Z",
+      "updated_at": "2023-11-11T20:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 17,
+    "fields": {
+      "name": "Loft Artistique Sidi Ghanem",
+      "type": "apartment",
+      "owner": 3,
+      "price_per_night": 90.00,
+      "address": "Rue Sidi Ghanem 78, Marrakech",
+      "latitude": 31.6636,
+      "longitude": -8.0306,
+      "created_at": "2023-11-12T21:00:00Z",
+      "updated_at": "2023-11-12T21:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 18,
+    "fields": {
+      "name": "Villa Contemporaine Amelkis",
+      "type": "villa",
+      "owner": 1,
+      "price_per_night": 350.00,
+      "address": "Circuit de la Palmeraie, Amelkis, Marrakech",
+      "latitude": 31.6011,
+      "longitude": -7.9736,
+      "created_at": "2023-11-13T22:00:00Z",
+      "updated_at": "2023-11-13T22:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 19,
+    "fields": {
+      "name": "Appartement Familial Semlalia",
+      "type": "apartment",
+      "owner": 2,
+      "price_per_night": 110.00,
+      "address": "Avenue Allal El Fassi, Semlalia, Marrakech",
+      "latitude": 31.6472,
+      "longitude": -8.0092,
+      "created_at": "2023-11-14T23:00:00Z",
+      "updated_at": "2023-11-14T23:00:00Z"
+    }
+  },
+  {
+    "model": "services_menage.property",
+    "pk": 20,
+    "fields": {
+      "name": "Maison de Ville M'hamid",
+      "type": "house",
+      "owner": 3,
+      "price_per_night": 130.00,
+      "address": "Rue Imam Chafai, M'hamid, Marrakech",
+      "latitude": 31.5942,
+      "longitude": -8.0211,
+      "created_at": "2023-11-15T00:00:00Z",
+      "updated_at": "2023-11-15T00:00:00Z"
+    }
+  }
+]

@@ -101,7 +101,9 @@ class PropertyDetail(DetailView):
         last_resa = reservations.last()
         context.update( { 'last_resa' : last_resa})
         context.update( { 'annees' : [last_year.year, aujourdhui.year, next_year.year  ]})
-        ## dernier client 
+        ## dernier Incident
+        incidents_enours = sm_models.Incident.objects.filter(property__id=property.id, status='EN_COURS') 
+        context.update( { 'last_incidents' : incidents_enours})
         
         #raise Exception("images : ", property_images)
         return context

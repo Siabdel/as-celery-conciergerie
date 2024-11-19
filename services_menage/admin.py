@@ -19,7 +19,7 @@ from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources, fields, widgets
 from django.contrib.admin import StackedInline
-from .models import Property, PropertyImage
+from .models import Property, PropertyImage, Incident
 from core.models import BaseImage
 
 
@@ -27,21 +27,97 @@ from core.models import BaseImage
 class ProductImageAdmin(admin.ModelAdmin):
     list_display =  [field.name for field in PropertyImage._meta.get_fields()]
 
+@admin.register(Incident)
+class IncidentAdmin(admin.ModelAdmin):
+    list_display = ('property', 'type', 'title', 'status_tag', 'date_reported', 'reported_by', 'assigned_to')
+    readonly_fields = ('date_reported', 'reported_by')
+    list_filter = ('type', 'status', 'property', 'date_reported')
+    search_fields = ('description', 'reported_by__name', 'assigned_to__name', 'property__name')
+    
+    fieldsets = (
+        (None, {
+            'fields': ('type', 'description', 'status')
+        }),
+
+        ('Informations de rapport', {
+            'fields': ('date_reported', 'reported_by'),
+            'classes': ('collapse',)
+        }),
+        ('Attribution', {
+            'fields': ('assigned_to',)
+        }),
+        ('Résolution', {
+            'fields': ('resolution_notes', 'resolved_date')
+        }),
+       
+    )
+
+    def save_model(self, request, obj, form, change):
+        if not change:  # Si c'est un nouvel incident
+            obj.reported_by = Employee.objects.get(user=request.user)
+        
+        if obj.status == 'RESOLU' and not obj.resolved_date:
+            obj.resolved_date = timezone.now()
+        
+        super().save_model(request, obj, form, change)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.GET.get('status__exact') == 'EN_COURS':
+            return qs.filter(status='EN_COURS')
+        return qs
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "assigned_to":
+            kwargs["queryset"] = Employee.objects.filter(role__in=['maintenance', 'concierge', 'manager'])
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    actions = ['mark_as_resolved']
+
+    def mark_as_resolved(self, request, queryset):
+        updated = queryset.update(status='RESOLU', resolved_date=timezone.now())
+        self.message_user(request, f'{updated} incident(s) marqué(s) comme résolu(s).')
+    mark_as_resolved.short_description = "Marquer les incidents sélectionnés comme résolus"
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['show_unresolved'] = request.GET.get('unresolved', False)
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def status_tag(self, obj):
+        if obj.status == 'EN_COURS':
+            return format_html('<span style="background-color: red; color: white; padding: 3px; border-radius: 3px;">En cours</span>')
+        return obj.get_status_display()
 # Register your models here.
 class PropertyImageInline(StackedInline):
     model = PropertyImage
     readonly_fields = ('thumbnail_path', 'large_path',)
-    fields = ('title', 'image',  )
+    fieldsets = (('System Images', {
+                'fields': (
+                    ('title', 'image'),
+                ),
+                'classes': ('collapse',)
+            })),
     extra = 0
     
+class PropertyIncidentInline(StackedInline):
+    model = Incident
+    fieldsets = (('ticket Incidents', {
+                'fields': (
+                    'title',
+                    ('type', 'status', 'reported_by', 'assigned_to')
+                ),
+                'classes': ('collapse',)
+            })),
+    extra = 0
     
 @admin.register(cg_models.Property)
 class PropertyAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'owner', 'price_per_night_display', 'address_preview')
     list_filter = ('type', 'owner')
     search_fields = ('name', 'address', 'owner__username')
-    readonly_fields = ('created_at', 'update_at', 'created_by')
-    inlines = [PropertyImageInline, ]
+    readonly_fields = ('created_at', 'updated_at', 'created_by')
+    inlines = [PropertyImageInline, PropertyIncidentInline,]
 
     fieldsets = (
         ('Property Information', {
@@ -56,7 +132,7 @@ class PropertyAdmin(admin.ModelAdmin):
         }),
         ('System Information', {
             'fields': (
-                ('created_at', 'update_at'),
+                ('created_at', 'updated_at'),
                 'created_by',
             ),
             'classes': ('collapse',)
@@ -295,3 +371,6 @@ class EventAdmin(admin.ModelAdmin):
 admin.site.unregister
 admin.register(Event, EventAdmin)
 
+
+from .models import Incident
+from staff.models import Employee

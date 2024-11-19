@@ -1,0 +1,302 @@
+[
+  {
+    "model": "services_menage.incident",
+    "pk": 21,
+    "fields": {
+      "type": "PANNE",
+      "description": "Panne du système de climatisation dans l'appartement 301",
+      "date_reported": "2023-12-06T09:30:00Z",
+      "reported_by": 2,
+      "status": "OUVERT",
+      "assigned_to": 3,
+      "resolution_notes": "",
+      "resolved_date": null,
+      "property": 6
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 22,
+    "fields": {
+      "type": "DOMMAGE",
+      "description": "Dégât des eaux dans le hall d'entrée du bâtiment C",
+      "date_reported": "2023-12-07T14:15:00Z",
+      "reported_by": 4,
+      "status": "EN_COURS",
+      "assigned_to": 1,
+      "resolution_notes": "Équipe de nettoyage en route",
+      "resolved_date": null,
+      "property": 7
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 23,
+    "fields": {
+      "type": "FUITE",
+      "description": "Fuite de gaz signalée dans l'appartement 402",
+      "date_reported": "2023-12-08T18:45:00Z",
+      "reported_by": 1,
+      "status": "RESOLU",
+      "assigned_to": 5,
+      "resolution_notes": "Fuite colmatée, vérification effectuée",
+      "resolved_date": "2023-12-08T20:30:00Z",
+      "property": 8
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 24,
+    "fields": {
+      "type": "DEGRADATION",
+      "description": "Vandalisme sur les boîtes aux lettres du rez-de-chaussée",
+      "date_reported": "2023-12-09T07:00:00Z",
+      "reported_by": 3,
+      "status": "OUVERT",
+      "assigned_to": 2,
+      "resolution_notes": "",
+      "resolved_date": null,
+      "property": 9
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 25,
+    "fields": {
+      "type": "AUTRE",
+      "description": "Problème de connexion internet dans tout le bâtiment D",
+      "date_reported": "2023-12-10T11:20:00Z",
+      "reported_by": 5,
+      "status": "EN_COURS",
+      "assigned_to": 4,
+      "resolution_notes": "Technicien du fournisseur d'accès contacté",
+      "resolved_date": null,
+      "property": 10
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 26,
+    "fields": {
+      "type": "PANNE",
+      "description": "Panne d'électricité dans les parties communes du 5ème étage",
+      "date_reported": "2023-12-11T16:30:00Z",
+      "reported_by": 2,
+      "status": "RESOLU",
+      "assigned_to": 1,
+      "resolution_notes": "Problème de disjoncteur résolu",
+      "resolved_date": "2023-12-11T18:45:00Z",
+      "property": 11
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 27,
+    "fields": {
+      "type": "DOMMAGE",
+      "description": "Bris de vitre dans la porte d'entrée principale",
+      "date_reported": "2023-12-12T08:10:00Z",
+      "reported_by": 4,
+      "status": "OUVERT",
+      "assigned_to": 3,
+      "resolution_notes": "",
+      "resolved_date": null,
+      "property": 12
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 28,
+    "fields": {
+      "type": "FUITE",
+      "description": "Fuite d'eau dans le parking souterrain",
+      "date_reported": "2023-12-13T13:40:00Z",
+      "reported_by": 1,
+      "status": "EN_COURS",
+      "assigned_to": 5,
+      "resolution_notes": "Plombier en intervention",
+      "resolved_date": null,
+      "property": 13
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 29,
+    "fields": {
+      "type": "DEGRADATION",
+      "description": "Graffitis sur les murs de l'ascenseur",
+      "date_reported": "2023-12-14T17:55:00Z",
+      "reported_by": 3,
+      "status": "RESOLU",
+      "assigned_to": 2,
+      "resolution_notes": "Nettoyage effectué",
+      "resolved_date": "2023-12-15T10:30:00Z",
+      "property": 14
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 30,
+    "fields": {
+      "type": "AUTRE",
+      "description": "Problème de sécurité : porte de garage ne se ferme pas complètement",
+      "date_reported": "2023-12-15T20:15:00Z",
+      "reported_by": 5,
+      "status": "OUVERT",
+      "assigned_to": 4,
+      "resolution_notes": "",
+      "resolved_date": null,
+      "property": 15
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 31,
+    "fields": {
+      "type": "PANNE",
+      "description": "Dysfonctionnement du système d'interphone",
+      "date_reported": "2023-12-16T09:05:00Z",
+      "reported_by": 2,
+      "status": "EN_COURS",
+      "assigned_to": 1,
+      "resolution_notes": "Technicien programmé pour demain",
+      "resolved_date": null,
+      "property": 16
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 32,
+    "fields": {
+      "type": "DOMMAGE",
+      "description": "Dommages causés par la tempête sur le toit",
+      "date_reported": "2023-12-17T06:30:00Z",
+      "reported_by": 4,
+      "status": "OUVERT",
+      "assigned_to": 3,
+      "resolution_notes": "",
+      "resolved_date": null,
+      "property": 17
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 33,
+    "fields": {
+      "type": "FUITE",
+      "description": "Fuite au niveau des canalisations extérieures",
+      "date_reported": "2023-12-18T12:20:00Z",
+      "reported_by": 1,
+      "status": "RESOLU",
+      "assigned_to": 5,
+      "resolution_notes": "Réparation effectuée",
+      "resolved_date": "2023-12-18T16:45:00Z",
+      "property": 18
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 34,
+    "fields": {
+      "type": "DEGRADATION",
+      "description": "Dégradation des espaces verts communs",
+      "date_reported": "2023-12-19T15:10:00Z",
+      "reported_by": 3,
+      "status": "EN_COURS",
+      "assigned_to": 2,
+      "resolution_notes": "Jardinier contacté pour évaluation",
+      "resolved_date": null,
+      "property": 19
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 35,
+    "fields": {
+      "type": "AUTRE",
+      "description": "Problème de chauffage collectif",
+      "date_reported": "2023-12-20T08:50:00Z",
+      "reported_by": 5,
+      "status": "OUVERT",
+      "assigned_to": 4,
+      "resolution_notes": "",
+      "resolved_date": null,
+      "property": 20
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 36,
+    "fields": {
+      "type": "PANNE",
+      "description": "Panne du système de ventilation dans le parking",
+      "date_reported": "2023-12-21T10:40:00Z",
+      "reported_by": 2,
+      "status": "RESOLU",
+      "assigned_to": 1,
+      "resolution_notes": "Ventilation réparée et testée",
+      "resolved_date": "2023-12-21T14:15:00Z",
+      "property": 6
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 37,
+    "fields": {
+      "type": "DOMMAGE",
+      "description": "Dommages sur la façade suite à un accident de voiture",
+      "date_reported": "2023-12-22T17:30:00Z",
+      "reported_by": 4,
+      "status": "EN_COURS",
+      "assigned_to": 3,
+      "resolution_notes": "Assurance contactée, devis en cours",
+      "resolved_date": null,
+      "property": 7
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 38,
+    "fields": {
+      "type": "FUITE",
+      "description": "Fuite d'eau dans le local à vélos",
+      "date_reported": "2023-12-23T07:25:00Z",
+      "reported_by": 1,
+      "status": "OUVERT",
+      "assigned_to": 5,
+      "resolution_notes": "",
+      "resolved_date": null,
+      "property": 8
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 39,
+    "fields": {
+      "type": "DEGRADATION",
+      "description": "Dégradation des équipements de l'aire de jeux pour enfants",
+      "date_reported": "2023-12-24T11:55:00Z",
+      "reported_by": 3,
+      "status": "EN_COURS",
+      "assigned_to": 2,
+      "resolution_notes": "Inspection en cours, remplacement à prévoir",
+      "resolved_date": null,
+      "property": 9
+    }
+  },
+  {
+    "model": "services_menage.incident",
+    "pk": 40,
+    "fields": {
+      "type": "AUTRE",
+      "description": "Problème d'éclairage automatique dans les couloirs",
+      "date_reported": "2023-12-25T19:05:00Z",
+      "reported_by": 5,
+      "status": "RESOLU",
+      "assigned_to": 4,
+      "resolution_notes": "Capteurs de mouvement remplacés",
+      "resolved_date": "2023-12-26T10:30:00Z",
+      "property": 10
+    }
+  }
+]

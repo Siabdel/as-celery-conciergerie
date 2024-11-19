@@ -4,7 +4,7 @@
 
 
 {% block revenue_report %}
-    <div>
+    <div v-if="revenueData" >
         <h4>Rapport de revenus</h4>
         <table class="table table-hover table-striped">
             <thead>
@@ -21,7 +21,7 @@
 {% endblock revenue_report%}
 
 {% block taux_occupation %}
-    <div id="occupation-report">
+    <div v-if="tauxData" id="occupation-report">
         <h4>Taux occupation</h4>
         <table class="table table-hover table-striped">
             <thead>
@@ -42,7 +42,7 @@
 
 {% block evolution %}
     <div class="col-md-6 mb-3">
-        <h3 class="card-header">Évolution des revenus des réservations</h3>
+        <h4 class="card-header">Évolution des revenus des réservations</h4>
         <div class="card">
             <div class="card-body">
                 <div id="chartAreaBar"></div>
@@ -50,7 +50,7 @@
         </div>
     </div>
     <div class="col-md-6 mb-3">
-        <h3 class="card-header">Évolution des prix par mois de la property </h3>
+        <h4 class="card-header">Évolution des prix par mois de la property </h4>
          <div class="card">
             <div class="card-body">
                 <div id="chartAreaLine"></div>

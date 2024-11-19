@@ -1,0 +1,52 @@
+[
+  {
+    "model": "services_menage.reservation",
+    "pk": 1,
+    "fields": {
+      "reservation_status": "CONFIRMED",
+      "property": 15,
+      "check_in": "2024-09-14T12:37:24",
+      "check_out": "2024-09-21T12:37:24",
+      "guest_name": "Guest 1",
+      "guest_email": "guest1@example.com",
+      "platform": "BOOKING",
+      "number_of_guests": 3,
+      "total_price": "368.29",
+      "cleaning_fee": "37.59",
+      "service_fee": "16.94",
+      "guest_phone": "+212 639876543",
+      "special_requests": "No special requests",
+      "is_business_trip": false,
+      "guest_rating": 4,
+      "cancellation_policy": "Flexible",
+      "booking_date": "2024-08-28T12:37:24",
+      "created_at": "2023-11-18T12:37:24.123456",
+      "updated_at": "2023-11-18T12:37:24.123456"
+    }
+  },
+  {
+    "model": "services_menage.reservation",
+    "pk": 2,
+    "fields": {
+      "reservation_status": "PENDING",
+      "property": 7,
+      "check_in": "2024-07-23T12:37:24",
+      "check_out": "2024-07-29T12:37:24",
+      "guest_name": "Guest 2",
+      "guest_email": "guest2@example.com",
+      "platform": "AIRBNB",
+      "number_of_guests": 2,
+      "total_price": "271.56",
+      "cleaning_fee": "45.32",
+      "service_fee": "22.18",
+      "guest_phone": "+212 612345678",
+      "special_requests": "",
+      "is_business_trip": true,
+      "guest_rating": null,
+      "cancellation_policy": "Flexible",
+      "booking_date": "2024-07-10T12:37:24",
+      "created_at": "2023-11-18T12:37:24.123456",
+      "updated_at": "2023-11-18T12:37:24.123456"
+    }
+  }
+]
