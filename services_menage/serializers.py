@@ -27,9 +27,8 @@ class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
         fields__ = '__all__'
-        fields = ( "id", "update_at",
-            "created_at", "name", "type", "address",
-            "price_per_night", "created_by", "owner",
+        fields = ( "id", "created_at", "name", "type", "address",
+            "price_per_night",  "owner",
         )
 
     def get_client(self, obj):

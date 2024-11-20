@@ -10,14 +10,21 @@ import pandas_report.serializers as pd_serializer
 import pandas as pd
 from rest_framework import serializers
 from django.db.models import F, Q
+## DRF
 from rest_framework.decorators import api_view
-from datetime import datetime, timedelta
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from datetime import datetime, date, timedelta
 from django.db.models.functions import TruncMonth
 from django.db.models import Avg, F, DecimalField, DurationField
 from django.db.models.expressions import ExpressionWrapper
 from decimal import Decimal
 from django.db.models import F, ExpressionWrapper, DecimalField, DurationField
 from django.db.models.functions import Cast, ExtractDay
+from dateutil.relativedelta import relativedelta
+from services_menage.serializers import PropertySerializer, ReservationSerializer
+from services_menage import models as sm_models
 
 
 
@@ -371,3 +378,66 @@ def get_monthly_price_evolution_by_property(request, property_id):
     else:
         return Response(serializer.errors, status=400)
     
+    
+## API's Reservations par Property 
+""" 
+    Nous avons créé deux ViewSets : PropertyViewSet et ReservationViewSet.
+    Dans PropertyViewSet, nous avons ajouté deux actions personnalisées :
+        reservations : pour obtenir toutes les réservations d'une propriété spécifique pour les 3 prochains mois.
+        create_reservation : pour créer une nouvelle réservation pour une propriété spécifique.
+    Dans ReservationViewSet, nous avons surchargé la méthode get_queryset pour permettre le filtrage des réservations par propriété.
+
+Pour utiliser ces endpoints, vous devrez les inclure dans vos URLs. Voici un exemple de configuration d'URL :
+
+"""
+
+class PropertyViewSet(viewsets.ModelViewSet):
+    queryset = sm_models.Property.objects.all()
+    serializer_class = PropertySerializer
+
+    @action(detail=True, methods=['get'])
+    def reservations(self, request, pk=None):
+        property = self.get_object()
+        today = date.today()
+        three_months_later = today + relativedelta(months=+3)
+
+        reservations = sm_models.Reservation.objects.filter(
+            property=property,
+            start_date__gte=today,
+            end_date__lte=three_months_later
+        ).order_by('start_date')
+
+        serializer = ReservationSerializer(reservations, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def create_reservation(self, request, pk=None):
+        property = self.get_object()
+        serializer = ReservationSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save(property=property)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ReservationViewSet(viewsets.ModelViewSet):
+    queryset = sm_models.Reservation.objects.all()
+    serializer_class = ReservationSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        property_id = self.request.query_params.get('property_id', None)
+        if property_id is not None:
+            queryset = queryset.filter(property_id=property_id)
+        return queryset
+
+    @action(detail=False, methods=['get'], url_path='by-property/(?P<property_id>\d+)')
+    def by_property(self, request, property_id=None):
+        """ 
+         vous pouvez utiliser reverse() comme ceci 
+        url = reverse('reservation-by-property', args=[10])  # Pour la propriété avec ID 10
+        """
+        reservations = self.get_queryset().filter(property_id=property_id)
+        serializer = self.get_serializer(reservations, many=True)
+        return Response(serializer.data)
+

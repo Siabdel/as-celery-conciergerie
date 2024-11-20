@@ -71,6 +71,7 @@
         delimiters: ['[[', ']]'],
         data: {
             message : "Vue.js",
+            full_url : "/panda/calendar/",
             revenueData: {},
             pricesData: {},
             tauxData: {},
@@ -96,8 +97,12 @@
             this.renderChartEvolutionPrice("#chartAreaBar", this.months, this.revenus, "Revenues par mois");
             this.renderChartEvolutionPrice("#chartAreaLine", this.months, this.prices, "Evolutions des prix par mois");
             //this.renderChartLine();
+            this.url_calendar()
         },
         methods: {
+            url_calendar(){
+                var url = this.full_url = `/calendar/cal/property/` + {{property.id}};
+            },
             async fetchMonthlyPriceData(){
                 let url = `{% url "report:api_property_price_evolution" property.pk  %}`
                 await fetch(url)
@@ -142,8 +147,8 @@
             // RENDER EN ligne
             renderChartLine(){
                 if (!this.revenueData || this.revenueData.length === 0) {
-                    console.error("Pas de données à afficher");
-                    return;
+                    //console.error("Pas de données à afficher");
+                    return [];
                 }
 
                 let data = this.revenueData.map((item, index) => ({

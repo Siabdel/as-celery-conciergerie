@@ -1,13 +1,22 @@
-from django.urls import path
+from django.urls import path, include
 from .views import RevenueChartView, revenue_data, RevenueReportView, revenue_report_data
 from .views import ConciergerieRevenueView, PropertyRevenueView
 from .api_views import RevenueReportAPIView, TauxOccupationAPIView, property_revenue_by_month
 from pandas_report import api_views 
-
+from rest_framework.routers import DefaultRouter
 
 app_name = "report"
 
+router = DefaultRouter()
+router.register(r'properties', api_views.PropertyViewSet)
+router.register(r'reservations', api_views.ReservationViewSet, basename="reservations")
+
 urlpatterns = [
+    path('', include(router.urls)),
+]
+
+
+urlpatterns += [
     path('revenue-chart/', RevenueChartView.as_view(), name='revenue_chart'),
     path('revenue-data/', revenue_data, name='revenue_data'), ## API json
     #

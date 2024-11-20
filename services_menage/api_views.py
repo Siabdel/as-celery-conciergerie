@@ -1,5 +1,5 @@
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from django.utils.dateparse import parse_date
 from django.utils.timezone import make_naive
 from django.utils.dateparse import parse_datetime
@@ -20,13 +20,17 @@ from core.models import CustomCalendar
 from django.views.generic import CreateView
 
 # Formulaire etat des lieu
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework import serializers
+from rest_framework.decorators import action
+from rest_framework.response import Response
+##
 from services_menage.serializers import CheckoutInventorySerializer
 from services_menage.forms import CheckoutInventoryForm
 #models
 from services_menage import models as sm_models
 from core import models as core_models
+from dateutil.relativedelta import relativedelta
 
 
 class PeriodicTaskListCreate(generics.ListCreateAPIView):
@@ -283,3 +287,4 @@ def update_event(request, pk):
     # Sérialiser et renvoyer l'événement mis à jour
     serializer = serializers.EventSerializer(event)
     return Response(serializer.data, status=status.HTTP_200_OK)
+

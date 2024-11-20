@@ -1,8 +1,14 @@
 
 import json
+import random
+from datetime import datetime, timedelta
+from decimal import Decimal
 from django.shortcuts import render
 import pandas as pd
 from django.db.models import Sum
+from django.db import transaction
+from votre_app.models import Reservation  # Assurez-vous d'importer votre modèle Reservation
+
 
 def month_name_fr(month_number):
     months_fr = {
@@ -14,11 +20,6 @@ def month_name_fr(month_number):
 
     
     
-import json
-import random
-from datetime import datetime, timedelta
-from decimal import Decimal
-
 # Fonction pour générer une date aléatoire entre deux dates
 def random_date(start, end):
     return start + timedelta(
@@ -100,3 +101,44 @@ def create_reservation_fixtures():
         json.dump(reservations, f, indent=2)
 
     print(f"Generated {len(reservations)} reservation fixtures.")
+
+    
+
+
+
+ # Supposons que vous ayez déjà un DataFrame nommé 'df' contenant vos réservations
+# avec des colonnes 'check_in' et 'check_out' de type datetime
+reservations = Reservation.objects.all()
+
+# Définir les nouvelles heures de check-in et check-out
+
+# Créer un DataFrame pandas à partir des réservations
+# Supposons que df est votre DataFrame contenant les réservations
+df = pd.DataFrame(list(reservations.values('id', 'check_in', 'check_out', 'total_price')))
+
+# Supposons que df est votre DataFrame avec les modifications
+
+# 1. Préparation des données
+df['check_in'] = pd.to_datetime(df['check_in'])
+df['check_out'] = pd.to_datetime(df['check_out'])
+
+check_in_time = timedelta(hours=14)
+check_out_time = timedelta(hours=11)
+
+df['check_in'] = df['check_in'].dt.normalize() + check_in_time
+df['check_out'] = df['check_out'].dt.normalize() + check_out_time
+
+df['days_reserved'] = ((df['check_out'] - df['check_in']).dt.total_seconds() / (24 * 3600)).ceil()
+
+# 2. Sauvegarde dans la base de données
+@transaction.atomic
+def update_reservations(dataframe):
+    for index, row in dataframe.iterrows():
+        Reservation.objects.filter(id=row['id']).update(
+            check_in=row['check_in'],
+            check_out=row['check_out'],
+            days_reserved=row['days_reserved']
+        )
+
+# Appel de la fonction pour mettre à jour la base de données
+update_reservations(df)

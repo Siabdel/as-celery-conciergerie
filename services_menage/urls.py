@@ -17,6 +17,11 @@ router.register(r'calendars', api_views.CalendarViewSet)
 router.register(r'events', api_views.EventViewSet)
 # Formulaire 
 router.register(r'checkout-inventory', api_views.CheckoutInventoryViewSet)
+## Api reservations par Property
+router = DefaultRouter()
+router.register(r'properties', api_views.PropertyViewSet)
+router.register(r'reservations', api_views.ReservationViewSet)
+
 
 
 urlpatterns = [

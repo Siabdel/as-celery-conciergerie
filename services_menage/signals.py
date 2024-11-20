@@ -1,12 +1,15 @@
 
 from django.utils import timezone
 from datetime import datetime, timedelta
+from django.db.models import F
+from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from services_menage import views
 from .models import Reservation, ResaStatus
 from services_menage import models as serv_models
+
         
 # 5. Utilisez des signaux pour automatiser la création d'événements :
 
@@ -84,3 +87,59 @@ def update_reservation_status(sender, instance, **kwargs):
 
     # Si le statut est "EXPIRED", on ne le change pas
     # L'expiration n'est pas réversible à ce stade.
+
+    # Pour mettre à jour l'heure de check-in à 14h00 et l'heure de check-out à 11h00 pour toutes les réservations
+    """
+    Reservation.objects.update(
+        check_in=F('check_in').replace(hour=14, minute=0, second=0),
+        check_out=F('check_out').replace(hour=12, minute=30, second=0)
+    )
+ """
+    import pandas as pd
+    from datetime import time
+    from datetime import timedelta
+    from django.db import transaction
+    # Supposons que vous ayez déjà un DataFrame nommé 'df' contenant vos réservations
+    # avec des colonnes 'check_in' et 'check_out' de type datetime
+    reservations = Reservation.objects.all()
+
+    # Définir les nouvelles heures de check-in et check-out
+
+    # Créer un DataFrame pandas à partir des réservations
+    # Supposons que df est votre DataFrame contenant les réservations
+    df = pd.DataFrame(list(reservations.values('id', 'check_in', 'check_out', 'total_price')))
+
+
+    # Convertir les colonnes en datetime si elles ne le sont pas déjà
+    df['check_in'] = pd.to_datetime(df['check_in'])
+    df['check_out'] = pd.to_datetime(df['check_out'])
+
+    # Définir les nouvelles heures de check-in et check-out
+    check_in_time = timedelta(hours=14)  # 14:00
+    check_out_time = timedelta(hours=12)  # 11:00
+
+    # Ajuster l'heure de check-in à 14:00
+    df['check_in'] = df['check_in'].dt.normalize() + check_in_time
+
+    # Ajuster l'heure de check-out à 11:00
+    df['check_out'] = df['check_out'].dt.normalize() + check_out_time
+
+    # Calculer le nombre de jours réservés pour chaque réservation
+    df['days_reserved'] = (df['check_out'] - df['check_in']).dt.total_seconds() / (24 * 3600)
+
+    # Arrondir le nombre de jours à l'entier supérieur si nécessaire
+    ## df['days_reserved'] = df['days_reserved'].ceil()
+
+    # Afficher le résultat
+    print(df[['check_in', 'check_out', 'days_reserved']])
+    # 2. Sauvegarde dans la base de données
+    @transaction.atomic
+    def update_reservations(dataframe):
+        for index, row in dataframe.iterrows():
+            Reservation.objects.filter(id=row['id']).update(
+                check_in=row['check_in'],
+                check_out=row['check_out'],
+            )
+
+    # Appel de la fonction pour mettre à jour la base de données
+    update_reservations(df)

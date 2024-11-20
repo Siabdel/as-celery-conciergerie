@@ -267,7 +267,7 @@ class ReservationAdmin(ImportExportModelAdmin):
     )
     def get_readonly_fields(self, request, obj=None):
         if obj:  # editing an existing object
-            return self.readonly_fields + ('property', 'check_in', 'check_out', 'guest_name', 'guest_email', 'platform', 'total_price')
+            return self.readonly_fields + ('property', 'guest_name', 'guest_email', 'platform', 'total_price')
         return self.readonly_fields
 
     def total_price_display(self, obj):
