@@ -8,6 +8,7 @@ import pandas as pd
 from django.db.models import Sum
 from django.db import transaction
 from votre_app.models import Reservation  # Assurez-vous d'importer votre modèle Reservation
+from services_menage.models import Reservation
 
 
 def month_name_fr(month_number):

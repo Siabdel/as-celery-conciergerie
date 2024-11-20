@@ -82,8 +82,10 @@ class Reservation(ASBaseTimestampMixin):
                                           choices=ResaStatus.choices, 
                                           default=ResaStatus.PENDING)
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='reservations')
-    check_in = models.DateTimeField()
-    check_out = models.DateTimeField()
+    
+    check_in = models.DateTimeField(default=timezone.now().replace(hour=14, minute=0, second=0, microsecond=0))
+    check_out = models.DateTimeField(default=timezone.now().replace(hour=12, minute=0, second=0, microsecond=0))
+    
     guest_name = models.CharField(max_length=100)
     guest_email = models.EmailField()
     
