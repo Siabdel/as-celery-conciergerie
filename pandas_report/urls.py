@@ -3,6 +3,7 @@ from .views import RevenueChartView, revenue_data, RevenueReportView, revenue_re
 from .views import ConciergerieRevenueView, PropertyRevenueView
 from .api_views import RevenueReportAPIView, TauxOccupationAPIView, property_revenue_by_month
 from pandas_report import api_views 
+from pandas_report.pdf_views import generate_pdf_property_report
 from rest_framework.routers import DefaultRouter
 
 app_name = "report"
@@ -32,6 +33,9 @@ urlpatterns += [
     path('revenue/', ConciergerieRevenueView.as_view(), name='revenue_report'),
     path('revenue-report/', RevenueReportView.as_view(), name='revenue_report_chart'),
     path('property-revenue-report/<int:property_id>', PropertyRevenueView.as_view(), name='property_revenue_report'),
+    # pdf report 
+    path('pdf-report/', generate_pdf_property_report,name='revenue_report_chart'),
+    
 ]
 #-------------------------------------------
 #--- API's            
@@ -39,6 +43,8 @@ urlpatterns += [
 
 urlpatterns += [
     # taux occupation des proprietes par mois
+
+    path('api/reservations/', api_views.ReservationViewSet.as_view({'get', 'list'}), name='api-reservations-by-property'),
     path('api/taux-occupation/', TauxOccupationAPIView.as_view(), name='api_revenue_report_chart'),
     # Revenue Report
     path('api/revenue-report/', RevenueReportAPIView.as_view(), name='api_revenue_report'),

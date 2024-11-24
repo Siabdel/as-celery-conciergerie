@@ -46,4 +46,5 @@ urlpatterns += [
     ## path('api/v1/calendar/employee-tasks/', EmployeeTaskCalendarView.as_view(), name='employee_task_calendar'),
     path('api/tasks/', api_views.get_employee_tasks, name='get_employee_tasks'),
     path('api/event/<int:pk>/update/', api_views.ServiceTaskEventUpdateView.as_view(), name='event-update'),
+    path('api/releve/', api_views.calculate_revenue_statement, name='api_releve_revenue'),
 ]

@@ -1,5 +1,6 @@
 import json
 import pandas as pd
+from decimal import Decimal
 from datetime import datetime, timedelta
 from django.shortcuts import render, HttpResponse
 from django.utils import timezone
@@ -371,3 +372,62 @@ class CheckoutInventoryCreateView(CreateView):
             )
 
         return redirect('inventory_detail', pk=inventory.pk)
+    
+    
+
+def calculate_revenue_statement(property, start_date, end_date):
+    """ 
+    # Utilisation de la fonction
+    property = Property.objects.get(id=1)  # Remplacer par l'ID de la propriété
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=90)
+
+    statement = calculate_revenue_statement(property, start_date, end_date)
+    print(f"Relevé des revenus du {statement['period_start']} au {statement['period_end']}:")
+    print(f"Revenu total: {statement['total_revenue']}€")
+    print(f"Dépenses totales: {statement['total_expenses']}€")
+    print(f"Commission Airbnb: {statement['airbnb_commission']}€")
+    print(f"Revenu net: {statement['net_revenue']}€")
+    """
+
+    # Calculer la période de 3 mois
+    three_months_ago = datetime.now() - timedelta(days=90)
+    start_date = max(start_date, three_months_ago)
+
+    # Initialiser les variables
+    total_revenue = Decimal('0.00')
+    total_expenses = Decimal('0.00')
+    airbnb_commission = Decimal('0.00')
+
+    # Récupérer toutes les réservations pour cette période
+    reservations = property.reservations.filter(check_in__gte=start_date, check_out__lte=end_date)
+
+    for reservation in reservations:
+        # Calculer le revenu de la réservation
+        reservation_revenue = reservation.total_price
+        total_revenue += reservation_revenue
+
+        # Calculer la commission Airbnb (supposons 3% du prix total)
+        commission = reservation_revenue * Decimal('0.03')
+        airbnb_commission += commission
+
+    # Récupérer tous les frais pour cette période
+    expenses = property.additional_expenses.filter(date__gte=start_date, date__lte=end_date)
+    for expense in expenses:
+        total_expenses += expense.amount
+
+    # Ajouter la commission Airbnb aux dépenses totales
+    total_expenses += airbnb_commission
+
+    # Calculer le revenu net
+    net_revenue = total_revenue - total_expenses
+
+    return {
+        'period_start': start_date,
+        'period_end': end_date,
+        'total_revenue': total_revenue,
+        'total_expenses': total_expenses,
+        'airbnb_commission': airbnb_commission,
+        'net_revenue': net_revenue
+    }
+

@@ -53,6 +53,25 @@ class Property(ASBaseTimestampMixin):
 
     def __str__(self):
         return f"{self.name} ({self.type})"
+    
+    
+    def get_price_for_date(self, date=None):
+        if date is None:
+            date = timezone.now().date()
+        
+        # Chercher une règle de prix active pour la date donnée
+        rule = self.pricing_rules.filter(
+            start_date__lte=date,
+            end_date__gte=date,
+            is_active=True
+        ).order_by('-priority').first()
+
+        # Si une règle est trouvée, retourner son prix, sinon retourner le prix de base
+        return rule.price_per_night if rule else self.price_per_night
+
+    def get_current_price(self):
+        return self.get_price_for_date()
+
         
     def get_active_listings(self):
         return self.listings.filter(is_active=True)
@@ -73,6 +92,45 @@ class Property(ASBaseTimestampMixin):
         return reverse("shop:product_delete", kwargs={'pk': self.pk})
     
 
+class PricingRule(models.Model):
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='pricing_rules')
+    start_date = models.DateField()
+    end_date = models.DateField()
+    price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    # Ajouts suggérés
+    is_active = models.BooleanField(default=True)
+    priority = models.IntegerField(default=0)
+    min_nights = models.PositiveIntegerField(default=1)
+    max_nights = models.PositiveIntegerField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-start_date', 'priority']
+
+    def __str__(self):
+        return f"{self.property} - {self.start_date} to {self.end_date}: {self.price_per_night}"
+
+    def clean(self):
+        if self.start_date > self.end_date:
+            raise ValidationError("La date de début doit être antérieure à la date de fin.")
+        # Vérifier le chevauchement avec d'autres règles de tarification
+        overlapping_rules = PricingRule.objects.filter(
+            property=self.property,
+            start_date__lte=self.end_date,
+            end_date__gte=self.start_date
+        ).exclude(pk=self.pk)
+        if overlapping_rules.exists():
+            raise ValidationError("Cette règle de tarification chevauche une règle existante.")
+
+    def save(self, *args, **kwargs):
+        if self.start_date > self.end_date:
+            raise ValueError("End date must be after start date")
+        super().save(*args, **kwargs)
+
+    def is_active_price(self):
+        today = timezone.now().date()
+        return self.start_date <= today <= self.end_date
+
 
 
   
@@ -82,7 +140,7 @@ class Reservation(ASBaseTimestampMixin):
                                           choices=ResaStatus.choices, 
                                           default=ResaStatus.PENDING)
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='reservations')
-    
+
     check_in = models.DateTimeField(default=timezone.now().replace(hour=14, minute=0, second=0, microsecond=0))
     check_out = models.DateTimeField(default=timezone.now().replace(hour=12, minute=0, second=0, microsecond=0))
     
@@ -261,3 +319,30 @@ class Incident(models.Model):
 
     def __str__(self):
         return f"{self.get_type_display()} - {self.status} - {self.property.name} - {self.date_reported}"
+    
+    """ 
+    es frais annexes dans un système de conciergerie, nous pouvons créer un modèle AdditionalExpense 
+    qui sera lié à chaque propriété. 
+    Nous définissons un modèle AdditionalExpense qui est lié à une propriété et inclut le type de dépense, 
+    le montant, la date et une description.
+    """
+
+class AdditionalExpense(models.Model):
+    EXPENSE_TYPES = [
+        ('supplies', 'Fournitures'),
+        ('repairs', 'Réparations'),
+        ('cleaning', 'Ménage'),
+        ('Assurance', 'Assurance'),
+        ('Internet', 'Internet'),
+        ('other', 'Autre'),
+    ]
+
+    property = models.ForeignKey('Property', on_delete=models.CASCADE, related_name='additional_expenses')
+    expense_type = models.CharField(max_length=20, choices=EXPENSE_TYPES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateField()
+    description = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.get_expense_type_display()} pour {self.property.name} - {self.amount}€"
+

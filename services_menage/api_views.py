@@ -1,4 +1,11 @@
-
+import json
+from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
+from django.shortcuts import render, HttpResponse
+from django.urls import reverse
+from django.contrib.auth.models import User
+import requests
+import pandas as pd
 from datetime import datetime, timedelta, date
 from django.utils.dateparse import parse_date
 from django.utils.timezone import make_naive
@@ -287,4 +294,151 @@ def update_event(request, pk):
     # Sérialiser et renvoyer l'événement mis à jour
     serializer = serializers.EventSerializer(event)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+##def calculate_revenue_statement(property, start_date, end_date):
+def calculate_revenue_statement(request ):
+    """ 
+    # Utilisation de la fonction
+    property = Property.objects.get(id=1)  # Remplacer par l'ID de la propriété
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=90)
+
+    statement = calculate_revenue_statement(property, start_date, end_date)
+    print(f"Relevé des revenus du {statement['period_start']} au {statement['period_end']}:")
+    print(f"Revenu total: {statement['total_revenue']}€")
+    print(f"Dépenses totales: {statement['total_expenses']}€")
+    print(f"Commission Airbnb: {statement['airbnb_commission']}€")
+    print(f"Revenu net: {statement['net_revenue']}€")
+    """
+
+    # Calculer la période de 3 mois
+    three_months_ago = datetime.now() - timedelta(days=90)
+
+     # Récupérer les paramètres de requête
+    property = request.query_params.get('property', None)
+    start_date = request.query_params.get('start_date', None)
+    end_date = request.query_params.get('end_date', None)
+    
+    
+    if start_date :
+        start_date = max(start_date, three_months_ago)
+    else :
+        start_date = datetime.now()
+        
+    if not end_date:
+        end_date = three_months_ago
+        
+    if not property :
+        property = sm_models.Property.objects.get(pk=1)
+
+    # Initialiser les variables
+    total_revenue = Decimal('0.00')
+    total_expenses = Decimal('0.00')
+    airbnb_commission = Decimal('0.00')
+
+    # Récupérer toutes les réservations pour cette période
+    reservations = property.reservations.filter(check_in__gte=end_date, check_out__lte=start_date)
+
+    releve_data = []
+    releve_reservation = {
+    }
+    
+    for reservation in reservations:
+        # Calculer le revenu de la réservation
+        reservation_revenue = reservation.total_price
+        total_revenue += reservation_revenue
+
+        # Calculer la commission Airbnb (supposons 3% du prix total)
+        commission = reservation_revenue * Decimal('0.03')
+        airbnb_commission += commission
+        
+
+    # Récupérer tous les frais pour cette période
+    expenses = property.additional_expenses.filter(date__gte=start_date, date__lte=end_date)
+    for expense in expenses:
+        total_expenses += expense.amount
+
+    # Ajouter la commission Airbnb aux dépenses totales
+    total_expenses += airbnb_commission
+
+    # Calculer le revenu net
+    net_revenue = total_revenue - total_expenses
+
+   
+    # fonction qui transfomre 
+    def round_decimal(value):
+        return Decimal(value).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    
+    
+    reservations_dict = list(reservations.values())
+    reservations_dict = [{k: int(v) if isinstance(v, Decimal) 
+                            else v for k, v in item.items()} 
+                                for item in reservations_dict]
+    
+    #raise Exception("resea =", list(reservations.values('id', 'check_in', 'check_out')))
+    pp = sm_models.Property.objects.filter(pk=property.id)
+    pro_dict =  list(elem for elem in pp.values())
+    df = pd.DataFrame(pro_dict)
+    owner = sm_models.User.objects.filter(pk=property.owner_id)
+    pro_dict[0]['owner'] = owner.values('id', 'username', 'first_name', 'last_name')[0] 
+
+    
+    # raise Exception("proprio =", pro_dict[0]['owner'])
+    dataset = {
+        'period_start': start_date,
+        'period_end': end_date,
+        'total_revenue': round_decimal(total_revenue),
+        'total_expenses': round_decimal(total_expenses),
+        'airbnb_commission': round_decimal(airbnb_commission),
+        'net_revenue': round_decimal(net_revenue),
+        'property': pro_dict[0],
+        'reservations': list(reservations.values('created_at', 'guest_name', 'guest_email', 'platform', 
+                                                'check_in', 'check_out',
+                                                'number_of_guests','total_price', 'cleaning_fee',
+                                                'service_fee', 'guest_phone'
+                                                )),
+    }
+    ## 
+    serializer = sm_serializers.DataRevenuePerPeriodeSerializer(data=dataset)
+    if serializer.is_valid():
+        return Response(serializer.data)
+    else:
+        print(serializer.errors)
+        return Response(serializer.errors, status=400)
+
+        
+    
+    
+
+@api_view(['GET'])
+def releve_activite_property(request):
+    # cette url endpoint pour la liste des reservations par property
+    # L'URL de base de votre API
+    # base_url = "http://localhost:8000/pandas"
+    # L'ID de la propriété dont vous voulez obtenir les réservations
+    property_id = 10
+
+    # Construire l'URL complète
+    # url = f"{base_url}/properties/{property_id}/reservations/"
+    # url = reverse('reservation-by-property', args=[10])  # Pour la propriété avec ID 10
+    url = reverse('api-reservations-by-property', args=[10])  # Pour la propriété avec ID 10
+
+    # Faire la requête GET
+    response = requests.get(url)
+
+    # Vérifier si la requête a réussi
+    if response.status_code == 200:
+        # La requête a réussi, vous pouvez accéder aux données
+        reservations = response.json()
+        print("Réservations pour la propriété 10:")
+        for reservation in reservations:
+            print(f"ID: {reservation['id']}, Date de début: {reservation['start_date']}, Date de fin: {reservation['end_date']}")
+    else:
+        # La requête a échoué
+        print(f"Erreur lors de la récupération des réservations: {response.status_code}")
+        print(response.text)
+
+            
 

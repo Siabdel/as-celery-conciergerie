@@ -427,15 +427,22 @@ class ReservationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         property_id = self.request.query_params.get('property_id', None)
-        if property_id is not None:
+        if property_id :
             queryset = queryset.filter(property_id=property_id)
         return queryset
+
 
     @action(detail=False, methods=['get'], url_path='by-property/(?P<property_id>\d+)')
     def by_property(self, request, property_id=None):
         """ 
          vous pouvez utiliser reverse() comme ceci 
         url = reverse('reservation-by-property', args=[10])  # Pour la propriété avec ID 10
+        # Pour ajouter le property_id, utilisez-le comme paramètre de requête
+        full_url = f"{url}?property_id=10"  # Pour la propriété avec ID 10
+        import requests
+        response = requests.get(full_url)
+        if response.status_code == 200:
+            reservations = response.json()
         """
         reservations = self.get_queryset().filter(property_id=property_id)
         serializer = self.get_serializer(reservations, many=True)

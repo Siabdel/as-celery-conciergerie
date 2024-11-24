@@ -8,7 +8,7 @@ from django.db.models import Count, Sum
 from django.db import models, IntegrityError
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
-from services_menage import models as cg_models
+from services_menage import models as sm_models
 from staff import models as staff_models
 # celery
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
@@ -100,7 +100,7 @@ class PropertyImageInline(StackedInline):
             })),
     extra = 0
     
-class PropertyIncidentInline(StackedInline):
+class PropertyIncidentInline(admin.TabularInline):
     model = Incident
     fieldsets = (('ticket Incidents', {
                 'fields': (
@@ -110,14 +110,30 @@ class PropertyIncidentInline(StackedInline):
                 'classes': ('collapse',)
             })),
     extra = 0
+
+
+class PricingRuleInline(admin.TabularInline):
+    model = sm_models.PricingRule
+    extra = 0
+
+ 
+class AdditionalExpenseInline(admin.TabularInline):
+    model = sm_models.AdditionalExpense
+    extra = 0
+    fields = ('property', 'expense_type', 'amount', 'date', 'description',)
     
-@admin.register(cg_models.Property)
+@admin.register(sm_models.AdditionalExpense)
+class AdditionalExpenseAdmin(admin.ModelAdmin):
+    list_display = ('property', 'expense_type', 'amount', 'date')
+    list_filter = ('expense_type', 'property', 'date')
+    search_fields = ('property__name', 'description')
+@admin.register(sm_models.Property)
 class PropertyAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'owner', 'price_per_night_display', 'address_preview')
     list_filter = ('type', 'owner')
     search_fields = ('name', 'address', 'owner__username')
     readonly_fields = ('created_at', 'updated_at', 'created_by')
-    inlines = [PropertyImageInline, PropertyIncidentInline,]
+    inlines = [PricingRuleInline, PropertyImageInline, PropertyIncidentInline, AdditionalExpenseInline]
 
     fieldsets = (
         ('Property Information', {
@@ -176,6 +192,14 @@ class PropertyAdmin(admin.ModelAdmin):
     #
     total_revenue.short_description = 'Revenu Total'
 
+@admin.register(sm_models.PricingRule)
+class PricingRuleAdmin(admin.ModelAdmin):
+    list_display = ('property', 'start_date', 'end_date', 'price_per_night', 'is_active', 'priority')
+    #fields = ('property', 'start_date', 'end_date', 'price_per_night',  'priority')
+    list_filter = ('property',  'start_date', 'end_date')
+    search_fields = ('property__name',)
+
+
 
 @admin.action(description=_("Dupliquer les réservations sélectionnées"))
 def duplicate_reservation(modeladmin, request, queryset):
@@ -200,9 +224,9 @@ def duplicate_reservation(modeladmin, request, queryset):
 class ReservationResource(resources.ModelResource):
     property_name = fields.Field(column_name='property_name', 
                                  attribute='property', 
-                                 widget=widgets.ForeignKeyWidget(cg_models.Property, 'name'))
+                                 widget=widgets.ForeignKeyWidget(sm_models.Property, 'name'))
     class Meta:
-        model = cg_models.Reservation
+        model = sm_models.Reservation
         fields = ('id', 'property', 'start_date', 'end_date', 'guest_name', 'guest_email', 'number_of_guests', 'total_price')
         export_order = fields
    
@@ -216,7 +240,7 @@ class ReservationResource(resources.ModelResource):
         pass
     
 
-@admin.register(cg_models.Reservation)
+@admin.register(sm_models.Reservation)
 class ReservationAdmin(ImportExportModelAdmin):
     resource_class = ReservationResource
     #
@@ -225,7 +249,7 @@ class ReservationAdmin(ImportExportModelAdmin):
     ## readonly_fields = ('numero', 'created_at', 'invoice_total')
     
     list_display = ('guest_name', 'property', 'check_in', 'check_out', 'reservation_status', 
-                    'platform', 'total_price')
+                    'platform', 'get_price_per_night', 'total_price')
     list_filter = ('reservation_status', 'platform', 'is_business_trip')
     search_fields = ('guest_name', 'guest_email', 'property__name')
     readonly_fields = ('booking_date', 'created_at', )
@@ -265,6 +289,12 @@ class ReservationAdmin(ImportExportModelAdmin):
             'classes': ('collapse',)
         }),
     )
+    
+    def get_price_per_night(self, obj):
+        return obj.property.get_price_for_date(obj.check_in)
+    get_price_per_night.short_description = 'Prix par nuit'
+
+
     def get_readonly_fields(self, request, obj=None):
         if obj:  # editing an existing object
             return self.readonly_fields + ('property', 'guest_name', 'guest_email', 'platform', 'total_price')
@@ -308,7 +338,7 @@ class ReservationAdmin(ImportExportModelAdmin):
 
 
 
-@admin.register(cg_models.ServiceTask)
+@admin.register(sm_models.ServiceTask)
 class ServiceTaskAdmin(admin.ModelAdmin):
     list_display = ('get_description', 'get_client', 'get_guestname', 'property', 
                     'start_date', 'end_date', 'status', 'completed')

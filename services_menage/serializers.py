@@ -161,3 +161,38 @@ class CheckoutInventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = CheckoutInventory
         fields = '__all__'
+
+class DataReservationsSerializer(serializers.Serializer):
+    created_at  = serializers.DateTimeField()
+    check_in    = serializers.DateTimeField()
+    check_out   = serializers.DateTimeField()
+    guest_name  = serializers.CharField()
+    guest_email = serializers.CharField()
+    platform    = serializers.CharField()
+    # les tottaux 
+    number_of_guests = serializers.IntegerField()
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    cleaning_fee = serializers.DecimalField(max_digits=10, decimal_places=2)
+    service_fee = serializers.DecimalField(max_digits=10, decimal_places=2)
+    guest_phone = serializers.CharField()
+   
+
+class PropertyPrimarySerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    address = serializers.CharField()
+    price_per_night = serializers.DecimalField(max_digits=10, decimal_places=2)
+    owner = serializers.JSONField()  # JSON pour inclure les informations du propriétaire
+
+class DataRevenuePerPeriodeSerializer(serializers.Serializer):
+    property = PropertyPrimarySerializer()
+    
+    # les totaux 
+    period_start = serializers.DateTimeField()
+    period_end = serializers.DateTimeField()
+    total_revenue = serializers.DecimalField(max_digits=10, decimal_places=2)
+    total_expenses = serializers.DecimalField(max_digits=10, decimal_places=2)
+    airbnb_commission = serializers.DecimalField(max_digits=10, decimal_places=2)
+    net_revenue = serializers.DecimalField(max_digits=10, decimal_places=2)
+    # reservations 
+    reservations = DataReservationsSerializer(many=True)
