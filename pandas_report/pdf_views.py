@@ -163,40 +163,58 @@ def generate_pdf_property_report(request):
     elements.append(Spacer(1, 20))  # Espacement après le titre
 
     # Créez le tableau
-    if reservations:
-        # Utilisez les clés de la première réservation comme en-têtes
-        headers = list(reservations[0].keys())
-        data = [headers]  # En-têtes du tableau
-
-        # Ajoutez les données des réservations
-        for reservation in reservations:
-            data.append([str(reservation.get(key, '')) for key in headers])
-
-        # Créez le tableau avec des colonnes adaptées
-        table = Table(data, colWidths=[doc.width / len(headers)] * len(headers))
-
-        # Appliquer un style de tableau propre
-        table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f8f9fa")),  # Couleur de l'en-tête
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#343a40")),  # Texte de l'en-tête
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#ffffff")),  # Couleur des lignes
-            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.HexColor("#f1f3f5"), colors.HexColor("#ffffff")]),  # Alternance des couleurs
-            ('TEXTCOLOR', (0, 1), (-1, -1), colors.HexColor("#495057")),  # Couleur du texte
-            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 1), (-1, -1), 10),
-            ('TOPPADDING', (0, 1), (-1, -1), 6),
-            ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#dee2e6"))  # Grille
-        ]))
-
-        elements.append(table)
-    else:
+    if not reservations:
         # Si aucune réservation n'est trouvée
-        elements.append(Paragraph("Aucune réservation trouvée.", styles['Normal']))
+        ##elements.append(Paragraph("Aucune réservation trouvée.", styles['Normal']))
+        return HttpResponse("pas de reservations !!!")
+        
+    # Utilisez les clés de la première réservation comme en-têtes
+    headers = list(reservations[0].keys())
+    data = [headers]  # En-têtes du tableau
+
+    # Ajoutez les données des réservations
+    # Ajoutez les données des réservations created_at  = serializers.CharField()
+    headers2 = ['created_at', 'check_in', 'check_out' , 'guest_name', 'guest_email', 'platform',
+                'guests', 'total_price', 'cleaning fee', 'service fee', 'guest_phone']
+
+
+    for reservation in reservations:
+        data.append([str(reservation.get(key, '')) for key in headers])
+                    
+    # Calculer la largeur maximale pour chaque colonne
+    col_widths = []
+    for col in zip(*data):
+        max_length = max(len(str(item)) for item in col)
+        col_widths.append(max_length * 7)  # Ajustez le facteur selon votre police
+
+    # raise Exception("data = ", data)
+
+    table = Table(data, colWidths=col_widths)
+
+    # Créez le tableau avec des colonnes adaptées
+    # table = Table(data, colWidths=[doc.width / len(headers)] * len(headers))
+
+    # Appliquer un style de tableau propre
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+        ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ('TOPPADDING', (0, 1), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    
+    
+
+    elements.append(table)
 
     # Construisez le PDF
     doc.build(elements)

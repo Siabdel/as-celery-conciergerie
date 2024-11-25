@@ -163,9 +163,13 @@ class CheckoutInventorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class DataReservationsSerializer(serializers.Serializer):
-    created_at  = serializers.DateTimeField()
-    check_in    = serializers.DateTimeField()
-    check_out   = serializers.DateTimeField()
+    # Champs formatés
+    #formatted_check_in = serializers.SerializerMethodField()
+    #formatted_check_out = serializers.SerializerMethodField()
+
+    created_at  = serializers.CharField()
+    check_in    = serializers.CharField()
+    check_out   = serializers.CharField()
     guest_name  = serializers.CharField()
     guest_email = serializers.CharField()
     platform    = serializers.CharField()
@@ -175,6 +179,12 @@ class DataReservationsSerializer(serializers.Serializer):
     cleaning_fee = serializers.DecimalField(max_digits=10, decimal_places=2)
     service_fee = serializers.DecimalField(max_digits=10, decimal_places=2)
     guest_phone = serializers.CharField()
+    
+    def get_formatted_check_in(self, obj):
+        return obj.check_in.strftime('%d/%m/%Y') if obj.check_in else None
+
+    def get_formatted_check_out(self, obj):
+        return obj.check_out.strftime('%d/%m/%Y') if obj.check_out else None
    
 
 class PropertyPrimarySerializer(serializers.Serializer):
@@ -188,7 +198,7 @@ class DataRevenuePerPeriodeSerializer(serializers.Serializer):
     property = PropertyPrimarySerializer()
     
     # les totaux 
-    period_start = serializers.DateTimeField()
+    period_start = serializers.CharField()
     period_end = serializers.DateTimeField()
     total_revenue = serializers.DecimalField(max_digits=10, decimal_places=2)
     total_expenses = serializers.DecimalField(max_digits=10, decimal_places=2)

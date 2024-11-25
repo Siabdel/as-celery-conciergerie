@@ -317,9 +317,9 @@ def calculate_revenue_statement(request ):
     three_months_ago = datetime.now() - timedelta(days=90)
 
      # Récupérer les paramètres de requête
-    property = request.query_params.get('property', None)
-    start_date = request.query_params.get('start_date', None)
-    end_date = request.query_params.get('end_date', None)
+    property    = request.query_params.get('property', None)
+    start_date  = request.query_params.get('start_date', None)
+    end_date    = request.query_params.get('end_date', None)
     
     
     if start_date :
@@ -383,22 +383,32 @@ def calculate_revenue_statement(request ):
     df = pd.DataFrame(pro_dict)
     owner = sm_models.User.objects.filter(pk=property.owner_id)
     pro_dict[0]['owner'] = owner.values('id', 'username', 'first_name', 'last_name')[0] 
+    # Appliquer strftime aux champs de dates
+    reservations_list = reservations.values(
+        'created_at', 'check_in', 'check_out', 'guest_name', 'guest_email', 'platform',
+        'number_of_guests', 'total_price', 'cleaning_fee', 'service_fee', 'guest_phone'
+    )
 
+    formatted_reservations_list = [
+    {
+        **reservation,
+        'created_at': reservation['created_at'].strftime('%d/%m/%Y') if reservation['created_at'] else None,
+        'check_in': reservation['check_in'].strftime('%d/%m/%Y') if reservation['check_in'] else None,
+        'check_out': reservation['check_out'].strftime('%d/%m/%Y') if reservation['check_out'] else None,
+    }
+    for reservation in reservations_list
+]
     
     # raise Exception("proprio =", pro_dict[0]['owner'])
     dataset = {
-        'period_start': start_date,
+        'period_start': start_date.strftime("%d %B %Y"),
         'period_end': end_date,
         'total_revenue': round_decimal(total_revenue),
         'total_expenses': round_decimal(total_expenses),
         'airbnb_commission': round_decimal(airbnb_commission),
         'net_revenue': round_decimal(net_revenue),
         'property': pro_dict[0],
-        'reservations': list(reservations.values('created_at', 'guest_name', 'guest_email', 'platform', 
-                                                'check_in', 'check_out',
-                                                'number_of_guests','total_price', 'cleaning_fee',
-                                                'service_fee', 'guest_phone'
-                                                )),
+        'reservations': list(formatted_reservations_list),
     }
     ## 
     serializer = sm_serializers.DataRevenuePerPeriodeSerializer(data=dataset)
