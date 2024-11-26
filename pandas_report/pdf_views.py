@@ -15,8 +15,8 @@ from django.conf import settings
 from django.http import HttpResponse
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import landscape, letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 
 
 
@@ -38,7 +38,7 @@ def request_url(url_in):
     return dataset
 
 
-def generate_pdf_property_report__(request):
+def generate_pdf_property_report(request):
     # Créez une instance de la vue avec la requêtefrom django.conf import settings
     # Assurez-vous d'avoir défini BASE_URL dans vos paramètres Django
     
@@ -126,14 +126,8 @@ def generate_pdf_property_report2(request):
     response['Content-Disposition'] = 'attachment; filename="property_report.pdf"'
 
     return response
-from io import BytesIO
-from django.http import HttpResponse
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import landscape, letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
 
-def generate_pdf_property_report(request):
+def generate_pdf_property_report3(request):
     # Obtenez les données à partir de l'API
     try:
         dataset = request_url("service/api/releve")
