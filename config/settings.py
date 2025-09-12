@@ -62,6 +62,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Application definition
 
 INSTALLED_APPS = [
+    'core', # common models 
+    'staff',
+    'services_menage', 
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -91,9 +94,7 @@ INSTALLED_APPS = [
     # local
     'django_celery_beat',
     'schedule',  # ou le nom correct de votre application
-    'core', # common models 
-    'staff',
-    'services_menage',
+    
     'slick_report', 
     'pandas_report',
     'fullcalendar', # fullcalendar scheduler
