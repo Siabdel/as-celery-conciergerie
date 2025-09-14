@@ -117,16 +117,17 @@ def generate_reservation_fixtures(num_reservations=100):
         }
         fixtures.append(fixture)
 
+
+    # Générer les fixtures
+    #reservations = generate_reservation_fixtures(100)
+
+    # Écrire les fixtures dans un fichier JSON
+    with open('reservation_fixtures.json', 'w') as f:
+        json.dump(reservations, f, indent=2)
+
+    print("Fixtures generated and saved to reservation_fixtures.json")
+    #
     return fixtures
-
-# Générer les fixtures
-reservations = generate_reservation_fixtures(100)
-
-# Écrire les fixtures dans un fichier JSON
-with open('reservation_fixtures.json', 'w') as f:
-    json.dump(reservations, f, indent=2)
-
-print("Fixtures generated and saved to reservation_fixtures.json")
 
 
 

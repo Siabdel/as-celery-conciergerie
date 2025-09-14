@@ -62,6 +62,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Application definition
 
 INSTALLED_APPS = [
+    'schedule',  # ou le nom correct de votre application
     'core', # common models 
     'staff',
     'services_menage', 
@@ -93,7 +94,6 @@ INSTALLED_APPS = [
     'explorer',
     # local
     'django_celery_beat',
-    'schedule',  # ou le nom correct de votre application
     
     'slick_report', 
     'pandas_report',
@@ -215,7 +215,7 @@ USE_TZ = False
 
 STATIC_URL = "static/"
 # Chemin où les fichiers statiques seront collectés (utilisé pour le déploiement)
-STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
@@ -223,10 +223,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # Additional locations of static files
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'staticfiles'),
     os.path.join(BASE_DIR, 'static', 'bootstrap_agency'),
-    os.path.join(BASE_DIR, 'media'),
-    os.path.join(BASE_DIR, 'media', 'upload'),
+    # os.path.join(BASE_DIR, 'media'),
+    #  os.path.join(BASE_DIR, 'media', 'upload'),
 ]
 
 ## 

@@ -1,38 +1,24 @@
 # FROM nginx:1.24.0-alpine-slim 
-FROM nginx:alpine-slim 
 
-# set work directory
-WORKDIR  /home/app/
+FROM nginx:alpine-slim
 
+WORKDIR /home/app
+RUN mkdir -p /home/app && \
+    chown -R nginx:nginx /home/app
 
-RUN rm /etc/nginx/conf.d/default.conf
-## 
+# supprimer la conf par défaut
+RUN rm -f /etc/nginx/conf.d/default.conf
 
-COPY nginx.conf /etc/nginx/conf.d
-
-
-FROM nginx:1.24.0-alpine-slim 
-
-RUN rm /etc/nginx/conf.d/default.conf
-
-# Créer un utilisateur non-root
-RUN adduser -D -H -u 1000 -s /sbin/nologin www-data -G www-data
-RUN adduser -D -H -u 1000 -s /sbin/nologin nginx
-# Définir l'utilisateur non-root
-RUN chown -R www-data:www-data  /home/app/
-
-
-# Copier la configuration Nginx
+# copier ta conf
 COPY nginx.conf /etc/nginx/conf.d/
 
-# Ajuster les permissions
-RUN chown -R www-data:www-data /var/cache/nginx /var/log/nginx /etc/nginx/conf.d
-RUN touch /var/run/nginx.pid && chown -R www-data:www-data /var/run/nginx.pid
+# dossiers & pid : même user alpine
+RUN chown -R nginx:nginx /var/cache/nginx /var/log/nginx /etc/nginx/conf.d && \
+    touch /var/run/nginx.pid && \
+    chown nginx:nginx /var/run/nginx.pid
 
-# Exposer les ports
 EXPOSE 80 443
-## use user 
-USER www-data
 
-# Démarrer Nginx
+# lancer nginx avec l’user alpine
+USER nginx
 CMD ["nginx", "-g", "daemon off;"]
