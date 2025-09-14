@@ -6,6 +6,7 @@ class ServicesMenageConfig(AppConfig):
     name = "services_menage"
 
     def ready(self):
-        import services_menage.signals  # remplacez 'your_app_name' par le nom réel de votre application
+        ## import services_menage.signals  # remplacez 'your_app_name' par le nom réel de votre application
+        pass # éviter l'import circulaire
     
 

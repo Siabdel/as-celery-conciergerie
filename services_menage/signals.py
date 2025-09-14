@@ -39,6 +39,20 @@ def creer_tache_nettoyage(sender, instance, created, **kwargs):
 	planifier_nettoyage(sender, instance, created)
 """ 
 
+# services_menage/signals.py
+
+def update_reservation_status(sender, instance, **kwargs):
+    qs = Reservation.objects.filter(
+        reservation_status__in=[ResaStatus.CONFIRMED, ResaStatus.IN_PROGRESS]
+    ).values('id', 'check_in', 'check_out')
+
+    if not qs.exists():          # <-- ajout
+        return
+
+    df = pd.DataFrame.from_records(qs)
+    # désormais sûr que les colonnes existent
+    df['check_in']  = pd.to_datetime(df['check_in'])
+    df['check_out'] = pd.to_datetime(df['check_out'])
 
 @receiver(pre_save, sender=Reservation)
 def update_reservation_status(sender, instance, **kwargs):

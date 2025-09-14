@@ -206,23 +206,11 @@ class Reservation(ASBaseTimestampMixin):
             raise ValidationError("Le statut 'COMPLETED' ne peut être défini que si la date de check-out n'est pas passée.")
 
     def save(self, *args, **kwargs):
-        """
-        Surcharge de la méthode `save()` pour inclure la validation avant la sauvegarde.
-        """
-        # Appel de la méthode clean() pour valider les règles métier
-        ##self.clean()
-        #raise ValidationError("quelle est le status ", self.reservation_status)
-        super().save(*args, **kwargs)
-##
         if not self.total_price:
             self.total_price = self.calculate_total_price()
-        try :
-            super().save(*args, **kwargs)
-        except IntegrityError as err:
-            # Au lieu de cela, levez une exception personnalisée
-            raise ValidationError("Une réservation existe déjà pour cette \
-                propriété à cette date. Veuillez choisir une autre date ou \
-                    une autre propriété.")
+        super().save(*args, **kwargs)   # laisse l'IntegrityError remonter
+    
+   
 
     def __str__(self):
         return f"Reservation for {self.property} from {self.check_in} to {self.check_out}"

@@ -1,4 +1,5 @@
 
+import os
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from schedule.models import Calendar as BaseCalendar
@@ -83,23 +84,26 @@ class BaseImage(models.Model):
     title = models.CharField(_('Titre'), max_length=50, null=True, blank=True)
     slug = models.SlugField(max_length=255, db_index=True, null=True, blank=True)
     image = models.ImageField(upload_to='upload/product_images/%Y/%m/', blank=True)
-    thumbnail_path = models.CharField(_("thumbnail"), max_length=50, null=True)
-    large_path     = models.CharField(_("large"), max_length=50, null=True)
+    thumbnail_path = models.CharField(_("thumbnail"), max_length=255, null=True, blank=True)
+    large_path = models.CharField(_("large"), max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
 
-    def save__(self, *args, **kwargs):
+    def save(self, *args, **kwargs):
         #raise Exception(f"args {args} kwargs = {kwargs}")
         img_100 = make_thumbnail(self.image, size=(100, 100))
         img_800 = make_thumbnail(self.image, size=(800, 600))
-        
-        output_dir = os.path.join(settings.MEDIA_ROOT, "images")
+ 
+        output_dir = os.path.join(settings.MEDIA_ROOT, "media")
          # Enregistre les images traitées
         base_name = os.path.basename(img_100.name)
-        self.thumbnail = os.path.join(output_dir, f"thumb_100x100_{base_name}")
+        self.thumbnail_path = os.path.join(output_dir, f"thumb_100x100_{base_name}")
+
         #
-        base_name = os.path.basename(img_100.name)
+        
+        base_name = os.path.basename(img_800.name)
         self.large_path = os.path.join(output_dir, f"large_800x600_{base_name}")
+        
         #raise Exception(f"image attribues = {img_100.name}")
         super().save(*args, **kwargs)
         

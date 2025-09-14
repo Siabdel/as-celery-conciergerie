@@ -6,30 +6,41 @@
 {% block header %}{% endblock %}
 
 {% block content %}
-    <h1>Liste des propriétes </h1>
+    <h1>Liste des propriétés</h1>
     <ul class="list-group">
         {% for property in object_list %}
+            {% with first_img=property.images.first %}   <!-- 1 seule requête -->
             <li class="list-group-item">
                 <div class="card">
                     <div class="card-header">
-                        <a href="{% url 'agence:property_detail' property.pk  %}" >
-                        <span class=""> <img  class="p-3 float-left" style="width:30%" src={% static 'img/appart_salon_008.jpg'  %} /> 
-                         <h3> {{ property.name }} </h3> </span>
-                        <span class="card-columns"> Type : {{ property.type }} <span>
+                        <a href="{% url 'agence:property_detail' property.pk %}">
+                            <span class="d-flex align-items-center">
+                                <!-- vignette ou placeholder -->
+                                <img class="p-3 float-left"
+                                     style="width:30%; max-height:150px; object-fit:cover;"
+                                     src="{% if first_img and first_img.thumbnail_path %}{{ first_img.thumbnail_path.url }}{% else %}{% static 'img/appart_salon_008.jpg' %}{% endif %}"
+                                     alt="{{ property.name }}">
+                                <div>
+                                    <h3>{{ property.name }} 
+                                    url :  {{ first_img.thumbnail_path.url }}   </h3>
+                                     {{ first_img.large_path }}  *** </h3>
+                                    <span class="text-muted">Type : {{ property.get_type_display }}</span>
+                                </div>
+                            </span>
                         </a>
                     </div>
 
                     <div class="card-body">
-                        Adresse : <small> {{ property.address }}</small>
-                        Localisation <smal>  {{ property.address }}</small>
-                        <span>Proprietaire : {{ property.owner.first_name }} {{ property.owner.last_name }} </span>
+                        Adresse : <small>{{ property.address }}</small><br>
+                        Localisation : <small>{{ property.address }}</small><br>
+                        <span>Propriétaire : {{ property.owner.first_name }} {{ property.owner.last_name }}</span>
                     </div>
-                    <div class="card-footer badge-info"> {{ property.price_per_night}} DH </div>
+                    <div class="card-footer badge-info">{{ property.price_per_night }} DH</div>
                 </div>
-
             </li>
+            {% endwith %}
         {% empty %}
-            <li class="list-group-item">Aucun copropriétaire enregistré.</li>
+            <li class="list-group-item">Aucune propriété enregistrée.</li>
         {% endfor %}
     </ul>
 {% endblock %}

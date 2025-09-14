@@ -206,7 +206,7 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 # Lorsque USE_TZ vaut True et que la base de données ne gère pas les fuseaux horaires (par ex. SQLite, MySQL, Oracle), Django lit et écrit les dates/heures en heure locale en fonction de cette option quand elle est définie et en UTC si elle ne l’est pas.
 
-USE_TZ = False
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
