@@ -1,0 +1,373 @@
+<!doctype html>
+    <html lang="fr" class="scroll-smooth">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Dimatlas Digit Agency - Agence Web Digitale</title>
+      <meta name="description" content="Dimatlas Digit Agency - Votre partenaire digital pour le développement web, CRM, facturation, ERP et solutions digitales innovantes." />
+      <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+      <link rel="stylesheet" href="/src/index.css">
+      <script src="https://cdn.jsdelivr.net/npm/lucide-static@0.292.0/build/lucide.min.js"></script>
+    </head>
+    <body class="min-h-screen">
+        <style>
+          .navbar-glass {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.8);
+          }
+          .hero-bg {
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80') no-repeat center center/cover;
+          }
+          .gradient-text {
+            background: linear-gradient(to right, #7e5bef, #ff49db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+          .btn-primary {
+            background: linear-gradient(to right, #7e5bef, #ff49db);
+          }
+          .btn-primary:hover {
+            background: linear-gradient(to right, #ff49db, #7e5bef);
+          }
+          .service-card:hover {
+            box-shadow: 0 10px 15px rgba(126, 91, 239, 0.3);
+          }
+          .floating-animation {
+            animation: float 6s ease-in-out infinite;
+          }
+          @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+          }
+          .section-padding {
+            padding: 6rem 0;
+          }
+        </style>
+            
+            
+
+
+      <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center h-16">
+            <a href="#home" class="flex items-center space-x-2">
+              <i data-lucide="globe" class="h-8 w-8 text-purple-600"></i>
+              <span class="text-xl font-bold gradient-text">Dimatlas Digit</span>
+            </a>
+
+            <div class="hidden md:flex items-center space-x-8">
+              <a href="#home" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Accueil</a>
+              <a href="#services" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Services</a>
+              <a href="#portal" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Portail Client</a>
+              <a href="#about" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">À Propos</a>
+              <a href="#contact" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Contact</a>
+              <button class="btn-primary text-white px-6 py-2 rounded-full">Démo Gratuite</button>
+            </div>
+
+            <div class="md:hidden">
+              <button id="mobile-menu-button" class="p-2 rounded-md text-gray-700 hover:text-purple-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500">
+                <i id="menu-open-icon" data-lucide="menu" class="h-6 w-6"></i>
+                <i id="menu-close-icon" data-lucide="x" class="h-6 w-6 hidden"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-white rounded-lg shadow-lg mt-2 p-4 mx-4">
+          <a href="#home" class="block py-2 text-gray-700 hover:text-purple-600 font-medium">Accueil</a>
+          <a href="#services" class="block py-2 text-gray-700 hover:text-purple-600 font-medium">Services</a>
+          <a href="#portal" class="block py-2 text-gray-700 hover:text-purple-600 font-medium">Portail Client</a>
+          <a href="#about" class="block py-2 text-gray-700 hover:text-purple-600 font-medium">À Propos</a>
+          <a href="#contact" class="block py-2 text-gray-700 hover:text-purple-600 font-medium">Contact</a>
+          <button class="btn-primary text-white w-full mt-4 rounded-full py-2">Démo Gratuite</button>
+        </div>
+      </nav>
+
+      <main>
+        <section id="home" class="hero-bg min-h-screen flex items-center relative overflow-hidden">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+              <div class="text-white">
+                <div class="flex items-center space-x-2 mb-6">
+                  <div class="flex">
+                    <i data-lucide="star" class="h-5 w-5 text-yellow-400 fill-current"></i>
+                    <i data-lucide="star" class="h-5 w-5 text-yellow-400 fill-current"></i>
+                    <i data-lucide="star" class="h-5 w-5 text-yellow-400 fill-current"></i>
+                    <i data-lucide="star" class="h-5 w-5 text-yellow-400 fill-current"></i>
+                    <i data-lucide="star" class="h-5 w-5 text-yellow-400 fill-current"></i>
+                  </div>
+                  <span class="text-sm opacity-90">Noté 5/5 par nos clients</span>
+                </div>
+                <h1 class="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
+                  Votre Agence
+                  <span class="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-400">Digitale</span>
+                  Complète
+                </h1>
+                <p class="text-xl mb-8 opacity-90 max-w-lg">
+                  Solutions web innovantes, CRM, facturation, ERP et bien plus. Transformez votre business avec nos outils digitaux de pointe.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                  <button class="btn-primary text-white px-8 py-4 text-lg rounded-full hover:scale-105 transition-transform flex items-center justify-center">
+                    Démarrer Maintenant <i data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
+                  </button>
+                  <button class="border border-white text-white hover:bg-white hover:text-purple-600 px-8 py-4 text-lg rounded-full flex items-center justify-center">
+                    <i data-lucide="play" class="mr-2 h-5 w-5"></i> Voir la Démo
+                  </button>
+                </div>
+                <div class="mt-12 flex items-center space-x-8">
+                  <div class="text-center">
+                    <div class="text-3xl font-bold">500+</div>
+                    <div class="text-sm opacity-75">Clients Satisfaits</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-3xl font-bold">99%</div>
+                    <div class="text-sm opacity-75">Uptime Garanti</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-3xl font-bold">24/7</div>
+                    <div class="text-sm opacity-75">Support Client</div>
+                  </div>
+                </div>
+              </div>
+              <div class="relative">
+                <div class="floating-animation">
+                  <img alt="Dimatlas Digit Agency - Solutions digitales innovantes" class="w-full h-auto rounded-2xl shadow-2xl" src="https://images.unsplash.com/photo-1647964185937-1c0456bb8f76" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="services" class="section-padding bg-gray-50">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+              <h2 class="text-4xl lg:text-5xl font-bold mb-6">Nos <span class="gradient-text">Services</span></h2>
+              <p class="text-xl text-gray-600 max-w-3xl mx-auto">Une gamme complète de solutions digitales pour propulser votre entreprise vers le succès dans l'ère numérique.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div class="service-card bg-white rounded-2xl p-8 shadow-lg cursor-pointer group">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <i data-lucide="globe" class="h-8 w-8 text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 text-gray-800">Développement Web</h3>
+                <p class="text-gray-600 leading-relaxed">Sites web modernes, responsives et optimisés pour le SEO</p>
+              </div>
+              <div class="service-card bg-white rounded-2xl p-8 shadow-lg cursor-pointer group">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <i data-lucide="users" class="h-8 w-8 text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 text-gray-800">CRM Avancé</h3>
+                <p class="text-gray-600 leading-relaxed">Gestion complète de vos relations clients et prospects</p>
+              </div>
+              <div class="service-card bg-white rounded-2xl p-8 shadow-lg cursor-pointer group">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <i data-lucide="file-text" class="h-8 w-8 text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 text-gray-800">Facturation</h3>
+                <p class="text-gray-600 leading-relaxed">Système de facturation automatisé et personnalisable</p>
+              </div>
+              <div class="service-card bg-white rounded-2xl p-8 shadow-lg cursor-pointer group">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <i data-lucide="bar-chart-3" class="h-8 w-8 text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4 text-gray-800">ERP Intégré</h3>
+                <p class="text-gray-600 leading-relaxed">Planification des ressources d'entreprise complète</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="portal" class="section-padding bg-white">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+              <h2 class="text-4xl lg:text-5xl font-bold mb-6">Portail <span class="gradient-text">Client</span></h2>
+              <p class="text-xl text-gray-600 max-w-3xl mx-auto">Accédez à tous vos services depuis une interface unique et intuitive. Gérez votre business en toute simplicité.</p>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <img alt="Interface du portail client Dimatlas Digit" class="w-full h-auto rounded-2xl shadow-2xl" src="https://images.unsplash.com/photo-1625296276703-3fbc924f07b5" />
+              </div>
+              <div class="space-y-8">
+                  <div class="flex items-center space-x-4">
+                      <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                          <i data-lucide="shield" class="h-6 w-6 text-white"></i>
+                      </div>
+                      <div>
+                          <h3 class="text-xl font-bold text-gray-800">Sécurisé</h3>
+                          <p class="text-gray-600">Vos données protégées par un chiffrement de niveau bancaire</p>
+                      </div>
+                  </div>
+                  <div class="flex items-center space-x-4">
+                      <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                          <i data-lucide="zap" class="h-6 w-6 text-white"></i>
+                      </div>
+                      <div>
+                          <h3 class="text-xl font-bold text-gray-800">Rapide</h3>
+                          <p class="text-gray-600">Interface optimisée pour une navigation fluide et intuitive</p>
+                      </div>
+                  </div>
+                  <div class="flex items-center space-x-4">
+                      <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                          <i data-lucide="clock" class="h-6 w-6 text-white"></i>
+                      </div>
+                      <div>
+                          <h3 class="text-xl font-bold text-gray-800">24/7</h3>
+                          <p class="text-gray-600">Accès permanent à vos outils de gestion</p>
+                      </div>
+                  </div>
+                  <button class="btn-primary text-white px-8 py-4 text-lg rounded-full hover:scale-105 transition-transform flex items-center justify-center">
+                    Accéder au Portail <i data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
+                  </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="about" class="section-padding bg-gray-50">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+              <h2 class="text-4xl lg:text-5xl font-bold mb-6">À Propos de <span class="gradient-text">Dimatlas Digit</span></h2>
+              <p class="text-xl text-gray-600 max-w-3xl mx-auto">Nous sommes une agence digitale passionnée, dédiée à transformer vos idées en solutions technologiques innovantes et performantes.</p>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <img alt="Équipe Dimatlas Digit Agency au travail" class="w-full h-auto rounded-2xl shadow-2xl" src="https://images.unsplash.com/photo-1627599936744-51d288f89af4" />
+              </div>
+              <div class="space-y-6">
+                <h3 class="text-3xl font-bold text-gray-800">Notre Mission</h3>
+                <p class="text-lg text-gray-600 leading-relaxed">Chez Dimatlas Digit, nous croyons que chaque entreprise mérite d'avoir accès aux meilleures technologies pour prospérer dans l'économie numérique. Notre mission est de démocratiser l'accès aux outils digitaux professionnels.</p>
+                <div class="space-y-4">
+                  <div class="flex items-center space-x-3">
+                      <div class="w-2 h-2 bg-purple-600 rounded-full"></div>
+                      <span class="text-gray-700">Innovation constante et veille technologique</span>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                      <div class="w-2 h-2 bg-purple-600 rounded-full"></div>
+                      <span class="text-gray-700">Accompagnement personnalisé de A à Z</span>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                      <div class="w-2 h-2 bg-purple-600 rounded-full"></div>
+                      <span class="text-gray-700">Support technique réactif 24/7</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="contact" class="section-padding bg-white">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+              <h2 class="text-4xl lg:text-5xl font-bold mb-6">Contactez <span class="gradient-text">Nous</span></h2>
+              <p class="text-xl text-gray-600 max-w-3xl mx-auto">Prêt à transformer votre business ? Parlons de votre projet et découvrons ensemble comment nous pouvons vous aider.</p>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-12">
+              <div class="space-y-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">Informations de Contact</h3>
+                <div class="space-y-6">
+                  <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <i data-lucide="mail" class="h-6 w-6 text-white"></i>
+                    </div>
+                    <div>
+                      <h4 class="text-lg font-semibold text-gray-800 mb-1">Email</h4>
+                      <p class="text-gray-600 font-medium">contact@dimatlas-digit.com</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <i data-lucide="phone" class="h-6 w-6 text-white"></i>
+                    </div>
+                    <div>
+                      <h4 class="text-lg font-semibold text-gray-800 mb-1">Téléphone</h4>
+                      <p class="text-gray-600 font-medium">+33 1 23 45 67 89</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <i data-lucide="map-pin" class="h-6 w-6 text-white"></i>
+                    </div>
+                    <div>
+                      <h4 class="text-lg font-semibold text-gray-800 mb-1">Adresse</h4>
+                      <p class="text-gray-600 font-medium">Paris, France</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="bg-gray-50 rounded-2xl p-8">
+                  <h3 class="text-2xl font-bold text-gray-800 mb-6">Envoyez-nous un Message</h3>
+                  <form action="#" class="space-y-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nom Complet</label>
+                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors" placeholder="Votre nom" required>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors" placeholder="votre@email.com" required>
+                      </div>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                      <textarea rows="6" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors resize-none" placeholder="Décrivez votre projet..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary text-white w-full py-4 text-lg rounded-lg hover:scale-105 transition-transform flex items-center justify-center">
+                      Envoyer le Message <i data-lucide="send" class="ml-2 h-5 w-5"></i>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="bg-gray-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-gray-400 text-sm mb-4 md:mb-0">© 2024 Dimatlas Digit Agency. Tous droits réservés.</p>
+            <div class="flex space-x-4">
+              <a href="#" class="text-gray-400 hover:text-purple-400"><i data-lucide="facebook" class="h-5 w-5"></i></a>
+              <a href="#" class="text-gray-400 hover:text-purple-400"><i data-lucide="twitter" class="h-5 w-5"></i></a>
+              <a href="#" class="text-gray-400 hover:text-purple-400"><i data-lucide="linkedin" class="h-5 w-5"></i></a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      <script>
+        lucide.createIcons();
+
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 50) {
+            navbar.classList.add('navbar-glass', 'shadow-lg');
+            navbar.classList.remove('bg-transparent');
+          } else {
+            navbar.classList.remove('navbar-glass', 'shadow-lg');
+            navbar.classList.add('bg-transparent');
+          }
+        });
+
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuOpenIcon = document.getElementById('menu-open-icon');
+        const menuCloseIcon = document.getElementById('menu-close-icon');
+
+        mobileMenuButton.addEventListener('click', () => {
+          mobileMenu.classList.toggle('hidden');
+          menuOpenIcon.classList.toggle('hidden');
+          menuCloseIcon.classList.toggle('hidden');
+        });
+        
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+          link.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+            menuOpenIcon.classList.remove('hidden');
+            menuCloseIcon.classList.add('hidden');
+          });
+        });
+      </script>
+    </body>
+    </html>

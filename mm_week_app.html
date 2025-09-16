@@ -1,0 +1,1280 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MM Week - Gestion de Projet Collaboratif</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #5034ff;
+            --secondary-color: #f7f8fa;
+            --accent-color: #ff5630;
+        }
+        .sidebar {
+            background-color: #2c3e50;
+            min-height: 100vh;
+            color: white;
+        }
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+            border-radius: 5px;
+        }
+        .nav-link {
+            color: #d1d5db;
+        }
+        .nav-link:hover {
+            color: white;
+        }
+        .task-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .kanban-column {
+            min-width: 280px;
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .status-todo {
+            background-color: #dfe1e6;
+        }
+        .status-in-progress {
+            background-color: #0052cc;
+        }
+        .status-done {
+            background-color: #36b37e;
+        }
+        .status-review {
+            background-color: #ffab00;
+        }
+        .board-header {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <div class="d-flex">
+            <!-- Sidebar -->
+            <div class="sidebar p-3 d-flex flex-column" style="width: 240px;">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-calendar-week me-2" style="font-size: 1.5rem;"></i>
+                    <h4 class="m-0">MM Week</h4>
+                </div>
+                
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active" @click="changeView('dashboard')">
+                            <i class="fas fa-tachometer-alt me-2"></i> Tableau de bord
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" @click="changeView('projects')">
+                            <i class="fas fa-project-diagram me-2"></i> Mes projets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" @click="changeView('tasks')">
+                            <i class="fas fa-tasks me-2"></i> Mes tâches
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" @click="changeView('calendar')">
+                            <i class="fas fa-calendar me-2"></i> Calendrier
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" @click="changeView('files')">
+                            <i class="fas fa-file-alt me-2"></i> Fichiers
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" @click="changeView('integrations')">
+                            <i class="fas fa-plug me-2"></i> Intégrations
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="mt-auto">
+                    <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="rounded-circle me-2" width="32" height="32">
+                            <strong>John Doe</strong>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                            <li><a class="dropdown-item" href="#">Profil</a></li>
+                            <li><a class="dropdown-item" href="#">Paramètres</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Déconnexion</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-grow-1">
+                <!-- Board Header -->
+                <div class="board-header p-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="m-0">{{ currentBoard }}</h5>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="input-group me-3" style="width: 300px;">
+                            <input type="text" class="form-control" placeholder="Rechercher..." v-model="searchQuery">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <div class="dropdown me-2">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="viewDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-eye me-1"></i> {{ currentViewLabel }}
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="viewDropdown">
+                                <li><a class="dropdown-item" href="#" @click="changeViewType('kanban')">Vue Kanban</a></li>
+                                <li><a class="dropdown-item" href="#" @click="changeViewType('list')">Vue Liste</a></li>
+                                <li><a class="dropdown-item" href="#" @click="changeViewType('calendar')">Vue Calendrier</a></li>
+                                <li><a class="dropdown-item" href="#" @click="changeViewType('timeline')">Vue Chronologie</a></li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-primary" @click="showNewTaskModal = true">
+                            <i class="fas fa-plus me-1"></i> Nouvelle tâche
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Content Area -->
+                <div class="p-4">
+                    <!-- Dashboard View -->
+                    <div v-if="currentView === 'dashboard'" class="dashboard-view">
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Tâches en cours</h5>
+                                        <h2 class="card-text">12</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Tâches terminées</h5>
+                                        <h2 class="card-text">24</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-dark">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Tâches en retard</h5>
+                                        <h2 class="card-text">3</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Projets actifs</h5>
+                                        <h2 class="card-text">5</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="card mb-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Projets récents</h5>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">Voir tout</a>
+                                    </div>
+                                    <div class="card-body">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Projet</th>
+                                                    <th>Équipe</th>
+                                                    <th>Progression</th>
+                                                    <th>Date limite</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="project in recentProjects" :key="project.id">
+                                                    <td>{{ project.name }}</td>
+                                                    <td>
+                                                        <div class="d-flex">
+                                                            <img v-for="member in project.team.slice(0, 3)" :src="member.avatar" :alt="member.name" class="avatar me-1">
+                                                            <span v-if="project.team.length > 3" class="avatar bg-secondary text-white d-flex align-items-center justify-content-center">+{{ project.team.length - 3 }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="progress" style="height: 6px;">
+                                                            <div class="progress-bar bg-success" :style="{width: project.progress + '%'}"></div>
+                                                        </div>
+                                                        <small>{{ project.progress }}%</small>
+                                                    </td>
+                                                    <td>{{ project.deadline }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Activité récente</h5>
+                                    </div>
+                                    <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                        <div v-for="activity in recentActivities" :key="activity.id" class="mb-3">
+                                            <div class="d-flex">
+                                                <img :src="activity.user.avatar" alt="" class="avatar me-2">
+                                                <div>
+                                                    <p class="mb-0"><strong>{{ activity.user.name }}</strong> {{ activity.action }} <strong>{{ activity.item }}</strong></p>
+                                                    <small class="text-muted">{{ activity.time }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Projects View -->
+                    <div v-if="currentView === 'projects'" class="projects-view">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4>Mes projets</h4>
+                            <button class="btn btn-primary" @click="showNewProjectModal = true">
+                                <i class="fas fa-plus me-1"></i> Nouveau projet
+                            </button>
+                        </div>
+
+                        <div class="row">
+                            <div v-for="project in projects" :key="project.id" class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header" :style="{backgroundColor: project.color}">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="card-title text-white mb-0">{{ project.name }}</h5>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="projectDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-h"></i>
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="projectDropdown">
+                                                    <li><a class="dropdown-item" href="#">Modifier</a></li>
+                                                    <li><a class="dropdown-item" href="#">Partager</a></li>
+                                                    <li><a class="dropdown-item" href="#">Supprimer</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">{{ project.description }}</p>
+                                        <div class="mb-3">
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar" :style="{width: project.progress + '%', backgroundColor: project.color}"></div>
+                                            </div>
+                                            <small>{{ project.progress }}% complété</small>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="d-flex">
+                                                <img v-for="member in project.team.slice(0, 3)" :src="member.avatar" :alt="member.name" class="avatar me-1">
+                                                <span v-if="project.team.length > 3" class="avatar bg-secondary text-white d-flex align-items-center justify-content-center">+{{ project.team.length - 3 }}</span>
+                                            </div>
+                                            <span class="badge bg-light text-dark"><i class="fas fa-calendar me-1"></i> {{ project.deadline }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tasks View (Kanban) -->
+                    <div v-if="currentView === 'tasks' && currentViewType === 'kanban'" class="tasks-kanban-view">
+                        <div class="d-flex overflow-auto" style="gap: 16px;">
+                            <div v-for="column in kanbanColumns" :key="column.id" class="kanban-column p-3" style="flex: 0 0 auto;">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0">{{ column.name }} ({{ column.tasks.length }})</h6>
+                                    <button class="btn btn-sm btn-outline-secondary" @click="addTaskToColumn(column.id)">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <draggable 
+                                    v-model="column.tasks" 
+                                    group="tasks" 
+                                    item-key="id"
+                                    @end="onTaskMoved"
+                                    class="kanban-tasks-container"
+                                    style="min-height: 100px;">
+                                    <template #item="{element}">
+                                        <div class="task-card card mb-3" @click="openTaskDetails(element.id)">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="card-title mb-0">{{ element.title }}</h6>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-link text-muted p-0" type="button" id="taskDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="fas fa-ellipsis-h"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="taskDropdown">
+                                                            <li><a class="dropdown-item" href="#">Modifier</a></li>
+                                                            <li><a class="dropdown-item" href="#">Dupliquer</a></li>
+                                                            <li><a class="dropdown-item" href="#">Supprimer</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <p class="card-text text-muted small">{{ element.description.substring(0, 60) + '...' }}</p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="badge bg-light text-dark">
+                                                        <span :class="'status-dot status-' + element.status.toLowerCase().replace(' ', '-')"></span>
+                                                        {{ element.status }}
+                                                    </span>
+                                                    <img :src="element.assignee.avatar" :alt="element.assignee.name" class="avatar">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </draggable>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tasks View (List) -->
+                    <div v-if="currentView === 'tasks' && currentViewType === 'list'" class="tasks-list-view">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Toutes les tâches</h5>
+                                <div class="d-flex">
+                                    <div class="input-group me-2" style="width: 200px;">
+                                        <select class="form-select" v-model="filterStatus">
+                                            <option value="">Tous les statuts</option>
+                                            <option v-for="status in statuses" :value="status">{{ status }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group me-2" style="width: 200px;">
+                                        <select class="form-select" v-model="filterProject">
+                                            <option value="">Tous les projets</option>
+                                            <option v-for="project in projects" :value="project.id">{{ project.name }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Tâche</th>
+                                            <th>Projet</th>
+                                            <th>Statut</th>
+                                            <th>Assignee</th>
+                                            <th>Date limite</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="task in filteredTasks" :key="task.id">
+                                            <td>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" :checked="task.status === 'Done'" @change="toggleTaskStatus(task.id)">
+                                                    <label class="form-check-label">{{ task.title }}</label>
+                                                </div>
+                                            </td>
+                                            <td>{{ getProjectName(task.projectId) }}</td>
+                                            <td>
+                                                <span class="badge bg-light text-dark">
+                                                    <span :class="'status-dot status-' + task.status.toLowerCase().replace(' ', '-')"></span>
+                                                    {{ task.status }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <img :src="task.assignee.avatar" :alt="task.assignee.name" class="avatar me-2">
+                                                {{ task.assignee.name }}
+                                            </td>
+                                            <td>{{ task.deadline }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1" @click="openTaskDetails(task.id)">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-secondary me-1">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calendar View -->
+                    <div v-if="(currentView === 'tasks' && currentViewType === 'calendar') || currentView === 'calendar'" class="calendar-view">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <button class="btn btn-sm btn-outline-secondary me-2">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <span class="fw-bold">{{ currentMonth }} {{ currentYear }}</span>
+                                    <button class="btn btn-sm btn-outline-secondary ms-2">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary" @click="showNewTaskModal = true">
+                                        <i class="fas fa-plus me-1"></i> Nouvelle tâche
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="calendar">
+                                    <div class="calendar-header d-flex">
+                                        <div v-for="day in days" class="calendar-day-header text-center fw-bold" style="flex: 1;">
+                                            {{ day }}
+                                        </div>
+                                    </div>
+                                    <div class="calendar-body">
+                                        <div v-for="week in weeks" class="calendar-week d-flex" style="min-height: 100px;">
+                                            <div v-for="day in week" class="calendar-day p-2" style="flex: 1; border: 1px solid #eee;">
+                                                <div class="d-flex justify-content-between">
+                                                    <span class="day-number">{{ day.date }}</span>
+                                                    <span v-if="isToday(day)" class="badge bg-primary">Aujourd'hui</span>
+                                                </div>
+                                                <div class="calendar-events mt-2">
+                                                    <div v-for="task in getTasksForDay(day)" :key="task.id" class="calendar-event mb-1 p-1 small rounded" 
+                                                         :style="{backgroundColor: getTaskColor(task), color: 'white'}">
+                                                        {{ task.title }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modals -->
+        <!-- New Task Modal -->
+        <div class="modal fade" id="newTaskModal" tabindex="-1" aria-hidden="true" v-show="showNewTaskModal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Nouvelle tâche</h5>
+                        <button type="button" class="btn-close" @click="showNewTaskModal = false" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="taskTitle" class="form-label">Titre</label>
+                                <input type="text" class="form-control" id="taskTitle" v-model="newTask.title" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="taskDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="taskDescription" rows="3" v-model="newTask.description"></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="taskProject" class="form-label">Projet</label>
+                                    <select class="form-select" id="taskProject" v-model="newTask.projectId">
+                                        <option v-for="project in projects" :value="project.id">{{ project.name }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="taskStatus" class="form-label">Statut</label>
+                                    <select class="form-select" id="taskStatus" v-model="newTask.status">
+                                        <option v-for="status in statuses" :value="status">{{ status }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="taskAssignee" class="form-label">Assignee</label>
+                                    <select class="form-select" id="taskAssignee" v-model="newTask.assigneeId">
+                                        <option v-for="user in teamMembers" :value="user.id">{{ user.name }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="taskDeadline" class="form-label">Date limite</label>
+                                    <input type="date" class="form-control" id="taskDeadline" v-model="newTask.deadline">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="taskTags" class="form-label">Tags</label>
+                                <input type="text" class="form-control" id="taskTags" v-model="newTask.tags">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="showNewTaskModal = false">Annuler</button>
+                        <button type="button" class="btn btn-primary" @click="addTask">Créer la tâche</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Project Modal -->
+        <div class="modal fade" id="newProjectModal" tabindex="-1" aria-hidden="true" v-show="showNewProjectModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Nouveau projet</h5>
+                        <button type="button" class="btn-close" @click="showNewProjectModal = false" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="projectName" class="form-label">Nom du projet</label>
+                                <input type="text" class="form-control" id="projectName" v-model="newProject.name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="projectDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="projectDescription" rows="3" v-model="newProject.description"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="projectColor" class="form-label">Couleur</label>
+                                <div class="color-picker d-flex">
+                                    <div v-for="color in projectColors" class="color-option me-2" 
+                                         :style="{backgroundColor: color}" 
+                                         @click="newProject.color = color"
+                                         :class="{'selected': newProject.color === color}"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="projectTeam" class="form-label">Équipe</label>
+                                <select multiple class="form-select" id="projectTeam" v-model="newProject.teamIds">
+                                    <option v-for="user in teamMembers" :value="user.id">{{ user.name }}</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="projectDeadline" class="form-label">Date limite</label>
+                                <input type="date" class="form-control" id="projectDeadline" v-model="newProject.deadline">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="showNewProjectModal = false">Annuler</button>
+                        <button type="button" class="btn btn-primary" @click="addProject">Créer le projet</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Details Modal -->
+        <div class="modal fade" id="taskDetailsModal" tabindex="-1" aria-hidden="true" v-show="showTaskDetailsModal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ selectedTask ? selectedTask.title : '' }}</h5>
+                        <button type="button" class="btn-close" @click="showTaskDetailsModal = false" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" v-if="selectedTask">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-4">
+                                    <h6>Description</h6>
+                                    <p>{{ selectedTask.description }}</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6>Commentaires</h6>
+                                    <div class="comment-section">
+                                        <div v-for="comment in selectedTask.comments" :key="comment.id" class="comment mb-3">
+                                            <div class="d-flex">
+                                                <img :src="comment.user.avatar" alt="" class="avatar me-2">
+                                                <div class="flex-grow-1">
+                                                    <div class="comment-header d-flex justify-content-between">
+                                                        <strong>{{ comment.user.name }}</strong>
+                                                        <small class="text-muted">{{ comment.time }}</small>
+                                                    </div>
+                                                    <div class="comment-body">
+                                                        <p class="mb-0">{{ comment.text }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="new-comment mt-3">
+                                            <textarea class="form-control" rows="2" placeholder="Ajouter un commentaire..." v-model="newComment"></textarea>
+                                            <button class="btn btn-primary mt-2" @click="addComment">Commenter</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="task-info mb-3">
+                                            <h6>Détails</h6>
+                                            <div class="info-item mb-2">
+                                                <small class="text-muted">Statut</small>
+                                                <div>
+                                                    <span class="badge bg-light text-dark">
+                                                        <span :class="'status-dot status-' + selectedTask.status.toLowerCase().replace(' ', '-')"></span>
+                                                        {{ selectedTask.status }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="info-item mb-2">
+                                                <small class="text-muted">Assignee</small>
+                                                <div>
+                                                    <img :src="selectedTask.assignee.avatar" :alt="selectedTask.assignee.name" class="avatar me-2">
+                                                    {{ selectedTask.assignee.name }}
+                                                </div>
+                                            </div>
+                                            <div class="info-item mb-2">
+                                                <small class="text-muted">Projet</small>
+                                                <div>{{ getProjectName(selectedTask.projectId) }}</div>
+                                            </div>
+                                            <div class="info-item mb-2">
+                                                <small class="text-muted">Date limite</small>
+                                                <div>{{ selectedTask.deadline }}</div>
+                                            </div>
+                                            <div class="info-item mb-2">
+                                                <small class="text-muted">Tags</small>
+                                                <div>
+                                                    <span v-for="tag in selectedTask.tags.split(',')" class="badge bg-secondary me-1">{{ tag.trim() }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="task-actions">
+                                            <button class="btn btn-sm btn-outline-primary w-100 mb-2">
+                                                <i class="fas fa-edit me-1"></i> Modifier
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary w-100 mb-2">
+                                                <i class="fas fa-share-alt me-1"></i> Partager
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger w-100">
+                                                <i class="fas fa-trash me-1"></i> Supprimer
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.min.js"></script>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- SortableJS for drag and drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <!-- Vue Draggable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-draggable-next/2.1.0/vuedraggable.umd.min.js"></script>
+    
+    <script>
+        const { createApp, ref, computed, onMounted } = Vue;
+        
+        createApp({
+            setup() {
+                // State
+                const currentView = ref('dashboard');
+                const currentViewType = ref('kanban');
+                const currentBoard = ref('Tableau de bord');
+                const currentViewLabel = ref('Vue Kanban');
+                const searchQuery = ref('');
+                const filterStatus = ref('');
+                const filterProject = ref('');
+                
+                const showNewTaskModal = ref(false);
+                const showNewProjectModal = ref(false);
+                const showTaskDetailsModal = ref(false);
+                
+                const selectedTask = ref(null);
+                const newComment = ref('');
+                
+                const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+                const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+                const currentDate = new Date();
+                const currentMonth = ref(months[currentDate.getMonth()]);
+                const currentYear = ref(currentDate.getFullYear());
+                
+                const statuses = ['To Do', 'In Progress', 'Review', 'Done'];
+                const projectColors = ['#5034ff', '#ff5630', '#36b37e', '#ffab00', '#6554c0', '#00b8d9'];
+                
+                // Data
+                const teamMembers = ref([
+                    { id: 1, name: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
+                    { id: 2, name: 'Jane Smith', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
+                    { id: 3, name: 'Robert Johnson', avatar: 'https://randomuser.me/api/portraits/men/22.jpg' },
+                    { id: 4, name: 'Emily Davis', avatar: 'https://randomuser.me/api/portraits/women/33.jpg' },
+                    { id: 5, name: 'Michael Wilson', avatar: 'https://randomuser.me/api/portraits/men/55.jpg' }
+                ]);
+                
+                const projects = ref([
+                    {
+                        id: 1,
+                        name: 'Site Web MM Week',
+                        description: 'Développement du nouveau site web pour la plateforme MM Week',
+                        color: '#5034ff',
+                        progress: 65,
+                        team: [
+                            { id: 1, name: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
+                            { id: 2, name: 'Jane Smith', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
+                            { id: 3, name: 'Robert Johnson', avatar: 'https://randomuser.me/api/portraits/men/22.jpg' }
+                        ],
+                        deadline: '15/06/2023'
+                    },
+                    {
+                        id: 2,
+                        name: 'Application Mobile',
+                        description: 'Création de l\'application mobile iOS et Android',
+                        color: '#ff5630',
+                        progress: 30,
+                        team: [
+                            { id: 2, name: 'Jane Smith', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
+                            { id: 4, name: 'Emily Davis', avatar: 'https://randomuser.me/api/portraits/women/33.jpg' }
+                        ],
+                        deadline: '30/07/2023'
+                    },
+                    {
+                        id: 3,
+                        name: 'Marketing Digital',
+                        description: 'Campagne de marketing digital pour le lancement',
+                        color: '#36b37e',
+                        progress: 85,
+                        team: [
+                            { id: 1, name: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
+                            { id: 5, name: 'Michael Wilson', avatar: 'https://randomuser.me/api/portraits/men/55.jpg' }
+                        ],
+                        deadline: '10/06/2023'
+                    }
+                ]);
+                
+                const tasks = ref([
+                    {
+                        id: 1,
+                        title: 'Concevoir la page d\'accueil',
+                        description: 'Créer les maquettes UX/UI pour la page d\'accueil avec toutes les sections nécessaires',
+                        status: 'In Progress',
+                        projectId: 1,
+                        assigneeId: 1,
+                        assignee: { id: 1, name: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
+                        deadline: '2023-06-05',
+                        tags: 'design,ux,ui',
+                        comments: [
+                            {
+                                id: 1,
+                                user: { id: 2, name: 'Jane Smith', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
+                                text: 'J\'ai quelques suggestions pour améliorer l\'UX',
+                                time: 'Il y a 2 jours'
+                            },
+                            {
+                                id: 2,
+                                user: { id: 1, name: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
+                                text: 'Merci pour les retours, je vais les intégrer',
+                                time: 'Hier'
+                            }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: 'Développer l\'API utilisateur',
+                        description: 'Créer les endpoints pour la gestion des utilisateurs (création, modification, suppression)',
+                        status: 'To Do',
+                        projectId: 1,
+                        assigneeId: 3,
+                        assignee: { id: 3, name: 'Robert Johnson', avatar: 'https://randomuser.me/api/portraits/men/22.jpg' },
+                        deadline: '2023-06-10',
+                        tags: 'backend,api',
+                        comments: []
+                    },
+                    {
+                        id: 3,
+                        title: 'Analyser la concurrence',
+                        description: 'Étudier les plateformes concurrentes et identifier les meilleures pratiques',
+                        status: 'Review',
+                        projectId: 3,
+                        assigneeId: 2,
+                        assignee: { id: 2, name: 'Jane Smith', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
+                        deadline: '2023-06-03',
+                        tags: 'marketing,analyse',
+                        comments: [
+                            {
+                                id: 3,
+                                user: { id: 5, name: 'Michael Wilson', avatar: 'https://randomuser.me/api/portraits/men/55.jpg' },
+                                text: 'J\'ai trouvé quelques informations intéressantes sur Asana',
+                                time: 'Il y a 3 jours'
+                            }
+                        ]
+                    },
+                    {
+                        id: 4,
+                        title: 'Configurer l\'environnement mobile',
+                        description: 'Mettre en place l\'environnement de développement pour React Native',
+                        status: 'Done',
+                        projectId: 2,
+                        assigneeId: 4,
+                        assignee: { id: 4, name: 'Emily Davis', avatar: 'https://randomuser.me/api/portraits/women/33.jpg' },
+                        deadline: '2023-05-28',
+                        tags: 'mobile,react',
+                        comments: []
+                    },
+                    {
+                        id: 5,
+                        title: 'Rédiger le contenu marketing',
+                        description: 'Préparer les textes pour la campagne publicitaire et les landing pages',
+                        status: 'In Progress',
+                        projectId: 3,
+                        assigneeId: 5,
+                        assignee: { id: 5, name: 'Michael Wilson', avatar: 'https://randomuser.me/api/portraits/men/55.jpg' },
+                        deadline: '2023-06-07',
+                        tags: 'content,marketing',
+                        comments: []
+                    }
+                ]);
+                
+                const kanbanColumns = ref([
+                    { id: 1, name: 'To Do', tasks: [] },
+                    { id: 2, name: 'In Progress', tasks: [] },
+                    { id: 3, name: 'Review', tasks: [] },
+                    { id: 4, name: 'Done', tasks: [] }
+                ]);
+                
+                const recentActivities = ref([
+                    {
+                        id: 1,
+                        user: { id: 2, name: 'Jane Smith', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
+                        action: 'a complété la tâche',
+                        item: 'Configurer CI/CD',
+                        time: 'Il y a 5 minutes'
+                    },
+                    {
+                        id: 2,
+                        user: { id: 1, name: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
+                        action: 'a ajouté un commentaire sur',
+                        item: 'Concevoir la page d\'accueil',
+                        time: 'Il y a 1 heure'
+                    },
+                    {
+                        id: 3,
+                        user: { id: 3, name: 'Robert Johnson', avatar: 'https://randomuser.me/api/portraits/men/22.jpg' },
+                        action: 'a créé la tâche',
+                        item: 'Développer l\'API utilisateur',
+                        time: 'Hier'
+                    },
+                    {
+                        id: 4,
+                        user: { id: 5, name: 'Michael Wilson', avatar: 'https://randomuser.me/api/portraits/men/55.jpg' },
+                        action: 'a changé le statut de',
+                        item: 'Analyser la concurrence',
+                        time: 'Il y a 2 jours'
+                    }
+                ]);
+                
+                const newTask = ref({
+                    title: '',
+                    description: '',
+                    status: 'To Do',
+                    projectId: 1,
+                    assigneeId: 1,
+                    deadline: '',
+                    tags: ''
+                });
+                
+                const newProject = ref({
+                    name: '',
+                    description: '',
+                    color: '#5034ff',
+                    teamIds: [],
+                    deadline: ''
+                });
+                
+                // Computed
+                const recentProjects = computed(() => {
+                    return projects.value.slice(0, 3);
+                });
+                
+                const filteredTasks = computed(() => {
+                    let filtered = tasks.value;
+                    
+                    if (filterStatus.value) {
+                        filtered = filtered.filter(task => task.status === filterStatus.value);
+                    }
+                    
+                    if (filterProject.value) {
+                        filtered = filtered.filter(task => task.projectId === parseInt(filterProject.value));
+                    }
+                    
+                    if (searchQuery.value) {
+                        const query = searchQuery.value.toLowerCase();
+                        filtered = filtered.filter(task => 
+                            task.title.toLowerCase().includes(query) || 
+                            task.description.toLowerCase().includes(query)
+                        );
+                    }
+                    
+                    return filtered;
+                });
+                
+                const weeks = computed(() => {
+                    const firstDay = new Date(currentYear.value, months.indexOf(currentMonth.value), 1);
+                    const lastDay = new Date(currentYear.value, months.indexOf(currentMonth.value) + 1, 0);
+                    
+                    let date = new Date(firstDay);
+                    date.setDate(date.getDate() - date.getDay() + 1); // Début de la semaine (lundi)
+                    
+                    const weeksArray = [];
+                    
+                    while (date <= lastDay || weeksArray.length < 6) {
+                        const week = [];
+                        
+                        for (let i = 0; i < 7; i++) {
+                            week.push({
+                                date: date.getDate(),
+                                month: date.getMonth(),
+                                year: date.getFullYear(),
+                                fullDate: new Date(date)
+                            });
+                            date.setDate(date.getDate() + 1);
+                        }
+                        
+                        weeksArray.push(week);
+                    }
+                    
+                    return weeksArray;
+                });
+                
+                // Methods
+                const changeView = (view) => {
+                    currentView.value = view;
+                    
+                    switch(view) {
+                        case 'dashboard':
+                            currentBoard.value = 'Tableau de bord';
+                            break;
+                        case 'projects':
+                            currentBoard.value = 'Mes projets';
+                            break;
+                        case 'tasks':
+                            currentBoard.value = 'Mes tâches';
+                            break;
+                        case 'calendar':
+                            currentBoard.value = 'Calendrier';
+                            break;
+                        case 'files':
+                            currentBoard.value = 'Fichiers';
+                            break;
+                        case 'integrations':
+                            currentBoard.value = 'Intégrations';
+                            break;
+                    }
+                };
+                
+                const changeViewType = (type) => {
+                    currentViewType.value = type;
+                    
+                    switch(type) {
+                        case 'kanban':
+                            currentViewLabel.value = 'Vue Kanban';
+                            break;
+                        case 'list':
+                            currentViewLabel.value = 'Vue Liste';
+                            break;
+                        case 'calendar':
+                            currentViewLabel.value = 'Vue Calendrier';
+                            break;
+                        case 'timeline':
+                            currentViewLabel.value = 'Vue Chronologie';
+                            break;
+                    }
+                };
+                
+                const getProjectName = (projectId) => {
+                    const project = projects.value.find(p => p.id === projectId);
+                    return project ? project.name : '';
+                };
+                
+                const getProjectColor = (projectId) => {
+                    const project = projects.value.find(p => p.id === projectId);
+                    return project ? project.color : '#5034ff';
+                };
+                
+                const getTaskColor = (task) => {
+                    return getProjectColor(task.projectId);
+                };
+                
+                const isToday = (day) => {
+                    const today = new Date();
+                    return day.date === today.getDate() && 
+                           day.month === today.getMonth() && 
+                           day.year === today.getFullYear();
+                };
+                
+                const getTasksForDay = (day) => {
+                    return tasks.value.filter(task => {
+                        const taskDate = new Date(task.deadline);
+                        return taskDate.getDate() === day.date && 
+                               taskDate.getMonth() === day.month && 
+                               taskDate.getFullYear() === day.year;
+                    });
+                };
+                
+                const openTaskDetails = (taskId) => {
+                    selectedTask.value = tasks.value.find(task => task.id === taskId);
+                    showTaskDetailsModal.value = true;
+                    
+                    // Initialize modal with jQuery
+                    $('#taskDetailsModal').modal('show');
+                };
+                
+                const addTask = () => {
+                    const assignee = teamMembers.value.find(m => m.id === newTask.value.assigneeId);
+                    
+                    const newId = Math.max(...tasks.value.map(t => t.id)) + 1;
+                    
+                    const task = {
+                        id: newId,
+                        title: newTask.value.title,
+                        description: newTask.value.description,
+                        status: newTask.value.status,
+                        projectId: newTask.value.projectId,
+                        assigneeId: newTask.value.assigneeId,
+                        assignee: {
+                            id: assignee.id,
+                            name: assignee.name,
+                            avatar: assignee.avatar
+                        },
+                        deadline: newTask.value.deadline,
+                        tags: newTask.value.tags,
+                        comments: []
+                    };
+                    
+                    tasks.value.push(task);
+                    distributeTasksToColumns();
+                    
+                    // Reset form
+                    newTask.value = {
+                        title: '',
+                        description: '',
+                        status: 'To Do',
+                        projectId: 1,
+                        assigneeId: 1,
+                        deadline: '',
+                        tags: ''
+                    };
+                    
+                    showNewTaskModal.value = false;
+                };
+                
+                const addProject = () => {
+                    const team = teamMembers.value.filter(m => newProject.value.teamIds.includes(m.id));
+                    
+                    const newId = projects.value.length > 0 ? Math.max(...projects.value.map(p => p.id)) + 1 : 1;
+                    
+                    const project = {
+                        id: newId,
+                        name: newProject.value.name,
+                        description: newProject.value.description,
+                        color: newProject.value.color,
+                        progress: 0,
+                        team: team,
+                        deadline: newProject.value.deadline
+                    };
+                    
+                    projects.value.push(project);
+                    
+                    // Reset form
+                    newProject.value = {
+                        name: '',
+                        description: '',
+                        color: '#5034ff',
+                        teamIds: [],
+                        deadline: ''
+                    };
+                    
+                    showNewProjectModal.value = false;
+                };
+                
+                const addComment = () => {
+                    if (!newComment.value.trim() || !selectedTask.value) return;
+                    
+                    const comment = {
+                        id: selectedTask.value.comments.length + 1,
+                        user: { id: 1, name: 'John Doe', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
+                        text: newComment.value,
+                        time: 'À l\'instant'
+                    };
+                    
+                    selectedTask.value.comments.push(comment);
+                    
+                    // Update comments in main tasks array
+                    const taskIndex = tasks.value.findIndex(t => t.id === selectedTask.value.id);
+                    if (taskIndex !== -1) {
+                        tasks.value[taskIndex].comments.push(comment);
+                    }
+                    
+                    newComment.value = '';
+                };
+                
+                const toggleTaskStatus = (taskId) => {
+                    const task = tasks.value.find(t => t.id === taskId);
+                    if (task) {
+                        task.status = task.status === 'Done' ? 'To Do' : 'Done';
+                        distributeTasksToColumns();
+                    }
+                };
+                
+                const addTaskToColumn = (columnId) => {
+                    const column = kanbanColumns.value.find(c => c.id === columnId);
+                    if (!column) return;
+                    
+                    const statusMap = {
+                        1: 'To Do',
+                        2: 'In Progress',
+                        3: 'Review',
+                        4: 'Done'
+                    };
+                    
+                    newTask.value.status = statusMap[columnId];
+                    showNewTaskModal.value = true;
+                };
+                
+                const onTaskMoved = (event) => {
+                    const movedTaskId = parseInt(event.item.dataset.id);
+                    const newColumnId = parseInt(event.to.dataset.columnid);
+                    
+                    const statusMap = {
+                        1: 'To Do',
+                        2: 'In Progress',
+                        3: 'Review',
+                        4: 'Done'
+                    };
+                    
+                    const task = tasks.value.find(t => t.id === movedTaskId);
+                    if (task) {
+                        task.status = statusMap[newColumnId];
+                    }
+                };
+                
+                const distributeTasksToColumns = () => {
+                    kanbanColumns.value.forEach(column => {
+                        const statusMap = {
+                            'To Do': 1,
+                            'In Progress': 2,
+                            'Review': 3,
+                            'Done': 4
+                        };
+                        
+                        const columnStatus = Object.entries(statusMap).find(([_, id]) => id === column.id);
+                        if (columnStatus) {
+                            column.tasks = tasks.value.filter(task => task.status === columnStatus[0]);
+                        }
+                    });
+                };
+                
+                // Lifecycle hooks
+                onMounted(() => {
+                    distributeTasksToColumns();
+                    
+                    // Initialize tooltips
+                    $('[data-bs-toggle="tooltip"]').tooltip();
+                    
+                    // Initialize modals
+                    $('#newTaskModal').on('hidden.bs.modal', () => {
+                        showNewTaskModal.value = false;
+                    });
+                    
+                    $('#newProjectModal').on('hidden.bs.modal', () => {
+                        showNewProjectModal.value = false;
+                    });
+                    
+                    $('#taskDetailsModal').on('hidden.bs.modal', () => {
+                        showTaskDetailsModal.value = false;
+                    });
+                });
+                
+                return {
+                    // State
+                    currentView,
+                    currentViewType,
+                    currentBoard,
+                    currentViewLabel,
+                    searchQuery,
+                    filterStatus,
+                    filterProject,
+                    showNewTaskModal,
+                    showNewProjectModal,
+                    showTaskDetailsModal,
+                    selectedTask,
+                    newComment,
+                    days,
+                    months,
+                    currentMonth,
+                    currentYear,
+                    statuses,
+                    projectColors,
+                    
+                    // Data
+                    teamMembers,
+                    projects,
+                    tasks,
+                    kanbanColumns,
+                    recentActivities,
+                    newTask,
+                    newProject,
+                    
+                    // Computed
+                    recentProjects,
+                    filteredTasks,
+                    weeks,
+                    
+                    // Methods
+                    changeView,
+                    changeViewType,
+                    getProjectName,
+                    getProjectColor,
+                    getTaskColor,
+                    isToday,
+                    getTasksForDay,
+                    openTaskDetails,
+                    addTask,
+                    addProject,
+                    addComment,
+                    toggleTaskStatus,
+                    addTaskToColumn,
+                    onTaskMoved,
+                    distributeTasksToColumns
+                };
+            }
+        }).component('draggable', window.vuedraggable).mount('#app');
+    </script>
+</body>
+</html>
