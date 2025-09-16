@@ -25,8 +25,8 @@ router.register(r'reservations', api_views.ReservationViewSet)
 
 
 urlpatterns = [
-    path('', views.home, name='home'),
     path('home/', views.home, name='home'),
+    ##path('home/', views.home, name='home'),
     path('dashboard/', views.conciergerie_page, name='dashboard'),
     path('personnel/', views.conciergerie_page, name='employee_list'),
     ##

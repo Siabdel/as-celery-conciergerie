@@ -26,7 +26,7 @@ environ.Env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR    = Path(__file__).resolve().parent.parent
 # Directory project au meme niveau de settings.py
-PROJECT_DIR = Path(__file__).resolve().parent.parent.parent
+PROJECT_DIR = Path(__file__).resolve().parent
 HOST = env("HOST")
 BASE_URL = f"http://{HOST}:8000"  # ou l'URL de votre serveur en production
 
@@ -215,7 +215,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 # Chemin où les fichiers statiques seront collectés (utilisé pour le déploiement)
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
@@ -223,7 +223,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # Additional locations of static files
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'staticfiles'),
+    os.path.join(BASE_DIR, 'static'),
     os.path.join(BASE_DIR, 'static', 'bootstrap_agency'),
     # os.path.join(BASE_DIR, 'media'),
     #  os.path.join(BASE_DIR, 'media', 'upload'),

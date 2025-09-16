@@ -24,10 +24,10 @@
         methods: {
             fetchRevenueData() {
                 let url = "{% url 'api_revenue_report_ap' %}"
-                axios.get('/api/revenue-data/')
+                axios.get('/api/releve/')
                     .then(response => {
                         this.chartData = response.data;
-                        console.error(response.data)
+                        console.log(response.data)
                         this.renderChart();
                     })
                     .catch(error => {
