@@ -9,24 +9,33 @@ from services_menage import views
 app_name = "agence"
 
 router = DefaultRouter()
+## Api reservations par Property
 router.register(r'property', api_views.PropertyViewSet)
-router.register(r'employees', api_views.EmployeeViewSet)
 router.register(r'reservations', api_views.ReservationViewSet)
+router.register(r'employees', api_views.EmployeeViewSet)
 router.register(r'maintenance_tasks', api_views.ServiceTaskViewSet)
 router.register(r'calendars', api_views.CalendarViewSet)
 router.register(r'events', api_views.EventViewSet)
 # Formulaire 
 router.register(r'checkout-inventory', api_views.CheckoutInventoryViewSet)
-## Api reservations par Property
-router = DefaultRouter()
-router.register(r'properties', api_views.PropertyViewSet)
-router.register(r'reservations', api_views.ReservationViewSet)
 
 
+#-------------------
+# Rest API 
+#-------------------
 
 urlpatterns = [
+    path('api/', include(router.urls), name='api_router'),
+    ## path('api/v1/calendar/employee-tasks/', EmployeeTaskCalendarView.as_view(), name='employee_task_calendar'),
+    path('api/tasks/', api_views.get_employee_tasks, name='get_employee_tasks'),
+    path('api/event/<int:pk>/update/', api_views.ServiceTaskEventUpdateView.as_view(), name='event-update'),
+    path('api/releve/', api_views.calculate_revenue_statement, name='api_releve_revenue'),
+]
+
+
+urlpatterns += [
     path('home/', views.home, name='home'),
-    ##path('home/', views.home, name='home'),
+    path('', views.conciergerie_page, name='dashboard'),
     path('dashboard/', views.conciergerie_page, name='dashboard'),
     path('personnel/', views.conciergerie_page, name='employee_list'),
     ##
@@ -37,14 +46,3 @@ urlpatterns = [
     path('planning/', views.planning_page, name='planning_page'),
 ]
 
-#-------------------
-# Rest API 
-#-------------------
-
-urlpatterns += [
-    path('api/', include(router.urls), name='api_router'),
-    ## path('api/v1/calendar/employee-tasks/', EmployeeTaskCalendarView.as_view(), name='employee_task_calendar'),
-    path('api/tasks/', api_views.get_employee_tasks, name='get_employee_tasks'),
-    path('api/event/<int:pk>/update/', api_views.ServiceTaskEventUpdateView.as_view(), name='event-update'),
-    path('api/releve/', api_views.calculate_revenue_statement, name='api_releve_revenue'),
-]
