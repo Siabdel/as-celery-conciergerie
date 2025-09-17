@@ -48,7 +48,8 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'atlass.fr' ]
+ALLOWED_HOSTS = ['localhost', '168.231.108.40', 'atlass.fr', 'netatlass.com', 'www.atlass.fr', 'www.netatlass.com',
+                 'dimatlas.com', 'www.dimatlas.com', 'happybee.atlass.fr', 'www.happybee.atlass.fr']
 
 SITE = 1
 SITE_ID = 1
