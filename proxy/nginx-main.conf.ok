@@ -1,0 +1,84 @@
+user nginx;
+worker_processes auto;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    # Logs
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+
+    # Gzip
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+    # Upstreams
+    upstream conciergerie {
+        server conciergerie_nginx:80;
+    }
+
+    upstream logistique {
+        server logistique_nginx:80;
+    }
+
+    # ==== HTTPS conciergerie.netatlass.com ====
+    server {
+        listen 443 ssl http2;
+        server_name conciergerie.netatlass.com;
+
+        ssl_certificate /etc/letsencrypt/live/conciergerie.netatlass.com/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/conciergerie.netatlass.com/privkey.pem;
+
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers HIGH:!aNULL:!MD5;
+        ssl_prefer_server_ciphers on;
+
+        location / {
+            proxy_pass http://conciergerie;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+
+    # ==== HTTPS logistique.netatlass.com ====
+    server {
+        listen 443 ssl http2;
+        server_name logistique.netatlass.com;
+
+        ssl_certificate /etc/letsencrypt/live/logistique.netatlass.com/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/logistique.netatlass.com/privkey.pem;
+
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers HIGH:!aNULL:!MD5;
+        ssl_prefer_server_ciphers on;
+
+        location / {
+            proxy_pass http://logistique;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+
+    # ==== HTTP → HTTPS redirect ====
+    server {
+        listen 80;
+        server_name netatlass.com conciergerie.netatlass.com logistique.netatlass.com;
+        location /.well-known/acme-challenge/ {
+            root /var/www/certbot;
+        }
+        location / {
+            return 301 https://$server_name$request_uri;
+        }
+    }
+}

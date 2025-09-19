@@ -49,7 +49,16 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = ['localhost', '168.231.108.40', 'atlass.fr', 'netatlass.com', 'www.atlass.fr', 'www.netatlass.com',
-                 'dimatlas.com', 'www.dimatlas.com', 'happybee.atlass.fr', 'www.happybee.atlass.fr']
+                 'conciergerie.netatlass.com', 'www.conciergerie.netatlass.com', ]
+
+# settings.py  ou  .env.prod
+CSRF_TRUSTED_ORIGINS = [
+    "https://conciergerie.netatlass.com",
+    "https://www.conciergerie.netatlass.com",
+]
+
+# conciergerie/.env.prod
+## CSRF_TRUSTED_ORIGINS=https://conciergerie.netatlass.com,https://www.conciergerie.netatlass.com
 
 SITE = 1
 SITE_ID = 1

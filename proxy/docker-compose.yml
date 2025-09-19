@@ -1,0 +1,20 @@
+## version: "3.9"
+
+services:
+  nginx-main:
+    image: nginx:alpine
+    container_name: nginx-main
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-main.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+    networks:
+      - proxy
+    restart: unless-stopped
+
+networks:
+  proxy:
+    external: true

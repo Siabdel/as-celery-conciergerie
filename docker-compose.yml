@@ -12,8 +12,7 @@ services:
     # commande :  python manage.py runserver 0.0.0.0:8000
     volumes: 
       - static_volume:/home/app/web/staticfiles
-    ports:
-      - 8800:8000
+    ports: []
     env_file:
       - ./.env.prod
     depends_on:
@@ -26,6 +25,9 @@ services:
         limits:
           cpus: '0.50'
           memory: 512M
+    networks:
+      - default
+      - proxy
 
   db:
     container_name: conciergerie_db
@@ -39,20 +41,21 @@ services:
     env_file:
       - ./.env.prod.db
 
- 
   nginx:
     container_name: conciergerie_nginx
     build: ./nginx
     volumes:
-      - static_volume:/home/app/web/staticfiles
-      - media_volume:/home/app/web/media
-    ports:
-      - 1338:80
+        - static_volume:/home/app/web/staticfiles
+        - media_volume:/home/app/web/media
+    ports: []          # 80 = port écouté DANS le container
     depends_on:
-      - web
+        - web
+    networks:
+      - default
+      - proxy
 
   pgadmin:
-    container_name: pgadmin_container
+    container_name: conciergerie_pgadmin
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-siabdel58@gmail.com}
@@ -62,10 +65,13 @@ services:
         - pgadmin:/home/app/.pgadmin:rw
 
     ports:
-      - "${PGADMIN_PORT:-5050}:80"
-    
+      - 8801:80
+
     restart: always
 
+networks:
+  proxy:
+    external: true
 
 volumes:
   postgres_data:
