@@ -16,8 +16,36 @@ router.register(r'employees', api_views.EmployeeViewSet)
 router.register(r'maintenance_tasks', api_views.ServiceTaskViewSet)
 router.register(r'calendars', api_views.CalendarViewSet)
 router.register(r'events', api_views.EventViewSet)
+#router.register(r'additional-expenses', api_views.AdditionalExpenseViewSet)
+# additional-expenses by property
+router.register(r'property-depenses', api_views.PropertyAdditionalDepenseExpenseViewSet) 
 # Formulaire 
 router.register(r'checkout-inventory', api_views.CheckoutInventoryViewSet)
+
+##-----------------------------------
+## Api Comptabilité
+"""
+router.register(r'checkin-inventory', api_views.CheckinInventoryViewSet)
+router.register(r'inventory-items', api_views.InventoryItemViewSet)
+router.register(r'inventories', api_views.InventoryViewSet)
+router.register(r'clients', api_views.ClientViewSet)
+router.register(r'revenue-statements', api_views.RevenueStatementViewSet)
+router.register(r'revenue-statement-items', api_views.RevenueStatementItemViewSet)
+router.register(r'invoices', api_views.InvoiceViewSet)
+router.register(r'invoice-items', api_views.InvoiceItemViewSet)
+router.register(r'payments', api_views.PaymentViewSet)
+router.register(r'payment-modes', api_views.PaymentModeViewSet)
+router.register(r'property-expenses', api_views.PropertyExpenseViewSet)
+router.register(r'property-expense-categories', api_views.PropertyExpenseCategoryViewSet)
+router.register(r'property-expense-items', api_views.PropertyExpenseItemViewSet)
+router.register(r'vendors', api_views.VendorViewSet)
+router.register(r'purchase-orders', api_views.PurchaseOrderViewSet)
+router.register(r'purchase-order-items', api_views.PurchaseOrderItemViewSet)
+router.register(r'business-expenses', api_views.BusinessExpenseViewSet)
+router.register(r'business-expense-categories', api_views.BusinessExpenseCategoryViewSet)
+router.register(r'business-expense-items', api_views.BusinessExpenseItemViewSet)
+router.register(r'business-expense-vendors', api_views.VendorViewSet) 
+"""
 
 
 #-------------------

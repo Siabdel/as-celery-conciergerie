@@ -250,6 +250,15 @@ class ServiceTask(ASBaseTimestampMixin):
 #---------------------------------------
 #-Etat des lieux du bien               -
 #---------------------------------------
+# ChckInInventory
+class InventoryItem(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return self.name
+# CheckOutInventory
 class CheckoutInventory(models.Model):
     reservation = models.OneToOneField(Reservation, on_delete=models.CASCADE, related_name='checkout_inventory')
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name='checkout_inventories')
@@ -315,7 +324,15 @@ class Incident(models.Model):
     le montant, la date et une description.
     """
 
-class AdditionalExpense(models.Model):
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="%(class)s_created")
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="%(class)s_updated")
+    
+    class Meta:
+        abstract = True
+class AdditionalExpense(BaseModel):
     EXPENSE_TYPES = [
         ('supplies', 'Fournitures'),
         ('repairs', 'Réparations'),
@@ -330,7 +347,34 @@ class AdditionalExpense(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()
     description = models.CharField(max_length=255)
-
+    occurrence_date = models.DateField(null=True, blank=True)  # Date de l'occurrence si récurrente
+    is_recurring = models.BooleanField(default=False)  # Indique si la dépense est récurrente
+    recurrence_interval = models.CharField(max_length=50, blank=True)  # Intervalle de récurrence (mensuel, annuel, etc.)
+    notes = models.TextField(blank=True)  # Notes supplémentaires
+    receipt = models.FileField(upload_to='receipts/', null=True, blank=True)  # Reçu ou facture associée
+    date_incurred = models.DateField(null=True, blank=True)  # Date de l'incidentdd
+    class Meta:
+        ordering = ['-date', 'property']
+        verbose_name = 'Additional Expense'
+        verbose_name_plural = 'Additional Expenses'
+        
+    def clean(self):
+        if self.amount < 0:
+            raise ValidationError("Le montant doit être une valeur positive.")
+        if self.date > timezone.now().date():
+            raise ValidationError("La date de la dépense ne peut pas être dans le futur.")
+        if self.is_recurring and not self.recurrence_interval:
+            raise ValidationError("L'intervalle de récurrence est requis pour les dépenses récurrentes.")
+        if self.is_recurring and (self.occurrence_date is None or self.occurrence_date <= timezone.now().date()):
+            raise ValidationError("La date d'occurrence doit être une date future pour les dépenses récurrentes.")
+    
+    def save(self, *args, **kwargs):
+        # valider les données avant de sauvegarder
+        self.full_clean()  # Appelle la méthode clean() pour valider les données
+        super().save(*args, **kwargs)
+    
+    
+    
     def __str__(self):
         return f"{self.get_expense_type_display()} pour {self.property.name} - {self.amount}€"
 

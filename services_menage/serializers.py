@@ -2,14 +2,14 @@
 from rest_framework import serializers
 from schedule.models import Calendar, Event
 from django_celery_beat.models import PeriodicTask
-from services_menage.models import Employee, Reservation, ServiceTask, Property
-from services_menage.models import ResaStatus, TaskTypeService
+import services_menage.models as sm_models
 from django.contrib.auth.models import User, Group, Permission
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta :
         model = User
         fields = '__all__'
+        #fields = ['id', 'username', 'email']  # Champs à exposer
 
 class CustomPeriodicTaskSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,7 +25,7 @@ class CalendarSerializer(serializers.ModelSerializer):
 class PropertySerializer(serializers.ModelSerializer):
     owner = UserSerializer()
     class Meta:
-        model = Property
+        model = sm_models.Property
         fields__ = '__all__'
         fields = ( "id", "created_at", "name", "type", "address",
             "price_per_night",  "owner",
@@ -39,7 +39,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     calendar = CalendarSerializer(read_only=True)
 
     class Meta:
-        model = Employee
+        model = sm_models.Employee
         fields = ['id', 'name', 'user', 'phone_number', 'calendar']
 
 class EventSerializer(serializers.ModelSerializer):
@@ -104,7 +104,7 @@ class ReservationSerializer(serializers.ModelSerializer):
 
  
     class Meta:
-        model = Reservation
+        model = sm_models.Reservation
         fields = '__all__'
         fields__ = [ 'id', 'title', 'start', 'end', 'guest_name', 'guest_email', 
                   'check_in', 'check_out', 'property',  
@@ -142,25 +142,17 @@ class ServiceTaskSerializer(serializers.ModelSerializer):
                 return obj.description[:20]
 
     class Meta:
-        model = ServiceTask
+        model = sm_models.ServiceTask
         fields = ['id', 'title', 'type_service', 'employee', 'reservation', 'employee', 'property', 'start', 'end', ]
 
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ServiceTask
+        model = sm_models.ServiceTask
         fields = ['id', 'description', 'start_date', 'end_date', 'employee', 'reservation']
         depth = 1  # Optionnel, si vous souhaitez inclure les détails des relations (employee, reservation)
 
-#-------------------
-# Formulaire serializers
-#-------------------
-from .models import CheckoutInventory
 
-class CheckoutInventorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CheckoutInventory
-        fields = '__all__'
 
 class DataReservationsSerializer(serializers.Serializer):
     # Champs formatés
@@ -206,3 +198,59 @@ class DataRevenuePerPeriodeSerializer(serializers.Serializer):
     net_revenue = serializers.DecimalField(max_digits=10, decimal_places=2)
     # reservations 
     reservations = DataReservationsSerializer(many=True)
+
+
+class AdditionalExpanseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = sm_models.AdditionalExpense
+        fields = '__all__'
+        #fields = ['id', 'property', 'expense_type', 'amount', 'date', 'description', 'notes', 'is_recurring', 'recurrence_interval', 'created_at', 'updated_at', 'created_by', 'updated_by', 'date_incurred']
+        
+        description = serializers.CharField()
+        amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+        property = PropertyPrimarySerializer()  
+        notes = serializers.CharField()  # Notes supplémentaires
+        is_recurring = serializers.BooleanField()  # Indique si la dépense est récurrente
+        recurrence_interval = serializers.CharField()  # Intervalle de récurrence (mensuel, annuel, etc.)
+        created_at = serializers.DateTimeField()  # Date de création de la dépense
+        updated_at = serializers.DateTimeField()  # Date de la dernière mise à jour de la dépense
+        created_by = UserSerializer()  # Utilisateur qui a créé la dépense
+        updated_by = UserSerializer()  # Utilisateur qui a mis à jour la dépense
+        date_incurred = serializers.DateField()  # Date à laquelle la dépense a
+        
+        created_by = UserSerializer()  # Utilisateur associé à la dépense
+        updated_by = UserSerializer()  # Utilisateur ayant modifié la dépense
+    
+    def validate_amount(self, value):
+        if value < 0:
+            raise serializers.ValidationError("Amount must be a positive value.")
+        return value
+    def validate_date_incurred(self, value):
+        from datetime import date
+        if value > date.today():
+            raise serializers.ValidationError("Date incurred cannot be in the future.")
+        return value
+    def validate_next_occurrence(self, value):
+        from datetime import date
+        if self.initial_data.get('is_recurring') and value <= date.today():
+            raise serializers.ValidationError("Next occurrence must be a future date for recurring expenses.")
+        return value
+    def validate(self, data):
+        if data.get('is_recurring') and not data.get('recurrence_interval'):
+            raise serializers.ValidationError("Recurrence interval is required for recurring expenses.")
+        return data
+class ResaStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = sm_models.ResaStatus
+        fields = '__all__'
+#-------------------
+# CheckinInventory Serializer
+#-------------------------------
+from .models import CheckoutInventory
+
+class CheckoutInventorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CheckoutInventory
+        model  = sm_models.CheckoutInventory
+        
+        fields = '__all__'

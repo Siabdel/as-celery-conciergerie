@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Luxury Conciergerie Immobilière | Visites 3D</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+
+    <style>
+        :root {
+            --primary-orange: #FF6B35;
+            --primary-blue: #004E89;
+            --light-bg: #F7F7F7;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--light-bg); }
+        .property-3d-container { height: 350px; background: #000; position: relative; overflow: hidden; }
+        .property-3d-placeholder { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+    </style>
+</head>
+<body>
+    <!-- (la même page que tu as, j'ai gardé l'essentiel) -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-building me-2"></i>LUXURY CONCIERGERIE</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="#">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Nos biens</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+                </ul>
+                <a href="#" class="btn btn-primary ms-lg-3">Prendre rendez-vous</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section (inchangé) -->
+    <section class="hero-section" style="background: linear-gradient(135deg,#004E89 0%,#FF6B35 100%); color:white; padding:3rem 0;">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-5 fw-bold">Découvrez des biens d'exception en immersion 3D</h1>
+                    <p class="lead">Notre technologie de visite virtuelle vous permet d'explorer chaque détail de nos propriétés premium depuis chez vous.</p>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <img src="http://static.photos/real-estate/1200x630/1" alt="Luxury property" class="img-fluid rounded-3 shadow">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Properties -->
+    <section id="properties" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Nos biens exclusifs</h2>
+                <p class="text-muted">Sélection de propriétés premium disponibles</p>
+            </div>
+
+            <div id="app">
+                <div class="row" v-for="property in properties" :key="property.id">
+                    <div class="col-lg-12 mb-4">
+                        <div class="property-card">
+                            <div class="row g-0">
+                                <div class="col-md-6">
+                                    <div class="property-3d-container" :id="'property-3d-' + property.id">
+                                        <div class="property-3d-placeholder" :id="'placeholder-' + property.id">
+                                            <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="property-info p-4">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <div>
+                                                <h3 class="fw-bold">{{ property.title }}</h3>
+                                                <p class="text-muted">{{ property.location }}</p>
+                                            </div>
+                                            <span class="property-price">{{ property.price }} €</span>
+                                        </div>
+                                        <p class="mb-4">{{ property.description }}</p>
+                                        <div class="row mb-3">
+                                            <div class="col-4"><div><i class="fas fa-bed me-2"></i> {{ property.bedrooms }} chambres</div></div>
+                                            <div class="col-4"><div><i class="fas fa-bath me-2"></i> {{ property.bathrooms }} sdb</div></div>
+                                            <div class="col-4"><div><i class="fas fa-ruler-combined me-2"></i> {{ property.area }} m²</div></div>
+                                        </div>
+                                        <div class="property-map" :id="'map-' + property.id" style="height:200px;border-radius:8px;"></div>
+                                        <div class="d-flex justify-content-between mt-4">
+                                            <a :href="'#' + property.id" class="btn btn-outline-primary">Détails</a>
+                                            <a href="#" class="btn btn-primary">Visite virtuelle</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- end v-for -->
+            </div>
+        </div>
+    </section>
+
+    <!-- (footer etc. omitted here for brevity — tu peux garder le tien) -->
+
+    <!-- Librairies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+    <!-- Three.js (r128) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+    <script>
+    // Données (identiques à ton fichier)
+    const propertiesData = [
+        { id:1, title:"Appartement Haussmannien", location:"Paris 8ème", description:"Magnifique appartement de 120m²...", price:"2 450 000", bedrooms:3, bathrooms:2, area:120, coordinates:[48.8722,2.3024], modelPath:"models/apartment1.glb" },
+        { id:2, title:"Penthouse Moderne", location:"Paris 16ème", description:"Exceptionnel penthouse de 180m²...", price:"3 750 000", bedrooms:4, bathrooms:3, area:180, coordinates:[48.8618,2.2673], modelPath:"models/apartment2.glb" },
+        { id:3, title:"Loft d'Artiste", location:"Paris 11ème", description:"Authentique loft de 150m²...", price:"1 950 000", bedrooms:2, bathrooms:2, area:150, coordinates:[48.8606,2.3755], modelPath:"models/apartment3.glb" }
+    ];
+
+    new Vue({
+        el:'#app',
+        data:{ properties: propertiesData },
+        mounted() {
+            this.initMaps();
+            this.init3DViews();
+        },
+        methods: {
+            initMaps() {
+                this.properties.forEach(property => {
+                    const map = L.map(`map-${property.id}`).setView(property.coordinates, 15);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'&copy; OpenStreetMap contributors' }).addTo(map);
+                    L.marker(property.coordinates).addTo(map).bindPopup(property.title);
+                });
+            },
+
+            // UTILITY: fit camera to object (bounding box)
+            fitCameraToObject( camera, object, offset = 1.25, controls ) {
+                const box = new THREE.Box3().setFromObject(object);
+                const size = box.getSize(new THREE.Vector3());
+                const center = box.getCenter(new THREE.Vector3());
+
+                // Compute the distance the camera needs to be to fit the object
+                const maxSize = Math.max(size.x, size.y, size.z);
+                const fov = camera.fov * ( Math.PI / 180 );
+                let distance = Math.abs( maxSize / 2 / Math.tan( fov / 2 ) );
+                distance *= offset; // add some offset
+                // Get direction and set camera position
+                const dir = new THREE.Vector3().subVectors(camera.position, center).normalize();
+                camera.position.copy(dir.multiplyScalar(distance).add(center));
+                camera.near = Math.max(0.1, distance / 100);
+                camera.far = distance * 100;
+                camera.updateProjectionMatrix();
+                if (controls) {
+                    controls.target.copy(center);
+                    controls.update();
+                } else {
+                    camera.lookAt(center);
+                }
+            },
+
+            init3DViews() {
+                // For each property create separate scene + renderer
+                this.properties.forEach(property => {
+                    const container = document.getElementById(`property-3d-${property.id}`);
+                    if (!container) return;
+
+                    // Clear placeholder content
+                    container.innerHTML = '';
+                    const placeholder = document.getElementById(`placeholder-${property.id}`);
+                    // Create scene
+                    const scene = new THREE.Scene();
+                    scene.background = new THREE.Color(0x000000);
+
+                    // Camera
+                    const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 2000);
+                    camera.position.set(0, 1.5, 3);
+
+                    // Renderer
+                    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+                    renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                    renderer.shadowMap.enabled = true;
+                    container.appendChild(renderer.domElement);
+
+                    // Lights
+                    const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+                    hemi.position.set(0, 50, 0);
+                    scene.add(hemi);
+
+                    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+                    dir.position.set(5, 10, 7.5);
+                    dir.castShadow = true;
+                    dir.shadow.camera.top = 10;
+                    dir.shadow.camera.bottom = -10;
+                    dir.shadow.camera.left = -10;
+                    dir.shadow.camera.right = 10;
+                    scene.add(dir);
+
+                    const ambient = new THREE.AmbientLight(0x404040, 0.5);
+                    scene.add(ambient);
+
+                    // Ground plane (subtle)
+                    const groundGeo = new THREE.PlaneGeometry(100, 100);
+                    const groundMat = new THREE.MeshStandardMaterial({ color:0x222222, roughness:1, metalness:0 });
+                    const ground = new THREE.Mesh(groundGeo, groundMat);
+                    ground.rotation.x = -Math.PI/2;
+                    ground.position.y = -1;
+                    ground.receiveShadow = true;
+                    scene.add(ground);
+
+                    // Controls
+                    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+                    controls.enableDamping = true;
+                    controls.dampingFactor = 0.07;
+                    controls.rotateSpeed = 0.5;
+
+                    // Loader
+                    const loader = new THREE.GLTFLoader();
+
+                    let modelGroup = new THREE.Group();
+                    scene.add(modelGroup);
+
+                    // Try to load modelPath (if available). If failure, create a fallback demo model.
+                    loader.load(property.modelPath, gltf => {
+                        // Remove placeholder spinner if present
+                        if (placeholder && placeholder.parentNode) placeholder.parentNode.removeChild(placeholder);
+
+                        modelGroup.add(gltf.scene);
+                        gltf.scene.traverse(node => {
+                            if (node.isMesh) {
+                                node.castShadow = true;
+                                node.receiveShadow = true;
+                            }
+                        });
+                        // Fit camera
+                        this.fitCameraToObject(camera, gltf.scene, 1.3, controls);
+                    }, xhr => {
+                        // progress (optional)
+                        // console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+                    }, err => {
+                        // onError -> fallback simple cube / demo
+                        console.warn(`Model failed to load (${property.modelPath}), using fallback. Error:`, err);
+                        if (placeholder && placeholder.parentNode) placeholder.parentNode.removeChild(placeholder);
+
+                        // create a demo apartment-like block + simple furniture
+                        const apt = new THREE.Group();
+
+                        // apartment box
+                        const boxGeo = new THREE.BoxGeometry(2.4, 1.8, 1.6);
+                        const boxMat = new THREE.MeshStandardMaterial({ color:0x004E89, roughness:0.6, metalness:0.1 });
+                        const aptBox = new THREE.Mesh(boxGeo, boxMat);
+                        aptBox.castShadow = true;
+                        aptBox.receiveShadow = true;
+                        aptBox.position.y = 0;
+                        apt.add(aptBox);
+
+                        // small table
+                        const tableGeo = new THREE.BoxGeometry(0.5, 0.03, 0.3);
+                        const tableMat = new THREE.MeshStandardMaterial({ color:0x8b5e3c });
+                        const table = new THREE.Mesh(tableGeo, tableMat);
+                        table.position.set(0.4, -0.75, 0);
+                        apt.add(table);
+
+                        modelGroup.add(apt);
+                        this.fitCameraToObject(camera, apt, 1.4, controls);
+                    });
+
+                    // Animation loop
+                    const animate = () => {
+                        requestAnimationFrame(animate);
+                        controls.update();
+                        renderer.render(scene, camera);
+                    };
+                    animate();
+
+                    // Handle resize for each container
+                    const onResize = () => {
+                        const w = container.clientWidth;
+                        const h = container.clientHeight;
+                        camera.aspect = w / h;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(w, h);
+                    };
+                    // Use ResizeObserver if available for better granularity
+                    if (window.ResizeObserver) {
+                        const ro = new ResizeObserver(onResize);
+                        ro.observe(container);
+                    } else {
+                        window.addEventListener('resize', onResize);
+                    }
+
+                    // Store references if you want to add interactions later
+                    property._3d = { scene, camera, renderer, controls, modelGroup };
+                });
+            }
+        }
+    });
+    </script>
+</body>
+</html>

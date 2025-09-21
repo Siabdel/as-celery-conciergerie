@@ -38,6 +38,7 @@ from services_menage.forms import CheckoutInventoryForm
 from services_menage import models as sm_models
 from core import models as core_models
 from dateutil.relativedelta import relativedelta
+from dateutil import parser
 
 
 class PeriodicTaskListCreate(generics.ListCreateAPIView):
@@ -79,8 +80,42 @@ class EventViewSet(viewsets.ModelViewSet):
         if calendar_id is not None:
             queryset = queryset.filter(calendar_id=calendar_id)
         return queryset
+## ---------------------------------------------------------
+#--  AdditionalExpense ViewSet
+#----------------------------------------------------------
+class AdditionalExpenseViewSet(viewsets.ModelViewSet) : 
+    queryset = sm_models.AdditionalExpense.objects.all()
+    serializer_class = sm_serializers.AdditionalExpanseSerializer
+    # permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.AllowAny]  # ou [IsAuthenticated]
+    
 
-# ou cas ou je serialize moi meme ces events par dates (start, end) a partir de resa
+# additional endpoints if  needed
+# Exemple pour filtrer par property
+    def get_queryset(self):
+        queryset = sm_models.AdditionalExpense.objects.all()
+        property_id = self.request.query_params.get('property_id', None)
+        if property_id is not None:
+            queryset = queryset.filter(property_id=property_id)
+        return queryset
+    
+# ---------------------------------------------------------
+#--  AdditionalExpense ViewSet by Property
+#----------------------------------------------------------
+class PropertyAdditionalDepenseExpenseViewSet(viewsets.ModelViewSet) :
+    queryset = sm_models.AdditionalExpense.objects.all()
+    serializer_class = sm_serializers.AdditionalExpanseSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        queryset = sm_models.AdditionalExpense.objects.all()
+        property_id = self.request.query_params.get('property_id', None)
+        if property_id is not None:
+            queryset = queryset.filter(property_id=property_id)
+        return queryset
+      
+
+## ou cas ou je serialize moi meme ces events par dates (start, end) a partir de resa
 def calendar_events(request):
     start = parse_datetime(request.GET.get('start'))
     end = parse_datetime(request.GET.get('end'))
@@ -256,12 +291,15 @@ class ServiceTaskEventUpdateView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+##-------------------------------
+# Formulaire état des lieux
+#------------------------------
 
 class CheckoutInventoryViewSet(viewsets.ModelViewSet):
     queryset = sm_models.CheckoutInventory.objects.all()
     serializer_class = CheckoutInventorySerializer
 
-from dateutil import parser
+
 
 @api_view(['PATCH'])
 def update_event(request, pk):
@@ -450,5 +488,5 @@ def releve_activite_property(request):
         print(f"Erreur lors de la récupération des réservations: {response.status_code}")
         print(response.text)
 
-            
+
 

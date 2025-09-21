@@ -121,12 +121,27 @@ class AdditionalExpenseInline(admin.TabularInline):
     model = sm_models.AdditionalExpense
     extra = 0
     fields = ('property', 'expense_type', 'amount', 'date', 'description',)
+    exclude = ('created_at', 'updated_at', 'created_by', 'updated_by',)
+    readonly_fields = ('created_at', 'updated_at', 'created_by', 'updated_by',)
+    show_change_link = True
     
 @admin.register(sm_models.AdditionalExpense)
 class AdditionalExpenseAdmin(admin.ModelAdmin):
     list_display = ('property', 'expense_type', 'amount', 'date')
     list_filter = ('expense_type', 'property', 'date')
     search_fields = ('property__name', 'description')
+    exclude = ('created_at', 'updated_at', 'created_by', 'updated_by',)
+    readonly_fields = ('created_at', 'updated_at', 'created_by', 'updated_by',)
+    show_change_link = True
+
+    def save_model(self, request, obj, form, change):
+        if not change:  
+            obj.created_by = request.user
+        if not obj.created_by :
+            obj.created_by = request.user
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
+        
 @admin.register(sm_models.Property)
 class PropertyAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'owner', 'price_per_night_display', 'address_preview')

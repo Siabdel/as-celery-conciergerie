@@ -28,7 +28,7 @@ BASE_DIR    = Path(__file__).resolve().parent.parent
 # Directory project au meme niveau de settings.py
 PROJECT_DIR = Path(__file__).resolve().parent
 HOST = env("HOST")
-BASE_URL = f"http://{HOST}:8000"  # ou l'URL de votre serveur en production
+BASE_URL = f"http://{HOST}"  # ou l'URL de votre serveur en production
 
 
 ADMINS = (
@@ -48,8 +48,9 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = ['localhost', '168.231.108.40', 'atlass.fr', 'netatlass.com', 'www.atlass.fr', 'www.netatlass.com',
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '168.231.108.40', 'atlass.fr', 'netatlass.com', 'www.atlass.fr', 'www.netatlass.com',
                  'conciergerie.netatlass.com', 'www.conciergerie.netatlass.com', ]
+
 
 # settings.py  ou  .env.prod
 CSRF_TRUSTED_ORIGINS = [
@@ -95,7 +96,6 @@ INSTALLED_APPS = [
     # debug tools
     'debug_toolbar', # newo
     'django_extensions',
-    'corsheaders', 
     # User Authentication
     'allauth',
     'allauth.account',
@@ -108,12 +108,14 @@ INSTALLED_APPS = [
     'slick_report', 
     'pandas_report',
     'fullcalendar', # fullcalendar scheduler
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',   # Doit être en haut
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware",  # new
+    'corsheaders.middleware.CorsMiddleware',  # Doit être en haut, avant CommonMiddleware
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -341,6 +343,32 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
 
+
+# Autoriser toujours la méthode OPTIONS (prévol)
+CORS_ALLOW_METHODS = list(default_methods := [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+])
+
+# Si tu utilises les cookies/session, aussi autoriser les credentials
+CORS_ALLOW_CREDENTIALS = True
+
+# Autoriser certains headers si besoin (ex : Authorization)
+CORS_ALLOW_HEADERS = list(default_headers := [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+])
+
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_URL = "/accounts/login/"
 
@@ -366,3 +394,42 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 # SQL Explorer
 #EXPLORER_PERMISSION_VIEW = lambda u: u.is_staff
 #EXPLORER_PERMISSION_CHANGE = lambda u: u.is_superuser
+
+# Configurer DRF pour utiliser JWT  
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES' : [
+        'rest_framework.permissions.IsAuthenticated',
+        #'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_AUTHENTIFICATION_CLASS' : [
+        'rest_famework.authentification.SessionAuthentification', 
+        #'rest_framework.authentification.BasicAuthentification',
+        ##'rest_framework_simplejwt.authentication.JWTAuthentication', 
+        ##'rest_framework.authtoken',
+    ] 
+    
+}
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:8080",
+    'http://localhost:5173',
+]
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+    "http://localhost:8000",
+    'http://localhost:8080',
+    'http://localhost:5173',
+] # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
+CORS_ORIGIN_REGEX_WHITELIST = [
+    'http://localhost:3000',
+    'http://localhost:8080',
+    'http://localhost:5173',
+]
+# DJANGO REST FRAMEWORKS
+
+CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
+CORS_ALLOW_ALL_ORIGINS = True  # Pour le développement uniquement
+
+## CORS_ALLOW_CREDENTIALS = True
