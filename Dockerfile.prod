@@ -25,6 +25,13 @@ RUN  apt update && apt -y upgrade \
 RUN apt update && apt -y upgrade && apt install -y nano \ 
         && apt install -y bash vim \ 
         && apt clean
+RUN apt-get update && apt-get install -y \
+    libpangoft2-1.0-0 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0
+#    libpq-dev \
+RUN apt-get update && apt-get install -y libpango-1.0-0 libpangocairo-1.0-0
+
 # install dependencies
 RUN pip install --upgrade pip
 COPY ./requirements.txt .

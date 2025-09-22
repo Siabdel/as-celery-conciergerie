@@ -1,4 +1,8 @@
 # your_app/management/commands/fake_maroc_ma.py
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'monprojet.settings')
+import django
+django.setup()
 import random
 from datetime import timedelta, datetime, time
 from decimal import Decimal
@@ -7,7 +11,8 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.db import IntegrityError
-from faker import Faker
+from faker import Fakerimport os
+
 
 from core.models import ResaStatus, PlatformChoices
 from services_menage.models import Property, Reservation, PricingRule

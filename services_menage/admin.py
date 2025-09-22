@@ -120,15 +120,15 @@ class PricingRuleInline(admin.TabularInline):
 class AdditionalExpenseInline(admin.TabularInline):
     model = sm_models.AdditionalExpense
     extra = 0
-    fields = ('property', 'expense_type', 'amount', 'date', 'description',)
+    fields = ('property', 'expense_type', 'amount', 'description',)
     exclude = ('created_at', 'updated_at', 'created_by', 'updated_by',)
     readonly_fields = ('created_at', 'updated_at', 'created_by', 'updated_by',)
     show_change_link = True
     
 @admin.register(sm_models.AdditionalExpense)
 class AdditionalExpenseAdmin(admin.ModelAdmin):
-    list_display = ('property', 'expense_type', 'amount', 'date')
-    list_filter = ('expense_type', 'property', 'date')
+    list_display = ('property', 'expense_type', 'amount', )
+    list_filter = ('expense_type', 'property', )
     search_fields = ('property__name', 'description')
     exclude = ('created_at', 'updated_at', 'created_by', 'updated_by',)
     readonly_fields = ('created_at', 'updated_at', 'created_by', 'updated_by',)

@@ -345,7 +345,6 @@ class AdditionalExpense(BaseModel):
     property = models.ForeignKey('Property', on_delete=models.CASCADE, related_name='additional_expenses')
     expense_type = models.CharField(max_length=20, choices=EXPENSE_TYPES)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    date = models.DateField()
     description = models.CharField(max_length=255)
     occurrence_date = models.DateField(null=True, blank=True)  # Date de l'occurrence si récurrente
     is_recurring = models.BooleanField(default=False)  # Indique si la dépense est récurrente
@@ -354,15 +353,13 @@ class AdditionalExpense(BaseModel):
     receipt = models.FileField(upload_to='receipts/', null=True, blank=True)  # Reçu ou facture associée
     date_incurred = models.DateField(null=True, blank=True)  # Date de l'incidentdd
     class Meta:
-        ordering = ['-date', 'property']
+        ordering = ['property',]
         verbose_name = 'Additional Expense'
         verbose_name_plural = 'Additional Expenses'
         
     def clean(self):
         if self.amount < 0:
             raise ValidationError("Le montant doit être une valeur positive.")
-        if self.date > timezone.now().date():
-            raise ValidationError("La date de la dépense ne peut pas être dans le futur.")
         if self.is_recurring and not self.recurrence_interval:
             raise ValidationError("L'intervalle de récurrence est requis pour les dépenses récurrentes.")
         if self.is_recurring and (self.occurrence_date is None or self.occurrence_date <= timezone.now().date()):
