@@ -12,6 +12,28 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
 })
+// recuperer le token dans de connexion
+axios.post('http://conciergerie.netatlass.com/api/token/', {
+  username: 'admin',
+  password: 'grutil001'
+})
+.then(response => {
+  const accessToken = response.data.access;      // Token court 5 min
+  const refreshToken = response.data.refresh;    // Token long 1 jour
+  console.log('Access Token:', accessToken);
+  console.log('Refresh Token:', refreshToken);
+  // Stocke le token, par exemple dans localStorage
+  localStorage.setItem('accessToken', accessToken);
+})
+.catch(error => {
+  // Gère l’erreur
+  console.log('Erreur post token :', error);
+});
+// rafraîchir la page pour voir le token dans localStorage
+
+// charger le token
+const accessToken = localStorage.getItem('accessToken');
+console.log('Access Token from localStorage:', accessToken);
 
 // Intercepteur pour ajouter les tokens JWT
 apiClient.interceptors.request.use(

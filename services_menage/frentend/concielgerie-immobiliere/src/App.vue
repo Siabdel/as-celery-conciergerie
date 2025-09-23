@@ -77,6 +77,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 import TableActivity from './components/TableActivity.vue'
 import apiService from './services/api'
 import { transformData, generatePdf, exportToICal } from './utils/helpers'
@@ -119,6 +120,69 @@ export default {
     this.filters.endDate = today.toISOString().split('T')[0]
   },
   methods: {
+    async loadData_test() {
+      // c'est mmieux de utiliser interceptor axios
+      // Interceptor pour ajouter le token à chaque requête
+      // on traite err 403 ou 401
+      axios.interceptors.request.use(
+        config => {
+          const token = localStorage.getItem('accessToken');
+          if (token) {
+            config.headers['Authorization'] = 'Bearer ' + token;
+          }
+          return config;
+        },
+        error => {
+          return Promise.reject(error);
+        }
+      );
+
+
+      // appel  load axios
+      //const URL = 'https://conciergerie.netatlass.com/api/'
+      const URL_LOCAL = 'http://localhost:8000/api/'
+      this.loading = true
+      this.error = null
+
+      // recuperer le token dans de connexion
+      axios.post('http://localhost:8000/api/token/', {
+        username: 'admin',
+        password: 'grutil001'
+      })
+      .then(response => {
+        const accessToken = response.data.access;      // Token court 5 min
+        const refreshToken = response.data.refresh;    // Token long 1 jour
+        console.log('Access Token:', accessToken);
+        console.log('Refresh Token:', refreshToken);
+        // Stocke le token, par exemple dans localStorage
+        localStorage.setItem('accessToken', accessToken);
+      })
+      .catch(error => {
+        // Gère l’erreur
+      });
+      // rafraîchir la page pour voir le token dans localStorage
+
+      // charger le token
+      const accessToken = localStorage.getItem('accessToken');
+      console.log('Access Token from localStorage:', accessToken);
+      // Utiliser le token dans les en-têtes des requêtes
+      axios.get(`${URL_LOCAL}property/`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        },
+        })
+        .then(response => {
+          console.log('Données chargées avec succès:', response.data);
+          this.activityData = response.data; // Mettre à jour les données avec la réponse
+        })
+        .catch(error => {
+          console.error('!!! - Erreur lors du chargement des données:', error);
+          console.log(' !!! - Erreur lors du chargement des données:', error);
+          this.error = 'Erreur lors du chargement des données. Veuillez réessayer.';
+        }).finally(
+          this.loading = false
+        );
+    },
     async loadData() {
       this.loading = true
       this.error = null

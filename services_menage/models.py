@@ -345,7 +345,7 @@ class AdditionalExpense(BaseModel):
     property = models.ForeignKey('Property', on_delete=models.CASCADE, related_name='additional_expenses')
     expense_type = models.CharField(max_length=20, choices=EXPENSE_TYPES)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    description = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, blank=True)  # Description de la dépense
     occurrence_date = models.DateField(null=True, blank=True)  # Date de l'occurrence si récurrente
     is_recurring = models.BooleanField(default=False)  # Indique si la dépense est récurrente
     recurrence_interval = models.CharField(max_length=50, blank=True)  # Intervalle de récurrence (mensuel, annuel, etc.)

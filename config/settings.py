@@ -16,6 +16,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from celery.schedules import crontab
 import environ
+from datetime import timedelta
 # Initialise environment variables
 env = environ.Env()
 environ.Env.read_env()
@@ -93,6 +94,7 @@ INSTALLED_APPS = [
     'rest_framework', # new
     'rest_framework.authtoken',
     "dj_rest_auth",
+    'drf_spectacular', # Générateur automatique de documentation OpenAPI 3 pour DRF
     # debug tools
     'debug_toolbar', # newo
     'django_extensions',
@@ -398,23 +400,34 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 # Configurer DRF pour utiliser JWT  
 
 REST_FRAMEWORK = {
+    
     'DEFAULT_PERMISSION_CLASSES' : [
-        'rest_framework.permissions.IsAuthenticated',
-        #'rest_framework.permissions.AllowAny',
+        #'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTIFICATION_CLASS' : [
         'rest_famework.authentification.SessionAuthentification', 
+        'rest_framework_simplejwt.authentication.JWTAuthentication', 
         #'rest_framework.authentification.BasicAuthentification',
         ##'rest_framework_simplejwt.authentication.JWTAuthentication', 
         ##'rest_framework.authtoken',
-    ] 
+    ],
+    # Schema pour la documentation automatique
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema', 
     
 }
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Conciergerie Mon API Django',
+    'DESCRIPTION': 'Documentation de mon API',
+    'VERSION': '1.0.0',
+}
+
+
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # adapte en fonction du port
     "http://localhost:8000",
     "http://localhost:8080",
-    'http://localhost:5173',
 ]
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
@@ -433,3 +446,9 @@ CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will
 CORS_ALLOW_ALL_ORIGINS = True  # Pour le développement uniquement
 
 ## CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = True # If you are using cookies/session authentication
+# duree de vie des tokens
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}

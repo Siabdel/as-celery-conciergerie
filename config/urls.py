@@ -20,6 +20,13 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+# urls.py (niveau projet)  
+from rest_framework_simplejwt.views import (  
+    TokenObtainPairView,  
+    TokenRefreshView,  
+    TokenVerifyView,  
+)  
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 
 urlpatterns = [
@@ -31,10 +38,36 @@ urlpatterns = [
     # SQL Explorer
     path('explorer/', include('explorer.urls')),
     # pandas Report 
-    path('pandas/', include('pandas_report.urls')),
+    # path('pandas/', include('pandas_report.urls')),
     # fullcalendar
-    path('calendar/', include('fullcalendar.urls')),
+    # path('calendar/', include('fullcalendar.urls')),
 ]
+# token auth & rest framework
+# JWT Auth
+# api/auth pour login/logout
+# api/auth/registration pour creer un user
+# pour obtenir un token : voici les urls
+# refresh token et verify token
+
+urlpatterns += [  
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),  
+    ##
+    # path('api/auth/', include('dj_rest_auth.urls')),
+    path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
+]  
+
+# Documentation automatique avec drf-spectacular
+# https://drf-spectacular.readthedocs.io/en/latest/readme.html
+
+urlpatterns += [
+    # tes autres URLs...
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+]
+
 
 # Ajoutez ces lignes pour servir les fichiers média en mode développement
 

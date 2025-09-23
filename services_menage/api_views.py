@@ -48,6 +48,7 @@ class PeriodicTaskListCreate(generics.ListCreateAPIView):
 class PropertyViewSet(viewsets.ModelViewSet):
     queryset = sm_models.Property.objects.all()
     serializer_class = sm_serializers.PropertySerializer
+    # permission_classes = [permissions.IsAuthenticated]
 
 class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = sm_models.Employee.objects.all()
