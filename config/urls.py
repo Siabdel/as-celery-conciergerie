@@ -40,7 +40,7 @@ urlpatterns = [
     # pandas Report 
     # path('pandas/', include('pandas_report.urls')),
     # fullcalendar
-    # path('calendar/', include('fullcalendar.urls')),
+    path('calendar/', include('fullcalendar.urls')),
 ]
 # token auth & rest framework
 # JWT Auth
