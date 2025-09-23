@@ -8,16 +8,8 @@ from rest_framework.routers import DefaultRouter
 
 app_name = "report"
 
-router = DefaultRouter()
-router.register(r'properties', api_views.PropertyViewSet)
-router.register(r'reservations', api_views.ReservationViewSet, basename="reservations")
 
 urlpatterns = [
-    path('', include(router.urls)),
-]
-
-
-urlpatterns += [
     path('revenue-chart/', RevenueChartView.as_view(), name='revenue_chart'),
     path('revenue-data/', revenue_data, name='revenue_data'), ## API json
     #
