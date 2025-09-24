@@ -81,14 +81,14 @@ parso==0.8.4
 pbr==6.1.0
 pexpect==4.9.0
 phonenumberslite==8.13.47
-pillow==11.0.0
+pillow>=9.2.0,<11.0
 platformdirs==4.3.6
 proglog==0.1.11
 prometheus_client==0.21.0
 prompt_toolkit==3.0.47
 proto-plus==1.26.1
 protobuf==6.31.1
-psycopg2-binary==2.9.6
+psycopg2-binary
 ptyprocess==0.7.0
 pure_eval==0.2.3
 pyasn1==0.6.1
@@ -136,6 +136,3 @@ virtualenvwrapper==6.1.1
 wcwidth==0.2.13
 weasyprint==62.3
 webencodings==0.5.1
-yt-dlp==2025.3.31
-yt-scraper==0.8.4
-zopfli==0.2.3.post1
