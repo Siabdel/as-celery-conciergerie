@@ -24,7 +24,7 @@ from core.models import BaseImage
 
 
 @admin.register(PropertyImage)
-class ProductImageAdmin(admin.ModelAdmin):
+class PropertyImageAdmin(admin.ModelAdmin):
     list_display =  [field.name for field in PropertyImage._meta.get_fields()]
 
 @admin.register(Incident)

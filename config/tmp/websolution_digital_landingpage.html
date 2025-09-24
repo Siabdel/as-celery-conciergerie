@@ -1,0 +1,610 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSolutions - Agence Digitale Professionnelle</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --secondary: #004E89;
+            --light: #F7F9FC;
+            --dark: #2D3748;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(0,78,137,0.1) 100%);
+        }
+        
+        .nav-scrolled {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: var(--primary);
+            width: 0%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress Indicator -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <span class="text-primary">Web</span><span class="text-secondary">Solutions</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#services">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#portfolio">Portfolio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">À propos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                </ul>
+                <a href="#contact" class="btn btn-primary ms-lg-3">Demander un devis</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-gradient py-5" style="padding-top: 100px !important;">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6" data-aos="fade-right">
+                    <h1 class="display-4 fw-bold mb-4">Solutions Digitales <span class="text-primary">Sur Mesure</span></h1>
+                    <p class="lead mb-4">Nous créons des solutions web innovantes pour booster votre business. E-commerce, gestion de stock, CRM, ERP et bien plus.</p>
+                    <div class="d-flex gap-3">
+                        <a href="#services" class="btn btn-primary btn-lg px-4">Nos services</a>
+                        <a href="#contact" class="btn btn-outline-secondary btn-lg px-4">Nous contacter</a>
+                    </div>
+                </div>
+                <div class="col-lg-6" data-aos="fade-left">
+                    <img src="http://static.photos/technology/1200x630/1" alt="Digital Solutions" class="img-fluid rounded-3 shadow">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h2 class="fw-bold">Nos <span class="text-primary">Services</span></h2>
+                <p class="text-muted">Nous offrons une gamme complète de services digitaux pour répondre à tous vos besoins</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card service-card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle mb-4">
+                                <i class="fas fa-shopping-cart fa-2x"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Solutions E-commerce</h4>
+                            <p class="text-muted">Plateformes sur mesure avec gestion de stock, paiements sécurisés et expérience utilisateur optimale.</p>
+                            <a href="#" class="btn btn-link text-primary p-0">En savoir plus <i class="fas fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card service-card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="icon-box bg-secondary bg-opacity-10 text-secondary rounded-circle mb-4">
+                                <i class="fas fa-boxes fa-2x"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Gestion de Stock</h4>
+                            <p class="text-muted">Systèmes intelligents pour suivre vos inventaires en temps réel avec alertes et analyses prédictives.</p>
+                            <a href="#" class="btn btn-link text-primary p-0">En savoir plus <i class="fas fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card service-card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle mb-4">
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">CRM Personnalisé</h4>
+                            <p class="text-muted">Gérez vos relations clients avec des outils adaptés à votre secteur d'activité et vos processus.</p>
+                            <a href="#" class="btn btn-link text-primary p-0">En savoir plus <i class="fas fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card service-card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="icon-box bg-secondary bg-opacity-10 text-secondary rounded-circle mb-4">
+                                <i class="fas fa-chart-line fa-2x"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">ERP Intégré</h4>
+                            <p class="text-muted">Automatisez vos processus métier avec des solutions ERP modulaires et évolutives.</p>
+                            <a href="#" class="btn btn-link text-primary p-0">En savoir plus <i class="fas fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card service-card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle mb-4">
+                                <i class="fas fa-home fa-2x"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Solutions Immobilières</h4>
+                            <p class="text-muted">Plateformes dédiées à la vente et gestion immobilière avec visites virtuelles et outils d'évaluation.</p>
+                            <a href="#" class="btn btn-link text-primary p-0">En savoir plus <i class="fas fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card service-card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="icon-box bg-secondary bg-opacity-10 text-secondary rounded-circle mb-4">
+                                <i class="fas fa-pencil-ruler fa-2x"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">CMS Sur Mesure</h4>
+                            <p class="text-muted">Systèmes de gestion de contenu adaptés à vos besoins spécifiques avec interface intuitive.</p>
+                            <a href="#" class="btn btn-link text-primary p-0">En savoir plus <i class="fas fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h2 class="fw-bold">Nos <span class="text-primary">Réalisations</span></h2>
+                <p class="text-muted">Découvrez quelques-uns de nos projets récents</p>
+            </div>
+            
+            <div class="row g-4" id="portfolio-container">
+                <!-- Portfolio items will be loaded here via Vue.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-5 bg-light">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6" data-aos="fade-right">
+                    <img src="http://static.photos/office/1200x630/1" alt="Notre équipe" class="img-fluid rounded-3 shadow">
+                </div>
+                <div class="col-lg-6" data-aos="fade-left">
+                    <h2 class="fw-bold mb-4">Qui <span class="text-primary">Sommes-Nous</span> ?</h2>
+                    <p class="lead">WebSolutions est une agence digitale spécialisée dans le développement de solutions web sur mesure pour les entreprises.</p>
+                    <p>Avec plus de 10 ans d'expérience, notre équipe d'experts accompagne les PME et grandes entreprises dans leur transformation digitale.</p>
+                    <p>Nous combinons expertise technique, design moderne et approche centrée utilisateur pour créer des solutions qui répondent parfaitement à vos besoins métier.</p>
+                    <div class="d-flex align-items-center mt-4">
+                        <div class="me-4">
+                            <h3 class="fw-bold text-primary mb-0">150+</h3>
+                            <p class="text-muted mb-0">Projets réalisés</p>
+                        </div>
+                        <div class="me-4">
+                            <h3 class="fw-bold text-primary mb-0">95%</h3>
+                            <p class="text-muted mb-0">Clients satisfaits</p>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold text-primary mb-0">10+</h3>
+                            <p class="text-muted mb-0">Années d'expérience</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h2 class="fw-bold">Ils Nous <span class="text-primary">Font Confiance</span></h2>
+                <p class="text-muted">Ce que nos clients disent de nous</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex mb-3">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                            </div>
+                            <p class="mb-4">"La plateforme e-commerce développée par WebSolutions a transformé notre business. Le système de gestion de stock intégré nous fait gagner un temps précieux."</p>
+                            <div class="d-flex align-items-center">
+                                <img src="http://static.photos/people/100x100/1" alt="Client" class="rounded-circle me-3" width="50">
+                                <div>
+                                    <h6 class="mb-0">Marie Dupont</h6>
+                                    <small class="text-muted">CEO, FashionStore</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex mb-3">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                            </div>
+                            <p class="mb-4">"Le CRM personnalisé a révolutionné notre gestion client. L'équipe a parfaitement compris nos besoins et a livré une solution parfaitement adaptée."</p>
+                            <div class="d-flex align-items-center">
+                                <img src="http://static.photos/people/100x100/2" alt="Client" class="rounded-circle me-3" width="50">
+                                <div>
+                                    <h6 class="mb-0">Jean Martin</h6>
+                                    <small class="text-muted">Directeur Commercial, ProService</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex mb-3">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star-half-alt text-warning"></i>
+                            </div>
+                            <p class="mb-4">"L'ERP développé par WebSolutions a automatisé 80% de nos processus métier. Un gain de productivité énorme et une équipe réactive pour les évolutions."</p>
+                            <div class="d-flex align-items-center">
+                                <img src="http://static.photos/people/100x100/3" alt="Client" class="rounded-circle me-3" width="50">
+                                <div>
+                                    <h6 class="mb-0">Sophie Leroy</h6>
+                                    <small class="text-muted">Directrice Financière, IndustriePlus</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-5 bg-primary bg-opacity-10">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center mb-5" data-aos="fade-up">
+                    <h2 class="fw-bold">Contactez-<span class="text-primary">Nous</span></h2>
+                    <p class="text-muted">Prêt à transformer votre business ? Parlons-en !</p>
+                </div>
+            </div>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm" data-aos="fade-up" data-aos-delay="100">
+                        <div class="card-body p-4 p-lg-5">
+                            <form id="contactForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="name" class="form-label">Nom complet</label>
+                                        <input type="text" class="form-control" id="name" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="email" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="subject" class="form-label">Sujet</label>
+                                        <input type="text" class="form-control" id="subject" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="message" class="form-label">Message</label>
+                                        <textarea class="form-control" id="message" rows="5" required></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary px-4 py-2">Envoyer le message</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <h4 class="fw-bold mb-4"><span class="text-primary">Web</span><span class="text-white">Solutions</span></h4>
+                    <p>Agence digitale spécialisée dans les solutions web sur mesure pour les entreprises.</p>
+                    <div class="d-flex gap-3 mt-4">
+                        <a href="#" class="text-white"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <h5 class="fw-bold mb-4">Liens rapides</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#home" class="text-white text-decoration-none">Accueil</a></li>
+                        <li class="mb-2"><a href="#services" class="text-white text-decoration-none">Services</a></li>
+                        <li class="mb-2"><a href="#portfolio" class="text-white text-decoration-none">Portfolio</a></li>
+                        <li class="mb-2"><a href="#about" class="text-white text-decoration-none">À propos</a></li>
+                        <li><a href="#contact" class="text-white text-decoration-none">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="fw-bold mb-4">Nos services</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">E-commerce</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Gestion de stock</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">CRM</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">ERP</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">Solutions immobilières</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="fw-bold mb-4">Contact</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2 text-primary"></i> 123 Rue Digitale, Paris</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2 text-primary"></i> +33 1 23 45 67 89</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2 text-primary"></i> contact@websolutions.fr</li>
+                        <li><i class="fas fa-clock me-2 text-primary"></i> Lun-Ven: 9h-18h</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 bg-light">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2023 WebSolutions. Tous droits réservés.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0">
+                        <a href="#" class="text-white text-decoration-none">Mentions légales</a> | 
+                        <a href="#" class="text-white text-decoration-none">Politique de confidentialité</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="btn btn-primary btn-lg back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></a>
+
+    <!-- Scripts -->
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    
+    <!-- Vue.js -->
+    <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.js"></script>
+    
+    <!-- AOS Animation -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+        
+        // Navbar scroll effect
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 100) {
+                $('.navbar').addClass('nav-scrolled');
+            } else {
+                $('.navbar').removeClass('nav-scrolled');
+            }
+        });
+        
+        // Scroll progress indicator
+        $(window).scroll(function() {
+            var scroll = $(window).scrollTop();
+            var height = $(document).height() - $(window).height();
+            var scrolled = (scroll / height) * 100;
+            $('#progressBar').css('width', scrolled + '%');
+        });
+        
+        // Back to top button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 300) {
+                $('#backToTop').fadeIn();
+            } else {
+                $('#backToTop').fadeOut();
+            }
+        });
+        
+        $('#backToTop').click(function() {
+            $('html, body').animate({scrollTop: 0}, 300);
+            return false;
+        });
+        
+        // Smooth scrolling for anchor links
+        $('a[href*="#"]').not('[href="#"]').not('[href="#0"]').click(function(event) {
+            if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') && location.hostname == this.hostname) {
+                var target = $(this.hash);
+                target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
+                if (target.length) {
+                    event.preventDefault();
+                    $('html, body').animate({
+                        scrollTop: target.offset().top - 70
+                    }, 800, function() {
+                        var $target = $(target);
+                        $target.focus();
+                        if ($target.is(":focus")) {
+                            return false;
+                        } else {
+                            $target.attr('tabindex','-1');
+                            $target.focus();
+                        }
+                    });
+                }
+            }
+        });
+        
+        // Vue.js for portfolio
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    portfolioItems: [
+                        {
+                            id: 1,
+                            title: "Plateforme E-commerce",
+                            category: "E-commerce",
+                            image: "http://static.photos/retail/640x360/1",
+                            description: "Solution complète avec gestion de stock intégrée et paiements sécurisés."
+                        },
+                        {
+                            id: 2,
+                            title: "CRM Immobilier",
+                            category: "Immobilier",
+                            image: "http://static.photos/estate/640x360/1",
+                            description: "Gestion des clients et propriétés avec visites virtuelles."
+                        },
+                        {
+                            id: 3,
+                            title: "ERP Industriel",
+                            category: "ERP",
+                            image: "http://static.photos/industry/640x360/1",
+                            description: "Automatisation des processus de production et logistique."
+                        },
+                        {
+                            id: 4,
+                            title: "Marketplace B2B",
+                            category: "E-commerce",
+                            image: "http://static.photos/office/640x360/2",
+                            description: "Plateforme de mise en relation professionnelle avec outils de négociation."
+                        },
+                        {
+                            id: 5,
+                            title: "Application Mobile CRM",
+                            category: "CRM",
+                            image: "http://static.photos/technology/640x360/2",
+                            description: "Solution mobile pour la gestion des clients sur le terrain."
+                        },
+                        {
+                            id: 6,
+                            title: "Site Vitrine Premium",
+                            category: "CMS",
+                            image: "http://static.photos/minimal/640x360/1",
+                            description: "Design élégant avec animations fluides et référencement optimisé."
+                        }
+                    ]
+                }
+            },
+            mounted() {
+                this.renderPortfolio();
+            },
+            methods: {
+                renderPortfolio() {
+                    const container = document.getElementById('portfolio-container');
+                    
+                    this.portfolioItems.forEach(item => {
+                        const col = document.createElement('div');
+                        col.className = 'col-md-6 col-lg-4';
+                        col.innerHTML = `
+                            <div class="card border-0 shadow-sm h-100" data-aos="fade-up">
+                                <img src="${item.image}" class="card-img-top" alt="${item.title}">
+                                <div class="card-body">
+                                    <span class="badge bg-primary mb-2">${item.category}</span>
+                                    <h5 class="card-title">${item.title}</h5>
+                                    <p class="card-text text-muted">${item.description}</p>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(col);
+                    });
+                }
+            }
+        }).mount('#portfolio-container');
+        
+        // Contact form handling
+        $('#contactForm').submit(function(e) {
+            e.preventDefault();
+            
+            // Here you would typically send the form data to your server
+            // For demo purposes, we'll just show an alert
+            alert('Merci pour votre message ! Nous vous contacterons bientôt.');
+            this.reset();
+        });
+    </script>
+</body>
+</html>

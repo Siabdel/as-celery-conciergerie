@@ -64,7 +64,7 @@ urlpatterns = [
 urlpatterns += [
     path('home/', views.home, name='home'),
     path('', views.conciergerie_page, name='dashboard'),
-    path('dashboard/', views.conciergerie_page, name='dashboard'),
+    path('dashboard/', views.conciergerie_page, name='dashboard_home'),
     path('personnel/', views.conciergerie_page, name='employee_list'),
     ##
     path('property/', views.PropretyList.as_view(), name='property_list'),

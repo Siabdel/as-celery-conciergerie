@@ -3,6 +3,10 @@ from django.urls import path
 from .pdf_views import generate_pdf_property_report
 from slick_report  import views
 
+
+app_name = "slick_report"
+
+
 """ 
 Chaque path() définit une URL pour un rapport spécifique :
 -->  reports/property-reservations/ affichera le rapport des réservations par propriété.

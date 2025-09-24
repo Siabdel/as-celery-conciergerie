@@ -38,7 +38,7 @@ urlpatterns = [
     # SQL Explorer
     path('explorer/', include('explorer.urls')),
     # pandas Report 
-    # path('pandas/', include('pandas_report.urls')),
+    path('pandas/', include('pandas_report.urls')),
     # fullcalendar
     path('calendar/', include('fullcalendar.urls')),
 ]

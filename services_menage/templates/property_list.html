@@ -1,46 +1,111 @@
 
-{% extends 'base_agency.html' %}
+{% extends 'base_service.html' %}
 {% load static %}
 
 {% block title %}Happy Bee {% endblock %}
-{% block header %}{% endblock %}
+{% block extra_blo %}{% endblock %}
 
 {% block content %}
-    <h1>Liste des propriétés</h1>
+<div class="container">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Nos Appartements Sélectionnés</h2>
+        <p class="text-muted">Découvrez notre sélection exclusive de biens immobiliers</p>
+    </div>
     <ul class="list-group">
         {% for property in object_list %}
             {% with first_img=property.images.first %}   <!-- 1 seule requête -->
-            <li class="list-group-item">
-                <div class="card">
-                    <div class="card-header">
+            <div class="property-card row g-0 mb-5" id="property2">
+                <div class="col-md-6 p-4 d-flex flex-column order-md-1">
                         <a href="{% url 'agence:property_detail' property.pk %}">
-                            <span class="d-flex align-items-center">
-                                <!-- vignette ou placeholder -->
-                                <img class="p-3 float-left"
-                                     style="width:30%; max-height:150px; object-fit:cover;"
-                                     src="{% if first_img and first_img.thumbnail_path %}{{ first_img.thumbnail_path.url }}{% else %}{% static 'img/appart_salon_008.jpg' %}{% endif %}"
-                                     alt="{{ property.name }}">
-                                <div>
-                                    <h3>{{ property.name }} 
-                                    url :  {{ first_img.thumbnail_path.url }}   </h3>
-                                     {{ first_img.large_path }}  *** </h3>
-                                    <span class="text-muted">Type : {{ property.get_type_display }}</span>
-                                </div>
-                            </span>
-                        </a>
-                    </div>
-
-                    <div class="card-body">
+                        <h3>{{ property.name }} </h3>
+                    </a>
+                    
+                    <div class="card card-body">
                         Adresse : <small>{{ property.address }}</small><br>
                         Localisation : <small>{{ property.address }}</small><br>
                         <span>Propriétaire : {{ property.owner.first_name }} {{ property.owner.last_name }}</span>
                     </div>
-                    <div class="card-footer badge-info">{{ property.price_per_night }} DH</div>
                 </div>
-            </li>
+                
+                <div class="col-md-6 order-md-2">
+                    <div class="card property-img-container">
+                        <span class="badge badge-premium px-3 py-2">NOUVEAU</span>
+                        <img class="p-3 float-left rounded-lg img-fluid p-2 rounded" id="property-image" 
+                                        style="width:30%; height:150px; object-fit:cover;"
+                                        src="{% if first_img %}{{ first_img.image.url }}{% else %}{% static 'img/avatar_residence.jpg' %}{% endif %}"
+                                        alt="{{ property.name }}">
+                        <button class="btn btn-primary-custom virtual-tour-btn" @click="showTour('property2')">
+                            <i class="fas fa-vr-cardboard me-2"></i> Visite 3D
+                        </button>
+                    </div>
+                    <div class="property-info">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h3 class="fw-bold">{{ property.title }}</h3>
+                                <p class="text-muted">{{ property.location }}</p>
+                            </div>
+                            <span class="property-price">{{ property.price }} €</span>
+                        </div>
+                        <p class="mb-4">{{ property.description }}</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-4">
+                                <div><i class="fas fa-bed me-2"></i> {{ property.bedrooms }} chambres</div>
+                            </div>
+                            <div class="col-4">
+                                <div><i class="fas fa-bath me-2"></i> {{ property.bathrooms }} sdb</div>
+                            </div>
+                            <div class="col-4">
+                                <div><i class="fas fa-ruler-combined me-2"></i> {{ property.area }} m²</div>
+                            </div>
+                        </div>
+                        
+                        <div class="property-map" :id="'map-' + property.id"></div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a :href="'#' + property.id" class="btn btn-outline-primary">Détails</a>
+                            <a href="#" class="btn btn-primary">Visite virtuelle</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+                
+            </div>
             {% endwith %}
         {% empty %}
             <li class="list-group-item">Aucune propriété enregistrée.</li>
         {% endfor %}
     </ul>
+</div>
 {% endblock %}
+
+<script>
+
+  // Vue.js App
+    new Vue({
+        el: '#app',
+        data: {
+            properties: propertiesData
+        },
+        mounted() {
+            this.initMaps();
+        },
+        methods: {
+            initMaps() {
+                this.properties.forEach(property => {
+                    const map = L.map(`map-${property.id}`).setView(property.coordinates, 15);
+                    
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+                    
+                    L.marker(property.coordinates).addTo(map)
+                        .bindPopup(property.title)
+                        .openPopup();
+                });
+            },
+           
+        }
+    });
+</script>

@@ -6,7 +6,7 @@ from pandas_report import api_views
 from pandas_report.pdf_views import generate_pdf_property_report
 from rest_framework.routers import DefaultRouter
 
-app_name = "report"
+app_name = "pandas_report"
 
 
 urlpatterns = [

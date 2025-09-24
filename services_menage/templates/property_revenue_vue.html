@@ -104,7 +104,7 @@
                 var url = this.full_url = `/calendar/cal/property/` + {{property.id}};
             },
             async fetchMonthlyPriceData(){
-                let url = `{% url "report:api_property_price_evolution" property.pk  %}`
+                let url = `{% url "pandas_report:api_property_price_evolution" property.pk  %}`
                 await fetch(url)
                     .then(response => response.json())
                     .then(response => {
@@ -120,7 +120,7 @@
                     });
             },
             async fetchRevenueData(){
-                let url = `{% url "report:api_property_revenue_by_month"  property.pk  %}`
+                let url = `{% url "pandas_report:api_property_revenue_by_month"  property.pk  %}`
                 await fetch(url)
                     .then(response => response.json())
                     .then(json => {
@@ -135,7 +135,7 @@
             },
             // taux occupation
             async fetchTauxOccupData() {
-                let url = `{% url "report:api_property_occupancy_rate_by_month" property.pk  %}`
+                let url = `{% url "pandas_report:api_property_occupancy_rate_by_month" property.pk  %}`
                 fetch(url)
                     .then(response => response.json())
                     .then(json => {
