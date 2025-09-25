@@ -5,7 +5,7 @@
 
 {% block revenue_report %}
     <div v-if="revenueData" >
-        <h4>Rapport de revenus</h4>
+        <h4>Rapport de revenus {{ property }}</h4>
         <table class="table table-hover table-striped">
             <thead>
                 <tr class="bg-info"> <th>Mois / Année</th> <th>Revenu</th> </tr>
@@ -18,11 +18,12 @@
             </tbody>
         </table>
     </div>
-{% endblock revenue_report%}
+{% endblock %}
 
 {% block taux_occupation %}
     <div v-if="tauxData" id="occupation-report">
         <h4>Taux occupation</h4>
+                                         <h2> TTTT : {{ property }} </h2>
         <table class="table table-hover table-striped">
             <thead>
                 <tr class="bg-info">
@@ -38,7 +39,7 @@
             </tbody>
         </table>
     </div>
-{% endblock taux_occupation %}
+{% endblock %}
 
 {% block evolution %}
     <div class="col-md-6 mb-3">
@@ -57,21 +58,32 @@
             </div>
         </div>
     </div>
-{% endblock evolution %}
+{% endblock %}
 
 {% block extra_css%}
     <link href="{% static 'css/mychart_style.css' %}" rel="stylesheet">
-{% endblock extra_css%}
+{% endblock %}
+
+
 
 {% block extra_js %}
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDCdbg3vdrRVokCr6E2-ADtbWT80NqMV_0"></script>
-<script> 
-    const myConsole = new Vue({
-        el: '#app',
-        delimiters: ['[[', ']]'],
-        data: {
-            message : "Vue.js",
-            full_url : "/panda/calendar/",
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDCdbg3vdrRVokCr6E2-ADtbWT80NqMV_0"></script>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+<script>
+
+// report_revenue.js
+const { createApp } = Vue;
+
+const ReportRevenueApp = {
+    delimiters: ['[[', ']]'],
+    data() {
+        return {
+            message: "Vue.js",
+            full_url: "/panda/calendar/",
             revenueData: {},
             pricesData: {},
             tauxData: {},
@@ -79,256 +91,290 @@
             revenus: [],
             prices: [],
             months: [],
-            chartData : [
+            chartData: [
                 {"date": "2023-01", "revenue": 1000},
                 {"date": "2023-02", "revenue": 1200},
                 {"date": "2023-03", "revenue": 1100},
                 {"date": "2023-04", "revenue": 1300},
                 {"date": "2023-05", "revenue": 1500},
             ],
-        },
-        mounted() {
-            this.fetchRevenueData();
-            this.fetchMonthlyPriceData();
-            this.fetchTauxOccupData();
-            //--------------
-        },
-        updated(){
+            propertyId: null
+        }
+    },
+    
+    mounted() {
+        // Récupérer l'ID de la propriété depuis un data attribute
+        this.propertyId = document.getElementById('app').dataset.propertyId || window.propertyId;
+        this.fetchRevenueData();
+        this.fetchMonthlyPriceData();
+        this.fetchTauxOccupData();
+        console.log(" charger les data :", this.propertyId);
+    },
+    
+    updated() {
+        this.$nextTick(() => {
             this.renderChartEvolutionPrice("#chartAreaBar", this.months, this.revenus, "Revenues par mois");
             this.renderChartEvolutionPrice("#chartAreaLine", this.months, this.prices, "Evolutions des prix par mois");
-            //this.renderChartLine();
-            this.url_calendar()
+            this.url_calendar();
+        });
+    },
+    
+    methods: {
+        url_calendar() {
+            if (this.propertyId) {
+                this.full_url = `/calendar/cal/property/${this.propertyId}`;
+            }
         },
-        methods: {
-            url_calendar(){
-                var url = this.full_url = `/calendar/cal/property/` + {{property.id}};
-            },
-            async fetchMonthlyPriceData(){
-                let url = `{% url "pandas_report:api_property_price_evolution" property.pk  %}`
-                await fetch(url)
-                    .then(response => response.json())
-                    .then(response => {
-                        this.pricesData = response.dataset;
-                        //- 
-                        this.prices = this.pricesData.map(elem => parseFloat(elem.price))
-                        this.months = this.pricesData.map(item => String(item.month)); // Supposons que chaque élément a une propriété 'month'
-                        //console.log("this.prices = ####", this.prices)
-                        //console.log("this.months = ####", this.months)
-                    })
-                    .catch(err => {
-                        console.log("err axios :",  err)
-                    });
-            },
-            async fetchRevenueData(){
-                let url = `{% url "pandas_report:api_property_revenue_by_month"  property.pk  %}`
-                await fetch(url)
-                    .then(response => response.json())
-                    .then(json => {
-                        this.revenueData = json.dataset;
-                        this.revenueData.map(elem => parseFloat(elem.revenue))
-                        //- 
-                        this.revenus = this.revenueData.map(elem => parseFloat(elem.revenue))
-                        this.months = this.revenueData.map(item => item.month); // Supposons que chaque élément a une propriété 'month'
-                        console.log("datset= revenue", this.revenueData)
-                       
-                    });
-            },
-            // taux occupation
-            async fetchTauxOccupData() {
-                let url = `{% url "pandas_report:api_property_occupancy_rate_by_month" property.pk  %}`
-                fetch(url)
-                    .then(response => response.json())
-                    .then(json => {
-                        this.tauxData = json.dataset;
-                        console.log("datset taux occup=", this.tauxData)
-                    });
-            },
-            //---------
-            // RENDER EN ligne
-            renderChartLine(){
-                if (!this.revenueData || this.revenueData.length === 0) {
-                    //console.error("Pas de données à afficher");
-                    return [];
-                }
+        
+        async fetchMonthlyPriceData() {
+            try {
+                //if (!this.propertyId) return;
+                // url = /pandas/api/property/15/price-evolution/
+                //-- 
+                const url = `{% url "pandas_report:api_property_price_evolution" property.pk  %}`
+                console.log(" URL PRICES : " + url);
+                //--            
+                //const url = `/report/api/property/${this.propertyId}/price-evolution/`;
+                const response = await axios.get(url);
+                
+                this.pricesData = response.data.dataset || [];
+                this.prices = this.pricesData.map(elem => parseFloat(elem.price) || 0);
+                this.months = this.pricesData.map(item => String(item.month));
+                
+            } catch (err) {
+                console.error("Erreur axios prices data:", err);
+                console.log("Erreur axios prices data:", err);
+            }
+        },
+        
+        async fetchRevenueData() {
+            try {
+                //if (!this.propertyId) return;
+                //utl = /pandas/api/property/15/revenue/
+                const url = `{% url "pandas_report:api_property_revenue_by_month"  property.pk  %}`
 
-                let data = this.revenueData.map((item, index) => ({
-                    month: item.month,
-                    revenue: this.revenus[index]
-                }));
+                console.log(" URL REVENUE : " + url);
+                
+                const response = await axios.get(url);
+                
+                this.revenueData = response.data.dataset || [];
+                this.revenus = this.revenueData.map(elem => parseFloat(elem.revenue) || 0);
+                this.months = this.revenueData.map(item => item.month);
+                
+            } catch (err) {
+                console.error("Erreur axios revenue data:", err);
+            }
+        },
+        
+        async fetchTauxOccupData() {
+            try {
+                //if (!this.propertyId) return;
+                // url = /pandas/api/property/15/occupancy/ 
+                const url2 = `/report/api/property/${this.propertyId}/occupancy-rate-by-month/`
+                const url = `{% url "pandas_report:api_property_occupancy_rate_by_month" property.pk  %}`
+                console.log(" URL TAUX OCCUP : " + url);
+                //--
+                const response = await axios.get(url);
+                
+                this.tauxData = response.data.dataset || [];
+                
+            } catch (err) {
+                console.error("Erreur axios taux occup data:", err);
+            }
+        },
+        
+        renderChartLine() {
+            if (!this.revenueData || this.revenueData.length === 0) {
+                return;
+            }
 
-                // Dimensions et marges
-                const margin = {top: 20, right: 30, bottom: 50, left: 60};
-                const width = 600 - margin.left - margin.right;
-                const height = 400 - margin.top - margin.bottom;
+            const data = this.revenueData.map((item, index) => ({
+                month: item.month,
+                revenue: this.revenus[index]
+            }));
 
-                // Création du SVG
-                const svg = d3.select('#chartAreaLine').append('svg')
-                    .attr('width', width + margin.left + margin.right)
-                    .attr('height', height + margin.top + margin.bottom)
-                    .append('g')
-                    .attr('transform', `translate(${margin.left},${margin.top})`);
+            // Nettoyer le contenu existant
+            d3.select('#chartAreaLine').selectAll('*').remove();
 
-                // Échelles
-                const x = d3.scalePoint()
-                    .domain(data.map(d => d.month))
-                    .range([0, width]);
+            // Dimensions et marges
+            const margin = {top: 20, right: 30, bottom: 50, left: 60};
+            const width = 600 - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
 
-                const y = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => d.revenue)])
-                    .range([height, 0]);
+            // Création du SVG
+            const svg = d3.select('#chartAreaLine').append('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
 
-                // Ligne
-                const line = d3.line()
-                    .x(d => x(d.month))
-                    .y(d => y(d.revenue));
+            // Échelles
+            const x = d3.scalePoint()
+                .domain(data.map(d => d.month))
+                .range([0, width]);
 
-                // Ajout de la ligne au graphique
-                svg.append("path")
-                    .datum(data)
-                    .attr("fill", "none")
-                    .attr("stroke", "steelblue")
-                    .attr("stroke-width", 1.5)
-                    .attr("d", line);
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.revenue)])
+                .range([height, 0]);
 
-                // Ajout des points
-                svg.selectAll(".dot")
-                    .data(data)
-                    .enter().append("circle")
-                    .attr("class", "dot")
-                    .attr("cx", d => x(d.month))
-                    .attr("cy", d => y(d.revenue))
-                    .attr("r", 5)
-                    .attr("fill", "steelblue");
+            // Ligne
+            const line = d3.line()
+                .x(d => x(d.month))
+                .y(d => y(d.revenue));
 
-                // Axe X
-                svg.append("g")
-                    .attr("transform", `translate(0,${height})`)
-                    .call(d3.axisBottom(x))
-                    .selectAll("text")  
-                    .style("text-anchor", "end")
-                    .attr("dx", "-.8em")
-                    .attr("dy", ".15em")
-                    .attr("transform", "rotate(-45)");
+            // Ajout de la ligne au graphique
+            svg.append("path")
+                .datum(data)
+                .attr("fill", "none")
+                .attr("stroke", "steelblue")
+                .attr("stroke-width", 1.5)
+                .attr("d", line);
 
-                // Axe Y
-                svg.append("g")
-                    .call(d3.axisLeft(y));
+            // Ajout des points
+            svg.selectAll(".dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("class", "dot")
+                .attr("cx", d => x(d.month))
+                .attr("cy", d => y(d.revenue))
+                .attr("r", 5)
+                .attr("fill", "steelblue");
 
-                // Étiquettes des axes
-                svg.append("text")
-                    .attr("transform", `translate(${width/2}, ${height + margin.top + 20})`)
-                    .style("text-anchor", "middle")
-                    .text("Mois");
+            // Axe X
+            svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("transform", "rotate(-45)");
 
-                svg.append("text")
-                    .attr("transform", "rotate(-90)")
-                    .attr("y", 0 - margin.left)
-                    .attr("x", 0 - (height / 2))
-                    .attr("dy", "1em")
-                    .style("text-anchor", "middle")
-                    .text("Revenus");
+            // Axe Y
+            svg.append("g")
+                .call(d3.axisLeft(y));
 
-                // Ajout des valeurs sur les points
-                svg.selectAll(".value-label")
-                    .data(data)
-                    .enter().append("text")
-                    .attr("class", "value-label")
-                    .attr("x", d => x(d.month))
-                    .attr("y", d => y(d.revenue) - 10)
-                    .attr("text-anchor", "middle")
-                    .text(d => d.revenue);
-            },
+            // Étiquettes des axes
+            svg.append("text")
+                .attr("transform", `translate(${width/2}, ${height + margin.top + 20})`)
+                .style("text-anchor", "middle")
+                .text("Mois");
 
-          
-            renderChartEvolutionPrice(id_area='#chartAreaBar', data_x=[], data_y=[], title="" ) {
-                if (!this.revenueData || this.revenueData.length === 0) {
-                    console.error("Pas de données à afficher");
-                    return;
-                }
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Revenus");
 
-                let data_prices = data_y
-                let data_months = data_x
+            // Ajout des valeurs sur les points
+            svg.selectAll(".value-label")
+                .data(data)
+                .enter().append("text")
+                .attr("class", "value-label")
+                .attr("x", d => x(d.month))
+                .attr("y", d => y(d.revenue) - 10)
+                .attr("text-anchor", "middle")
+                .text(d => d.revenue);
+        },
 
-                // Initialization
-                const svgWidth = 450; // Augmenté pour plus d'espace
-                const svgHeight = 400; // Augmenté pour plus d'espace
-                const margin = { top: 50, right: 30, bottom: 60, left: 40 }; // Ajusté pour l'axe X
-                const chartWidth = svgWidth - margin.left - margin.right;
-                const chartHeight = svgHeight - margin.top - margin.bottom;
+        renderChartEvolutionPrice(id_area = '#chartAreaBar', data_x = [], data_y = [], title = "") {
+            if (!data_x.length || !data_y.length) {
+                return;
+            }
 
-                // SVG initialization
-                d3.select(id_area).selectAll('*').remove(); // Nettoyer le contenu existant
-                const svg = d3.select(id_area).append('svg')
-                    .attr('width', svgWidth)
-                    .attr('height', svgHeight)
-                    .append('g')
-                    .attr('transform', `translate(${margin.left},${margin.top})`);
+            const data_prices = data_y;
+            const data_months = data_x;
 
-                // Échelles
-                const xScale = d3.scaleBand()
-                    .domain(data_months)
-                    .range([0, chartWidth])
-                    .padding(0.1);
+            // Nettoyer le contenu existant
+            d3.select(id_area).selectAll('*').remove();
 
-                const yScale = d3.scaleLinear()
-                    .domain([0, d3.max(data_prices)])
-                    .range([chartHeight, 0]);
+            // Initialization
+            const svgWidth = 450;
+            const svgHeight = 400;
+            const margin = { top: 50, right: 30, bottom: 60, left: 40 };
+            const chartWidth = svgWidth - margin.left - margin.right;
+            const chartHeight = svgHeight - margin.top - margin.bottom;
 
-                // Axes
-                const xAxis = d3.axisBottom(xScale);
-                const yAxis = d3.axisLeft(yScale);
+            // SVG initialization
+            const svg = d3.select(id_area).append('svg')
+                .attr('width', svgWidth)
+                .attr('height', svgHeight)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
 
-                // Ajout de l'axe X
-                svg.append("g")
-                    .attr("transform", `translate(0,${chartHeight})`)
-                    .call(xAxis)
-                    .selectAll("text")
-                    .style("text-anchor", "end")
-                    .attr("dx", "-.8em")
-                    .attr("dy", ".15em")
-                    .attr("transform", "rotate(-45)");
+            // Échelles
+            const xScale = d3.scaleBand()
+                .domain(data_months)
+                .range([0, chartWidth])
+                .padding(0.1);
 
-                // Ajout de l'axe Y
-                svg.append("g")
-                    .call(yAxis);
+            const yScale = d3.scaleLinear()
+                .domain([0, d3.max(data_prices)])
+                .range([chartHeight, 0]);
 
-                // Création des barres
-                const bars = svg.selectAll('.bar')
-                    .data(data_prices)
-                    .enter()
-                    .append('g')
-                    .attr('class', 'bar');
+            // Axes
+            const xAxis = d3.axisBottom(xScale);
+            const yAxis = d3.axisLeft(yScale);
 
-                bars.append('rect')
-                    .attr("x", (d, i) => xScale(data_months[i]))
-                    .attr("y", d => yScale(d))
-                    .attr("width", xScale.bandwidth())
-                    .attr("height", d => chartHeight - yScale(d))
-                    .attr("fill", "steelblue");
+            // Ajout de l'axe X
+            svg.append("g")
+                .attr("transform", `translate(0,${chartHeight})`)
+                .call(xAxis)
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("transform", "rotate(-45)");
 
-                // Ajout des textes sur les barres
-                bars.append("text")
-                    .attr("class", "text-info")
-                    .style("font-size", "16px")
-                    .attr("x", (d, i) => xScale(data_months[i]) + xScale.bandwidth() / 2)
-                    .attr("y", d => yScale(d) - 5)
-                    .attr("text-anchor", "middle")
-                    .text(d => d);
+            // Ajout de l'axe Y
+            svg.append("g")
+                .call(yAxis);
 
-                // Ajout du titre du graphique
-                svg.append("text")
-                    .attr("x", chartWidth / 2)
-                    .attr("y", 0 - (margin.top / 2))
-                    .attr("text-anchor", "middle")
-                    .style("font-size", "16px")
-                    .attr("class", "text-info")
-                    .style("text-decoration", "underline")
-                    .text(title)
-            },
+            // Création des barres
+            const bars = svg.selectAll('.bar')
+                .data(data_prices)
+                .enter()
+                .append('g')
+                .attr('class', 'bar');
 
+            bars.append('rect')
+                .attr("x", (d, i) => xScale(data_months[i]))
+                .attr("y", d => yScale(d))
+                .attr("width", xScale.bandwidth())
+                .attr("height", d => chartHeight - yScale(d))
+                .attr("fill", "steelblue");
+
+            // Ajout des textes sur les barres
+            bars.append("text")
+                .attr("class", "text-info")
+                .style("font-size", "16px")
+                .attr("x", (d, i) => xScale(data_months[i]) + xScale.bandwidth() / 2)
+                .attr("y", d => yScale(d) - 5)
+                .attr("text-anchor", "middle")
+                .text(d => d);
+
+            // Ajout du titre du graphique
+            svg.append("text")
+                .attr("x", chartWidth / 2)
+                .attr("y", 0 - (margin.top / 2))
+                .attr("text-anchor", "middle")
+                .style("font-size", "16px")
+                .attr("class", "text-info")
+                .style("text-decoration", "underline")
+                .text(title);
         }
-    });
+    }
+};
+
+// Initialiser l'application Vue 3
+document.addEventListener('DOMContentLoaded', function() {
+    const app = createApp(ReportRevenueApp);
+    app.mount('#app');
+});
 </script>
 {% endblock %}
+
 
 

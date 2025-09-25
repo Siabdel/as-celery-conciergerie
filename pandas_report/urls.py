@@ -22,11 +22,15 @@ urlpatterns = [
 #-------------------------------------------
 urlpatterns += [
     # ... vos autres URLs ...
+    # reporting views 
     path('revenue/', ConciergerieRevenueView.as_view(), name='revenue_report'),
+    # revenue report with charts
     path('revenue-report/', RevenueReportView.as_view(), name='revenue_report_chart'),
+    # property revenue report by property_id
     path('property-revenue-report/<int:property_id>', PropertyRevenueView.as_view(), name='property_revenue_report'),
+    # property revenue per month API
     # pdf report 
-    path('pdf-report/', generate_pdf_property_report,name='revenue_report_chart'),
+    path('pdf-report/', generate_pdf_property_report,name='pdf_property_report'),
     
 ]
 #-------------------------------------------
@@ -34,9 +38,9 @@ urlpatterns += [
 #-------------------------------------------
 
 urlpatterns += [
-    # taux occupation des proprietes par mois
 
     path('api/reservations/', api_views.ReservationViewSet.as_view({'get', 'list'}), name='api-reservations-by-property'),
+    # taux occupation des proprietes par mois
     path('api/taux-occupation/', TauxOccupationAPIView.as_view(), name='api_revenue_report_chart'),
     # Revenue Report
     path('api/revenue-report/', RevenueReportAPIView.as_view(), name='api_revenue_report'),

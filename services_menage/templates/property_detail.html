@@ -23,7 +23,9 @@
             </div>
         </div>
         <div class="col-md-6">
-            {% include "includes/images_card.html" %}
+            <div class="container property-image">
+                {% include "includes/carousel.html" %}
+            </div>
         </div>
     </div>
 
@@ -33,11 +35,11 @@
             <ul class="list-group list-group-numbered">
                 <li class="list-group-item d-flex justify-content-between align-items-start">
                     <span class="ms-2 me-auto">
-                        <span class="fw-bold mr-3">Dernier client    </span>
-                        <span class="fa-2x text-right">
+                        <span class="fw-bold mr-3">Dernier client  :  </span>
+                        <span class="fa-1x text-right">
                             {{ last_resa.guest_name }}
                         </span>
-                        <span class="fw-bold mr-3 p-2">Email  </span>
+                        <span class="fw-bold mr-3 p-2">Email : </span>
                         <span class="fa-1x text-right text-info">
                                 {{ last_resa.guest_email }} 
                         </span>
@@ -66,14 +68,8 @@
 
     </div>
     <div class="section mt-4">
-        <div class="card" id="localisation">
-            <div class="card-header text-left"><label class="text-info fa-2x p-2">Localisation coordonnees </label> Latitude, Longitude : {{ property.latitude }}, {{ property.longitude }}</div>
-            
-            <div class="card-body">
-                <div id="map_wego" style="width: 100%; height: 300px;"></div>
-                    {% include "includes/localisation_herewego.html" %}
-            </div>
-            
+        <div class="card-body">
+            {% include "includes/map_localisation_v1.html" %}
         </div>
     </div>
 
@@ -93,8 +89,8 @@
                                         <li class="list-group-item"><a  class="text-info" href="#">Rapport financier</a></li>
                                         <li class="list-group-item"><a class="text-info" href="#">Frais annexes mensuels</a></li>
                                         <li class="list-group-item">
-                                            <a class="text-info" href="{% url 'pandas_report:property_revenue_report' property.pk %}">
-                                                Relevé de revenus/charges</a></li>
+                                            <a class="text-info" href="{% url 'pandas_report:property_revenue_report' property.pk %}"> Relevé de revenus/charges</a>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
