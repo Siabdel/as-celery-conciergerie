@@ -2,7 +2,6 @@ from django.urls import path, include
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.routers import DefaultRouter
-from services_menage import api_views 
 from fullcalendar import views 
 
 app_name = "fullcalendar"

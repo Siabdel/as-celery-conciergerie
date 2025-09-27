@@ -1,0 +1,72 @@
+
+<nav id="sidebar" class="mt-5 col-md-3 col-lg-2 d-md-block bg-light sidebar sidebar-collapsed">
+    <div class="pt-3">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="#">
+                    <i class="bi bi-house-door"></i> Tableau de bord
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'conciergerie:property_list' %}">
+                    <i class="bi bi-building"></i> propriétés
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'conciergerie:home' %}">
+                    <i class="bi bi-people"></i> Reservations
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'fullcalendar:calendar_empl' %}" target="blank">
+                    <i class="bi bi-calendar-event"></i> Planning des employées
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'fullcalendar:calendar_resa' %}" target="blank">
+                    <i class="bi bi-calendar-event"></i> Planning des reservations
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link" href="/service/api/" target="blank">
+                    <i class="bi bi-file-earmark-text"></i> API router
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+{% block extra_css %}
+    <style>
+        .sidebar{
+            top: 20%;
+        }
+
+
+        .sidebar-trigger {
+            position: fixed;
+            left: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 40px;
+            background-color: #f8f9fa;
+            border-radius: 0 5px 5px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .sidebar-collapsed .nav-link span {
+            display: none;
+        }
+
+        .sidebar-expanded .nav-link span {
+            display: inline;
+        }
+    </style>
+{% endblock %}

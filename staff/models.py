@@ -16,6 +16,7 @@ from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.models import User
 from core.models import CustomCalendar
+from core.models import Agency 
 
 PAYMENT_TYPES = (
     ('full', _('Full payment')),
@@ -57,6 +58,7 @@ class Service(models.Model):
     Version: 1.1.0
     Since: 1.0.0
     """
+    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, blank=False)
     description = models.TextField(blank=True, null=True)
     duration = models.DurationField(validators=[MinValueValidator(datetime.timedelta(seconds=1))])
@@ -161,9 +163,10 @@ class Employee(models.Model):
         ('concierge', 'Concierge'),
         ('manager', 'Manager'),
     ]
+    agency = models.ForeignKey(Agency, on_delete=models.CASCADE) # new field
+    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     calendar = models.ForeignKey(CustomCalendar, on_delete=models.CASCADE)
-    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='cleaner')
     phone_number = models.CharField(max_length=15, null=True)
     hire_date = models.DateField() # date d'embauche
@@ -264,6 +267,7 @@ class Absence(models.Model):
         MALADIE = 'MALD', _('En maladie')
         INCONNU = 'NJSU', _('Non justifier')
     
+    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
     type_absence = models.CharField(max_length=200, 
                                     choices=TypeAbsence.choices,
                                     default=TypeAbsence.INCONNU)

@@ -69,21 +69,32 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # new
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+AUTH_USER_MODEL = 'auth.User' ## (par défaut)
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'schedule',  # ou le nom correct de votre application
+    # local apps
+    'schedule', # django fullcalendar
     'core', # common models 
     'staff',
-    'services_menage', 
+    'fullcalendar', # fullcalendar scheduler
+    ## 'slick_report', 
+    ## 'pandas_report',
+    ##'services_menage', 
+    "conciergerie",
+     # apps par defaut
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_filters", # new
+    'django.contrib.sites',  # new
+    'django.contrib.humanize', # new
+    'corsheaders',
      ## import / Export
     'import_export',
     ## Django Slick reportings
@@ -107,10 +118,6 @@ INSTALLED_APPS = [
     # local
     'django_celery_beat',
     
-    'slick_report', 
-    'pandas_report',
-    'fullcalendar', # fullcalendar scheduler
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -414,8 +421,21 @@ REST_FRAMEWORK = {
     ],
     # Schema pour la documentation automatique
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema', 
-    
+#-----------
+# Paginations 
+#-----------
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
 }
+
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Conciergerie Mon API Django',

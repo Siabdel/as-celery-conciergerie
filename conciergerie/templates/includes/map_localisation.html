@@ -1,0 +1,120 @@
+
+{% load i18n static %}
+<div id="appi_map">
+    <div v-if="property && property.id" class="property-map" :id="'map-' + property.id"></div>
+    <div v-else>Chargement de la carte...</div>
+</div>
+
+{% block extra_css %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% endblock %}
+
+<script>
+new Vue({
+    el: '#appi_map',
+    data: {
+        property: null
+    },
+
+    mounted() {
+        this.loadPropertyData();
+    },
+
+    methods: {
+        loadPropertyData() {
+            // Convertir l'objet property Django en objet JavaScript
+            const djangoProperty = {{ property|safe }};
+            
+            if (djangoProperty) {
+                this.property = {
+                    id: djangoProperty.id || 1,
+                    title: djangoProperty.title || "Propriété",
+                    location: djangoProperty.location || "",
+                    coordinates: [
+                        parseFloat(djangoProperty.latitude) || 48.8566,
+                        parseFloat(djangoProperty.longitude) || 2.3522
+                    ],
+                    description: djangoProperty.description || ""
+                };
+                
+                // Initialiser la carte après chargement des données
+                this.$nextTick(() => {
+                    this.initMap();
+                });
+            }
+        },
+        
+        initMap() {
+            if (!this.property || !this.property.coordinates) {
+                console.error('Coordonnées non disponibles');
+                return;
+            }
+            
+            const mapId = `map-${this.property.id}`;
+            const mapContainer = document.createElement('div');
+            mapContainer.id = mapId;
+            mapContainer.className = 'property-map';
+            
+            // Remplacer le contenu existant
+            const appElement = document.querySelector('#appi_map');
+            appElement.innerHTML = '';
+            appElement.appendChild(mapContainer);
+            
+            // Attendre que le DOM soit prêt
+            this.$nextTick(() => {
+                const mapElement = document.getElementById(mapId);
+                
+                if (mapElement && typeof L !== 'undefined') {
+                    try {
+                        // Nettoyer si déjà initialisé
+                        if (mapElement._leaflet_id) {
+                            const existingMap = L.map(mapElement);
+                            existingMap.remove();
+                        }
+                        
+                        const map = L.map(mapId).setView(this.property.coordinates, 15);
+                        
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        }).addTo(map);
+                        
+                        const popupContent = `
+                            <div>
+                                <strong>${this.property.title}</strong>
+                                <br>${this.property.location || ''}
+                            </div>
+                        `;
+                        
+                        L.marker(this.property.coordinates).addTo(map)
+                            .bindPopup(popupContent)
+                            .openPopup();
+                            
+                        // Style CSS pour la carte
+                        mapElement.style.height = '400px';
+                        mapElement.style.width = '100%';
+                        mapElement.style.borderRadius = '8px';
+                        
+                    } catch (error) {
+                        console.error('Erreur lors de l\'initialisation de la carte:', error);
+                    }
+                }
+            });
+        }
+    }
+});
+</script>
+
+<style>
+.property-map {
+    height: 400px;
+    width: 100%;
+    margin: 20px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+</style>

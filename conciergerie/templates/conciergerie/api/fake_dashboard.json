@@ -1,0 +1,52 @@
+// api/fake_dashboard.json
+{
+  "agency": {
+    "name": "HappyBee Conciergerie",
+    "logo": "/static/img/logo.svg",
+    "currency": "MAD"
+  },
+  "today_stats": {
+    "active_properties": 42,
+    "checkins": 8,
+    "checkouts": 5,
+    "services_todo": 12
+  },
+  "checkins": [
+    {
+      "id": 1,
+      "property_name": "Villa Alizee",
+      "guest_name": "Youssef Alaoui",
+      "check_in": "2025-09-17T14:00:00Z",
+      "status": "CHECKED_IN",
+      "platform": "Airbnb"
+    }
+  ],
+  "checkouts": [
+    {
+      "id": 2,
+      "property_name": "Appart Agadir",
+      "guest_name": "Amal Benani",
+      "check_out": "2025-09-17T11:00:00Z",
+      "status": "CHECKED_OUT"
+    }
+  ],
+  "services": [
+    {
+      "id": 3,
+      "property_name": "Villa Alizee",
+      "service_type": "CLEANING",
+      "start_time": "2025-09-17T10:00:00Z",
+      "employee": "Fatima Zahar",
+      "status": "PENDING"
+    }
+  ],
+  "occupancy_last7": [
+    {"day": "2025-09-10", "rate": 82},
+    {"day": "2025-09-11", "rate": 78},
+    {"day": "2025-09-12", "rate": 85},
+    {"day": "2025-09-13", "rate": 90},
+    {"day": "2025-09-14", "rate": 88},
+    {"day": "2025-09-15", "rate": 92},
+    {"day": "2025-09-16", "rate": 95}
+  ]
+}

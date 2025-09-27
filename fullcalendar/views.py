@@ -2,7 +2,7 @@ import requests
 from django.shortcuts import render
 from django.views.generic import ListView, CreateView, DetailView
 from django.views.generic import TemplateView
-from services_menage.models import Property
+from conciergerie.models import Property
 
 # Create your views here.
 

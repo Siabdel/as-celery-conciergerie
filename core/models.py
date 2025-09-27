@@ -10,9 +10,59 @@ from django.contrib.auth import get_user_model
 from django.db.models import Sum, F
 from core.utils import make_thumbnail
 from django.conf import settings
+from django.contrib.auth.models import AbstractUser, UserManager
+from django.utils.text import slugify
 
 
-## ----
+# -------------------------------------------------------------------
+# CORE MODELS
+# -------------------------------------------------------------------
+
+"""_summary_
+    Pour transformer votre Django-Conciergerie en SaaS B2B multi-agences il suffit d’ajouter 
+UNE seule table racine : Agency (ou Company) et de toutes faire pointer dessus via ForeignKey.
+Le reste du code (vues, API, admin) devient multi-tenant en filtrant 
+systématiquement par request.user.agency.
+
+"""
+class Agency(models.Model):
+    name        = models.CharField(max_length=100, unique=True)
+    slug        = models.SlugField(max_length=100, unique=True, blank=True)  # blank=True permet vide en admin
+    logo        = models.ImageField(upload_to="agency/logos/", blank=True)
+    currency    = models.CharField(max_length=3, default="EUR")
+    is_active   = models.BooleanField(default=False)
+    created_at  = models.DateTimeField(auto_now_add=True)
+    president_name = models.CharField(max_length=100, blank=True, null=True)
+    address     = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    email       = models.EmailField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+    
+
+    def save(self, *args, **kwargs):
+        if not self.slug:                      # pas de slug fourni
+            self.slug = slugify(self.name)     # généré depuis name
+        super().save(*args, **kwargs)
+    
+    
+
+class UserProfile(models.Model):
+    user    = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return f"Profile of {self.user.username} in {self.agency.name}"
+
+        
+# core/models.py
+class OwnerProfile(models.Model):
+    user   = models.OneToOneField(User, on_delete=models.CASCADE, related_name="owner")
+    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)   # ← PAS null
+    phone  = models.CharField(max_length=20, blank=True)
+
+
 class ResaStatus(models.TextChoices):
     """
     PENDING : État initial d'une réservation, en attente de confirmation.
@@ -49,36 +99,8 @@ class TaskTypeService(models.TextChoices):
     MAINTENANCE = 'MAINT', _('Maintenance')
     ERROR = 'ERROR', _('Affectation en erreur !')
 
-#---------------
-#- Base Times
-#---------------
-class ASBaseTimestampMixin(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True, )
-    updated_at = models.DateTimeField(auto_created=True, default=timezone.now)
-    created_by = models.ForeignKey( get_user_model(), on_delete=models.CASCADE,default=1)
-    
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.created_at = timezone.now()
-        self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
-    class Meta:
-        abstract = True
 
-#---------------
-#- Calendard
-#---------------
-
-        
-class CustomCalendar(BaseCalendar):
-    class Meta:
-        proxy = True
-
-    @classmethod
-    def create_unique(cls, name, slug):
-        if not cls.objects.filter(name=name).exists():
-            return cls.objects.create(name=name, slug=slug)
-        return cls.objects.get(name=name)
+  
 
 class BaseImage(models.Model):
     title = models.CharField(_('Titre'), max_length=50, null=True, blank=True)
@@ -122,3 +144,39 @@ class BaseImage(models.Model):
         raise NotImplementedError(msg.format(self.__class__.__name__))
 
    
+
+
+ 
+#---------------
+#- Base Times
+#---------------
+
+class ASBaseTimestampMixin(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_created=True, default=timezone.now)
+    created_by = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, default=1)
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.created_at = timezone.now()
+        self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
+
+    class Meta:
+        abstract = True
+
+
+#---------------
+#- Calendard
+#---------------
+class CustomCalendar(BaseCalendar):
+    class Meta:
+        proxy = True
+
+    @classmethod
+    def create_unique(cls, name, slug):
+        if not cls.objects.filter(name=name).exists():
+            return cls.objects.create(name=name, slug=slug)
+        return cls.objects.get(name=name)
+
+

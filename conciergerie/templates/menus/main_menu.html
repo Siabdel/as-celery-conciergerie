@@ -1,0 +1,70 @@
+ {% load static %}
+ <nav class="navbar navbar-default navbar-expand-lg navbar-light bg-dark">
+        <div class="container">
+            <a class="navbar-brand pt-1" href="{% url 'conciergerie:home' %}" >Happy Bee</a>
+            <img stye="height:50%" class="pr-2" src="{% static 'img/Happy_Bee_100x100.jpg' %}"  > 
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
+                aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse"> 
+                <form class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Search" 
+                        aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Rechercher</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                   {# Header contains the main_navigation block #}
+                {# "home/menus/main_menu.html" with parent=site_root calling_page=self #}
+                <ul class="nav navbar navbar-right">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" 
+                        id="navbarDropdown" role="button" data-toggle="dropdown" 
+                        aria-expanded="false"> Service
+                        </a>
+                        <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="/admin/devis/" target="_blanc">Devis</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/admin/invoice/" target="_blanc">Facture</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/admin/customer/customer/" target="_blanc">Client</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/admin/product/" target="_blanc">Catalog produit</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/admin/profile/" target="_blanc">Profile</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/admin/shop/" target="_blanc">Store shopy</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/admin/project/project/" target="_blanc">Projet</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/admin/auth/" target="_blanc">Compte utilisateurs</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" 
+                        id="navbarDropdown" role="button" data-toggle="dropdown" 
+                        aria-expanded="false"> admin
+                        </a>
+                        <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">A propos</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/admin/login">Connexion</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link " href="#" 
+                        id="navbarDropdown" role="button" data-toggle="dropdown" 
+                        aria-expanded="false">
+                        </a>
+                    </li>
+                </ul>
+           </div>
+        </div>
+    </nav>

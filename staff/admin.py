@@ -9,14 +9,13 @@ from django.utils.html import format_html
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources, fields, widgets
-from services_menage import models as cg_models
 from staff import models as staff_models
 from .models import Service
 
 
 # Register your models here.
 
-@admin.register(cg_models.Employee)
+@admin.register(staff_models.Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('name', 'get_calendar_name')
     search_fields = ('name',)

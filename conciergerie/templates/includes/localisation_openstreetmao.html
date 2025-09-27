@@ -1,0 +1,15 @@
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+{% endblock %}
+
+<div id="map" style="height: 400px;"></div>
+<script>
+  var map = L.map('map').setView([{{ property.latitude }}, {{ property.longitude }}], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  L.marker([{{ property.latitude }}, {{ property.longitude }}]).addTo(map)
+    .bindPopup("{{ property.address }}").openPopup();
+</script>

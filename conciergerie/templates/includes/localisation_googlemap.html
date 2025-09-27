@@ -1,0 +1,32 @@
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Coordonnées de la propriété
+    var lat = {{ property.latitude }};
+    var lng = {{ property.longitude }};
+
+    // Créer la carte Google Maps
+    var map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: lat, lng: lng},
+        zoom: 15
+    });
+
+    // Attendre que la carte soit chargée
+    google.maps.event.addListenerOnce(map, 'idle', function() {
+        // Créer un marqueur Google Maps
+        var marker = new google.maps.Marker({
+            position: {lat: lat, lng: lng},
+            map: map
+        });
+
+        // Ajouter une infobulle
+        var tooltip = new google.maps.InfoWindow({
+            content: "{{ property.address }}"
+        });
+
+        // Afficher l'infobulle au clic sur le marqueur
+        marker.addListener('click', function() {
+            tooltip.open(map, marker);
+        });
+    });
+});
+</script>

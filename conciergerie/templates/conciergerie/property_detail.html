@@ -1,0 +1,153 @@
+{% extends 'base_service.html' %}
+{% load i18n static %}
+
+{% block header %} {% endblock %}
+
+{% block content %}
+<div class="container mt-2">
+    <div class="section row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header fa-2x text-info"> {{ property.name }}</div>
+                <div class="card-body">
+                    <ul class="list-group list-group-striped">
+                        <li class="list-group-item" >Ref Property_ID:  
+                            <span class="badge badge-danger m-2 p-2"> {{last_resa.check_in|date:'Y'}}-{{ property.pk }}  </span></li>
+                        <li class="list-group-item"> Adresse de la propriété: <h6>  {{ property.address }} </h6> </li>
+                        <li class="list-group-item text-left"><label>Localisation de </label> Latitude, Longitude : {{ property.latitude }}, {{ property.longitude }}</li>
+
+                        <li class="list-group-item"> derniere interventions avenir : </li>
+                        <li class="list-group-item"> Avis : </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="container property-image">
+                {% include "includes/carousel.html" %}
+            </div>
+        </div>
+    </div>
+
+    <div class="section mt-4">
+        <div class="card">
+        <div class="card-header text-left"><label class="text-info fa-2x p-2">Info Réservation</label> </div>
+            <ul class="list-group list-group-numbered">
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <span class="ms-2 me-auto">
+                        <span class="fw-bold mr-3">Dernier client  :  </span>
+                        <span class="fa-1x text-right">
+                            {{ last_resa.guest_name }}
+                        </span>
+                        <span class="fw-bold mr-3 p-2">Email : </span>
+                        <span class="fa-1x text-right text-info">
+                                {{ last_resa.guest_email }} 
+                        </span>
+                </li>
+
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <span class="ms-2 me-auto">
+                        <span class="fw-bold mr-3 fa-1x"> Nombre de reservatios en {{ annees.1 }}</span>
+                        <span class="badge bg-primary rounded-pill accordion-body text-right ">
+                            {{ nb_reservations_now }}
+                        </span>
+                    </span>
+                    <span class="ms-2 me-auto">
+                        <span class="fw-bold mr-3"> Nombre de reservatios en {{ annees.2 }} </span>
+                        <span class="badge bg-primary rounded-pill accordion-body text-right">
+                            {{ nb_reservations_next_year }}
+                        </span>
+                    </span>
+                </li>
+
+                <li class="list-group-item"> derniere interventions avenir : </li>
+                <li class="list-group-item"> Avis : </li>
+            </ul>
+            
+            </div>
+
+    </div>
+    <div class="section mt-4">
+        <div class="card-body">
+            {% include "includes/map_localisation_v1.html" %}
+        </div>
+    </div>
+
+    <hr/> <br>
+    <div id="app">
+
+        <div class="section mt-3">
+            <div class="card">
+                <div class="card-header text-left"><label class="text-info fa-2x p-2">Dashboard</label> </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Liens rapides</h5>
+                                    <ul class="list-group"> <a :href="full_url"  class="text-info">
+                                            Calendrier des reservations de la propriete</a></li>
+                                        <li class="list-group-item"><a  class="text-info" href="#">Rapport financier</a></li>
+                                        <li class="list-group-item"><a class="text-info" href="#">Frais annexes mensuels</a></li>
+                                        <li class="list-group-item">
+                                            <a class="text-info" href="{% url 'pandas_report:property_revenue_report' property.pk %}"> Relevé de revenus/charges</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    {% block revenue_report %}
+                                    <!-- Le contenu de property_revenue_report.html sera injecté ici -->
+                                    {% endblock %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <!-- class="card-title">Taux d'occupation --> 
+                                        {% block taux_occupation %}
+                                        <!-- Le contenu de property_ taux occupation ici -->
+                                        {% endblock %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                    
+        <HR class="border-2"> <br>
+    
+        <div class="section mt-3">
+            <div class="card">
+                <div class="card-header text-left"><label class="text-info fa-2x p-2">Evolutions</label> </div>
+                <div class="row card-body">
+                    {% block evolution %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+
+        <div class="section mt-3">
+            <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Derniers incidents relevés</h5>
+                                <ul class="list-group">
+                                    {% for ticket in last_incidents %}
+                                    <li class="list-group-item">  {{ ticket.title }} - constaté : {{ticket.date_reported|date:"D d  M-Y"}} </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -30,24 +30,25 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 
 
 urlpatterns = [
-    path('', include('services_menage.urls')),
-
+    path('', include('conciergerie.urls')),
     path("admin/", admin.site.urls),
-    path('service/', include('services_menage.urls')),
-    path('report/', include('slick_report.urls')),
+    # fullcalendar
+    path('calendar/', include('fullcalendar.urls')),
+    ## path('report/', include('slick_report.urls')),
     # SQL Explorer
     path('explorer/', include('explorer.urls')),
     # pandas Report 
-    path('pandas/', include('pandas_report.urls')),
+    ##path('pandas/', include('pandas_report.urls')),
     # fullcalendar
-    path('calendar/', include('fullcalendar.urls')),
+    ## path('calendar/', include('fullcalendar.urls')),
 ]
-# token auth & rest framework
+""" 
 # JWT Auth
 # api/auth pour login/logout
 # api/auth/registration pour creer un user
 # pour obtenir un token : voici les urls
 # refresh token et verify token
+"""
 
 urlpatterns += [  
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

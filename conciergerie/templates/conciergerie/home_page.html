@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HappyBee – Dashboard</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+  <style>
+    :root { --orange: #FF6B35; --blue: #005E9B; }
+    .bg-orange { background-color: var(--orange) !important; }
+    .text-orange { color: var(--orange) !important; }
+    .btn-orange { background-color: var(--orange); border-color: var(--orange); color: #fff; }
+    .btn-orange:hover { filter: brightness(1.1); }
+    .card-hover:hover { transform: translateY(-3px); transition: .2s; }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <!-- =====  NAVBAR  ===== -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-blue shadow-sm">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#">
+          <img src="{{ agency.logo }}" alt="Logo" height="28" class="me-2">
+          {{ agency.name }}
+        </a>
+        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navmenu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navmenu">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="/admin">Admin</a></li>
+            <li class="nav-item"><a class="nav-link" href="/api/doc">API</a></li>
+            <li class="nav-item"><a class="nav-link" href="/logout"><i class="bi bi-box-arrow-right"></i></a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- =====  HERO  ===== -->
+    <section class="bg-orange text-white py-4">
+      <div class="container d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="mb-1">Tableau de bord</h1>
+          <p class="mb-0">Aujourd’hui <strong>[[ today ]]</strong></p>
+        </div>
+        <div>
+          <button class="btn btn-light btn-sm me-2" @click="newReservation"><i class="bi bi-plus-circle"></i> Réservation</button>
+          <button class="btn btn-light btn-sm" @click="newService"><i class="bi bi-plus-circle"></i> Service</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====  CARDS STATS  ===== -->
+    <section class="py-4">
+      <div class="container">
+        <div class="row g-3">
+          <div class="col-6 col-md-3"><div class="card card-hover h-100">
+            <div class="card-body text-center">
+              <div class="fs-4 fw-bold text-orange">[[ stats.active_properties ]]</div>
+              <div class="small text-muted">Biens actifs</div>
+            </div>
+          </div></div>
+          <div class="col-6 col-md-3"><div class="card card-hover h-100">
+            <div class="card-body text-center">
+              <div class="fs-4 fw-bold text-orange">[[ stats.checkins ]]</div>
+              <div class="small text-muted">Check-ins</div>
+            </div>
+          </div></div>
+          <div class="col-6 col-md-3"><div class="card card-hover h-100">
+            <div class="card-body text-center">
+              <div class="fs-4 fw-bold text-orange">[[ stats.checkouts ]]</div>
+              <div class="small text-muted">Check-outs</div>
+            </div>
+          </div></div>
+          <div class="col-6 col-md-3"><div class="card card-hover h-100">
+            <div class="card-body text-center">
+              <div class="fs-4 fw-bold text-orange">[[ stats.services_todo ]]</div>
+              <div class="small text-muted">Services à faire</div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====  ONGLET + TABLEAUX  ===== -->
+    <section class="py-3">
+      <div class="container">
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#today" type="button">Aujourd’hui</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tomorrow" type="button">Demain</button>
+          </li>
+        </ul>
+        <div class="tab-content" id="pills-tabContent">
+          <!-- AUJOURD’HUI -->
+          <div class="tab-pane fade show active" id="today" role="tabpanel">
+            <div class="row g-4">
+              <div class="col-md-4"><div class="card"><div class="card-header bg-blue text-white">Check-ins</div>
+                <div class="card-body p-0"><table class="table table-sm mb-0"><tbody>
+                  <tr v-for="r in checkins" :key="r.id">
+                    <td><strong>[[ property_name ]]</strong><br><small class="text-muted">[[ r.guest_name ]]</small></td>
+                    <td><span class="badge" :class="r.status=='CHECKED_IN' ? 'bg-success' : 'bg-warning'">[[ r.status ]]</span></td>
+                  </tr>
+                </tbody></table></div></div></div>
+
+              <div class="col-md-4"><div class="card"><div class="card-header bg-blue text-white">Check-outs</div>
+                <div class="card-body p-0"><table class="table table-sm mb-0"><tbody>
+                  <tr v-for="r in checkouts" :key="r.id">
+                    <td><strong>[[ r.property_name ]]</strong><br><small class="text-muted">[[ r.guest_name ]]</small></td>
+                    <td><span class="badge bg-info">[[ r.status ]]</span></td>
+                  </tr>
+                </tbody></table></div></div></div>
+
+              <div class="col-md-4"><div class="card"><div class="card-header bg-blue text-white">Services</div>
+                <div class="card-body p-0"><table class="table table-sm mb-0"><tbody>
+                  <tr v-for="s in services" :key="s.id">
+                    <td><strong>[[ s.property_name ]]</strong><br><small class="text-muted">[[ s.service_type ]] – [[ s.employee ]]</small></td>
+                    <td><span class="badge" :class="s.status=='PENDING' ? 'bg-warning' : 'bg-success'">[[ s.status ]]</span></td>
+                  </tr>
+                </tbody></table></div></div></div>
+            </div>
+          </div><!-- /today -->
+
+          <!-- DEMAIN -->
+          <div class="tab-pane fade" id="tomorrow" role="tabpanel">
+            <p class="text-muted">Données de demain (même structure) – non chargées ici pour alléger.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====  MINI GRAPH  ===== -->
+    <section class="py-3">
+      <div class="container"><div class="card">
+        <div class="card-header bg-blue text-white">Taux d’occupation – 7 derniers jours</div>
+        <div class="card-body"><canvas id="occupancyChart" height="80"></canvas></div>
+      </div></div>
+    </section>
+
+    <!-- =====  FOOTER  ===== -->
+    <footer class="bg-light py-4 mt-5">
+      <div class="container text-center text-muted">
+        <small>HappyBee Conciergerie SaaS – © {% now "Y" %}</small>
+      </div>
+    </footer>
+    <div> 
+      <!-- Chart.js -->
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <!-- jQuery -->
+      <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+      <!-- Vue 3 Global Build -->
+      <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+      <!-- Axios -->
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    </div>
+ 
+
+  <!-- =================  VUE 3  ================= -->
+    <script>
+
+      
+      const { createApp } = Vue;
+      createApp({
+        delimiters: ['[[', ']]'],
+        data() {
+          return {
+            today: new Date().toLocaleDateString("fr-FR"),
+            agency: {},
+            stats: {},
+            checkins: [],
+            checkouts: [],
+            services: [],
+            occupancy: [],
+            datasets: [],
+          };
+        },
+        //------------------------------
+        mounted() {
+          this.fetchDashboard();
+          this.drawChart();
+          console.log("Données Agence JSON:", this.agency);
+
+        },
+        //------------------------------
+        methods: {
+          todayISO() {
+            return new Date().toISOString().slice(0, 10); // "2025-09-26"
+          },
+          async fetchDashboard() {
+            const url = "/api/dashboard/?day=" + this.todayISO();
+            console.log("Appel API Dashboard:", url);
+
+            await axios.get(url).then(response => {
+              console.log("Réponse API Dashboard reçue:", response.data);
+              const data = JSON.stringify(response.data);
+              console.log("Données API Dashboard JSON:", data);
+              this.agency = data;
+              this.stats = response.data.today_stats;
+              this.checkins = response.data.checkins;
+              this.checkouts = response.data.checkouts;
+              this.services = response.data.services;
+              this.occupancy = response.data.occupancy_last7;
+              // this.drawChart();
+              console.log("Données API Dashboard: agency", this.agency);
+            }).catch(e => {
+              console.error("Erreur API Dashboard !!:", e);
+            });
+          },
+          drawChart() {
+            if (this.occupancyChart) {
+              this.occupancyChart.destroy();
+            }
+            const ctx = document.getElementById('occupancyChart');
+            this.occupancyChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: this.occupancy.map(o => o.day),
+                datasets: [{
+                  label: 'Taux %',
+                  data: this.occupancy.map(o => o.rate),
+                  borderColor: '#FF6B35',
+                  backgroundColor: 'rgba(255,107,53,.2)',
+                  tension: .3,
+                  fill: true
+                }]
+              },
+              options: {
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, max: 100 } }
+              }
+            });
+          },
+          newReservation() { window.location.href = "/admin/conciergerie/reservation/add/"; },
+          newService() { window.location.href = "/admin/conciergerie/servicetask/add/"; },
+        },
+      }).mount('#app');
+
+    
+    </script>
+  </div><!-- /#app -->
+</body>
+</html>
