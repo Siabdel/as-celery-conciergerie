@@ -69,6 +69,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ["id", "name", "role", "phone_number", "hire_date", "is_active"]
+        # serializer
+        full_name = serializers.CharField(source="user.get_full_name", read_only=True)
 
 # conciergerie/ota_webhooks/serializers.py
 

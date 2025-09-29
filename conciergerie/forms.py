@@ -23,3 +23,8 @@ class ReservationImportForm(forms.Form):
         decoded_file = file.read().decode("utf-8-sig")
         reader = csv.DictReader(io.StringIO(decoded_file))
         return list(reader)
+
+
+
+class CheckoutInventoryForm(forms.Form):
+    pass

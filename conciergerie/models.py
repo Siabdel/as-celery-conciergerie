@@ -56,8 +56,8 @@ class Property(ASBaseTimestampMixin):
     owner = models.ForeignKey(auth_models.User, on_delete=models.CASCADE, related_name='properties_owned')   # ← indispe
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     address = models.CharField(max_length=255)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
     capacity = models.PositiveIntegerField(default=1)
     is_active = models.BooleanField(default=True)
 

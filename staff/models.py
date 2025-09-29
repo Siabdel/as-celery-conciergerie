@@ -164,12 +164,11 @@ class Employee(models.Model):
         ('manager', 'Manager'),
     ]
     agency = models.ForeignKey(Agency, on_delete=models.CASCADE) # new field
-    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="employee")
     calendar = models.ForeignKey(CustomCalendar, on_delete=models.CASCADE)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='cleaner')
     phone_number = models.CharField(max_length=15, null=True)
-    hire_date = models.DateField() # date d'embauche
+    hire_date = models.DateField( null=True, blank=True ) # date d'embauche
     is_active = models.BooleanField(default=True)
     services_offered = models.ManyToManyField(Service)
     slot_duration = models.PositiveIntegerField(
@@ -185,7 +184,7 @@ class Employee(models.Model):
 
     def __str__(self):
         ## return f"{self.get_staff_member_name()}"
-        return f"{self.name} - {self.get_role_display()}"
+        return f"{self.agency} - {self.user} - {self.get_role_display()}"
 
 
 

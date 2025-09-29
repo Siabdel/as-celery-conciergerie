@@ -1,0 +1,409 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fiche Bien - Conciergerie Pro</title>
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Icônes -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <!-- Vue.js 3 -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root {
+      --color-primary: #FF6B35;
+      --color-secondary: #005E9B;
+      --color-light: #FFFFFF;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+    }
+    .hero-header {
+      background: linear-gradient(120deg, var(--color-secondary), #004a7a);
+      color: white;
+      padding: 2rem 0;
+    }
+    .property-card {
+      border-left: 4px solid var(--color-primary);
+      box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+    }
+    .carousel-control {
+      background: rgba(0,0,0,0.3);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .floor-plan {
+      width: 100%;
+      height: 300px;
+      background: #e9ecef;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    .room {
+      position: absolute;
+      border: 2px solid var(--color-secondary);
+      background: rgba(0, 94, 155, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    #map-container {
+      height: 300px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .btn-primary {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+    .btn-secondary {
+      background-color: var(--color-secondary);
+      border-color: var(--color-secondary);
+    }
+    .feature-badge {
+      background-color: rgba(255, 107, 53, 0.1);
+      color: var(--color-primary);
+    }
+    footer a {
+      color: var(--color-secondary);
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Header -->
+  <header class="hero-header mb-4">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h1 class="h3 mb-2">{{ property.titre }}</h1>
+          <p class="mb-1"><i class="bi bi-geo-alt me-2"></i> {{ property.adresse }}</p>
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            <span class="badge bg-light text-dark">{{ property.type }}</span>
+            <span class="badge bg-light text-dark">{{ property.surface }} m²</span>
+            <span class="badge bg-light text-dark">{{ property.pieces }} pièces</span>
+          </div>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+          <div class="h4 mb-1">{{ property.prix }} €</div>
+          <button class="btn btn-light">📅 Visite</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mb-5">
+    <div class="row g-4">
+      <!-- Galerie Photos -->
+      <div class="col-lg-7">
+        <div class="card property-card">
+          <div class="card-body">
+            <div id="photoCarousel" class="carousel slide" data-bs-ride="carousel">
+              <div class="carousel-inner">
+                <div v-for="(photo, index) in property.photos" :key="index" 
+                     class="carousel-item" :class="{ active: index === 0 }">
+                  <img :src="photo.url" class="d-block w-100" 
+                       style="height: 400px; object-fit: cover;" 
+                       :alt="'Photo ' + (index+1)"
+                       @click="openLightbox(index)">
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#photoCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#photoCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              </button>
+            </div>
+            <div class="d-flex justify-content-center mt-2">
+              <div v-for="(photo, index) in property.photos" 
+                   :key="index" 
+                   class="mx-1" 
+                   @click="setCurrentSlide(index)"
+                   style="cursor: pointer;">
+                <img :src="photo.thumb || photo.url" 
+                     class="img-thumbnail" 
+                     style="width: 60px; height: 40px; object-fit: cover;"
+                     :class="{ 'border-primary border-2': index === currentSlide }">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Détails du bien -->
+      <div class="col-lg-5">
+        <div class="card property-card h-100">
+          <div class="card-body">
+            <h3 class="card-title h5">Détails du bien</h3>
+            <div class="row mb-3">
+              <div class="col-sm-6 mb-2">
+                <small class="text-muted">Propriétaire</small>
+                <div class="fw-medium">{{ property.owner.nom }}</div>
+              </div>
+              <div class="col-sm-6 mb-2">
+                <small class="text-muted">Téléphone</small>
+                <div class="fw-medium">{{ property.owner.tel }}</div>
+              </div>
+              <div class="col-sm-6 mb-2">
+                <small class="text-muted">Étage</small>
+                <div class="fw-medium">{{ property.etage }}</div>
+              </div>
+              <div class="col-sm-6 mb-2">
+                <small class="text-muted">Charges</small>
+                <div class="fw-medium">{{ property.charges }} €/mois</div>
+              </div>
+            </div>
+
+            <h4 class="h6 mt-3">Caractéristiques</h4>
+            <div class="d-flex flex-wrap gap-1 mb-3">
+              <span v-for="feature in property.caracteristiques" 
+                    :key="feature" 
+                    class="badge feature-badge">{{ feature }}</span>
+            </div>
+
+            <div class="mt-3">
+              <h4 class="h6">Description</h4>
+              <p class="small">{{ property.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Localisation -->
+      <div class="col-12">
+        <div class="card property-card">
+          <div class="card-body">
+            <h3 class="card-title h5 mb-3">Localisation</h3>
+            <div class="row g-4">
+              <div class="col-lg-7">
+                <div id="map-container"></div>
+              </div>
+              <div class="col-lg-5">
+                <div class="d-flex align-items-start">
+                  <i class="bi bi-building fs-4 text-primary me-3"></i>
+                  <div>
+                    <h4 class="h6 mb-1">Immeuble</h4>
+                    <p class="small mb-2">{{ property.immeuble.nom }}<br>
+                    {{ property.immeuble.adresse }}</p>
+                  </div>
+                </div>
+                <div class="d-flex align-items-start mt-3">
+                  <i class="bi bi-people fs-4 text-primary me-3"></i>
+                  <div>
+                    <h4 class="h6 mb-1">Gestionnaire</h4>
+                    <p class="small mb-1">{{ property.gestionnaire.nom }}</p>
+                    <a :href="'tel:' + property.gestionnaire.tel" class="small text-decoration-none">
+                      📞 {{ property.gestionnaire.tel }}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plan de l'étage -->
+      <div class="col-12">
+        <div class="card property-card">
+          <div class="card-body">
+            <h3 class="card-title h5 mb-3">Plan de l'étage</h3>
+            <div class="floor-plan" id="floorPlan">
+              <!-- Les pièces sont dessinées via JS -->
+            </div>
+            <div class="mt-3">
+              <div v-for="room in property.plan" :key="room.id" class="d-flex align-items-center mb-2">
+                <div class="me-2" :style="{ width: '12px', height: '12px', backgroundColor: room.color }"></div>
+                <small><strong>{{ room.nom }}</strong> - {{ room.surface }} m²</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Lightbox pour zoom photo -->
+  <div class="modal fade" id="photoLightbox" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Vue agrandie</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img :src="currentPhotoUrl" class="img-fluid" alt="Vue agrandie">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-light text-center py-4 border-top">
+    <div class="container">
+      <p class="mb-1">
+        <a href="#">Mentions légales</a> | 
+        <a href="#">Contact</a> | 
+        <a href="#">Support</a> | 
+        <a href="#">CGV</a>
+      </p>
+      <p class="text-muted small mb-0">&copy; 2025 ConciergeriePro. Tous droits réservés.</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+const { createApp, ref, computed, onMounted } = Vue;
+
+const app = createApp({
+  setup() {
+    const currentSlide = ref(0);
+    const currentPhotoIndex = ref(0);
+
+    // Fake data (propriétés du bien)
+    const property = ref({
+      id: 1,
+      titre: "Appartement Moderne Centre-Ville",
+      adresse: "15 Rue de la République, 69002 Lyon",
+      type: "Appartement",
+      surface: 85,
+      pieces: 3,
+      etage: 3,
+      charges: 120,
+      prix: "345 000",
+      description: "Magnifique appartement neuf avec vue dégagée. Cuisine équipée moderne, parquet massif, baies vitrées. Proche des commodités, transports et écoles.",
+      
+      owner: {
+        nom: "M. Dupont",
+        tel: "+33 6 12 34 56 78"
+      },
+      
+      caracteristiques: [
+        "Balcon", "Cuisine équipée", "Parquet", 
+        "Double vitrage", "Cave", "Parking"
+      ],
+      
+      photos: [
+        { url: "https://picsum.photos/800/600?random=1", thumb: "https://picsum.photos/100/75?random=1" },
+        { url: "https://picsum.photos/800/600?random=2", thumb: "https://picsum.photos/100/75?random=2" },
+        { url: "https://picsum.photos/800/600?random=3", thumb: "https://picsum.photos/100/75?random=3" },
+        { url: "https://picsum.photos/800/600?random=4", thumb: "https://picsum.photos/100/75?random=4" }
+      ],
+      
+      plan: [
+        { id: 1, nom: "Salon", surface: 28, color: "#FF6B35", x: 10, y: 10, w: 200, h: 150 },
+        { id: 2, nom: "Cuisine", surface: 12, color: "#005E9B", x: 220, y: 10, w: 100, h: 100 },
+        { id: 3, nom: "Chambre 1", surface: 16, color: "#2E8B57", x: 10, y: 170, w: 120, h: 100 },
+        { id: 4, nom: "Chambre 2", surface: 14, color: "#9370DB", x: 140, y: 170, w: 110, h: 100 },
+        { id: 5, nom: "Salle de bain", surface: 8, color: "#FFA500", x: 260, y: 120, w: 70, h: 80 },
+        { id: 6, nom: "WC", surface: 3, color: "#808080", x: 260, y: 210, w: 40, h: 40 }
+      ],
+      
+      immeuble: {
+        nom: "Résidence Bellecour",
+        adresse: "15 Rue de la République, 69002 Lyon"
+      },
+      
+      gestionnaire: {
+        nom: "Conciergerie Pro",
+        tel: "+33 4 72 12 34 56"
+      },
+      
+      coords: [45.764043, 4.835659]
+    });
+
+    const currentPhotoUrl = computed(() => {
+      return property.value.photos[currentPhotoIndex.value]?.url || '';
+    });
+
+    const setCurrentSlide = (index) => {
+      currentSlide.value = index;
+      // Activer l'item correspondant dans le carousel
+      $('.carousel').carousel(index);
+    };
+
+    const openLightbox = (index) => {
+      currentPhotoIndex.value = index;
+      new bootstrap.Modal(document.getElementById('photoLightbox')).show();
+    };
+
+    // Initialisation cartographique
+    const initMap = () => {
+      if (!property.value.coords) return;
+      
+      const map = L.map('map-container').setView(property.value.coords, 16);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(map);
+
+      L.marker(property.value.coords).addTo(map)
+        .bindPopup(`<b>${property.value.titre}</b><br>${property.value.adresse}`)
+        .openPopup();
+    };
+
+    // Dessin du plan d'étage
+    const drawFloorPlan = () => {
+      const container = document.getElementById('floorPlan');
+      if (!container) return;
+
+      container.innerHTML = '';
+      property.value.plan.forEach(room => {
+        const div = document.createElement('div');
+        div.className = 'room';
+        div.style.left = room.x + 'px';
+        div.style.top = room.y + 'px';
+        div.style.width = room.w + 'px';
+        div.style.height = room.h + 'px';
+        div.style.borderColor = room.color;
+        div.style.backgroundColor = room.color + '20';
+        div.innerText = `${room.nom}\n${room.surface} m²`;
+        container.appendChild(div);
+      });
+    };
+
+    onMounted(() => {
+      initMap();
+      drawFloorPlan();
+      
+      // Initialisation carousel
+      new bootstrap.Carousel('#photoCarousel', {
+        interval: false
+      });
+    });
+
+    return {
+      property,
+      currentSlide,
+      currentPhotoUrl,
+      setCurrentSlide,
+      openLightbox
+    };
+  }
+});
+
+app.mount('#app');
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résidence Les Jardins - Conciergerie Premium</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-orange: #FF6B35;
+            --primary-blue: #2A4B7C;
+            --accent-white: #FFFFFF;
+            --light-gray: #F8F9FA;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+        }
+        
+        .navbar-brand {
+            color: var(--primary-orange) !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-orange) 100%);
+            color: white;
+            padding: 80px 0;
+        }
+        
+        .property-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .property-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .floor-plan-container {
+            border: 2px solid var(--primary-blue);
+            border-radius: 10px;
+            background: white;
+            height: 700px;
+            overflow: auto;
+        }
+        
+        .room-details {
+            position: absolute;
+            background: rgba(255,255,255,0.98);
+            border: 2px solid var(--primary-orange);
+            border-radius: 8px;
+            padding: 12px;
+            display: none;
+            z-index: 1000;
+            max-width: 250px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .floor-indicator {
+            background: var(--primary-blue);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        
+        .apartment-highlight {
+            transition: all 0.3s ease;
+        }
+        
+        .apartment-highlight:hover {
+            filter: brightness(1.1);
+            stroke-width: 3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-building me-2"></i>Résidence Les Jardins
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link text-dark" href="#fiche">Fiche Bien</a>
+                <a class="nav-link text-dark" href="#plan">Plan d'Étage</a>
+                <a class="nav-link text-dark" href="#localisation">Localisation</a>
+                <a class="nav-link text-dark" href="#contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-3">Résidence Les Jardins</h1>
+            <p class="lead mb-4">Conciergerie premium au cœur de la ville</p>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="d-flex justify-content-center gap-4 text-white">
+                        <div><i class="fas fa-bed me-2"></i>12 Appartements</div>
+                        <div><i class="fas fa-calendar-alt me-2"></i>Livraison: Juin 2024</div>
+                        <div><i class="fas fa-star me-2"></i>Conciergerie 24/7</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div id="app" class="container my-5">
+        <!-- Carousel Photos -->
+        <section class="mb-5">
+            <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner rounded-3">
+                    <div class="carousel-item active">
+                        <img src="https://via.placeholder.com/1200x600/2A4B7C/FFFFFF?text=Façade+Principale" class="d-block w-100" alt="Façade">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://via.placeholder.com/1200x600/FF6B35/FFFFFF?text=Hall+d'Entrée" class="d-block w-100" alt="Hall">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://via.placeholder.com/1200x600/2A4B7C/FFFFFF?text=Appartement+Témoin" class="d-block w-100" alt="Appartement">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Plan d'Étage avec Fabric.js -->
+        <section id="plan" class="mb-5">
+            <h2 class="mb-4">Plan d'Étage Interactif - Distribution Réelle</h2>
+            
+            <!-- Sélecteur d'étage -->
+            <div class="d-flex justify-content-center mb-4">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary" 
+                            :class="{ active: currentFloor === 0 }"
+                            @click="showFloor(0)">Rez-de-chaussée</button>
+                    <button type="button" class="btn btn-outline-primary" 
+                            :class="{ active: currentFloor === 1 }"
+                            @click="showFloor(1)">1er Étage</button>
+                    <button type="button" class="btn btn-outline-primary" 
+                            :class="{ active: currentFloor === 2 }"
+                            @click="showFloor(2)">2ème Étage</button>
+                    <button type="button" class="btn btn-outline-primary" 
+                            :class="{ active: currentFloor === 3 }"
+                            @click="showFloor(3)">3ème Étage</button>
+                </div>
+            </div>
+            
+            <div class="floor-indicator">Étage {{ currentFloor === 0 ? 'RDC' : currentFloor === 1 ? '1er' : currentFloor === 2 ? '2ème' : '3ème' }} - {{ floors[currentFloor]?.apartments.length }} appartements</div>
+            
+            <div class="floor-plan-container position-relative">
+                <canvas id="floorPlanCanvas" width="1400" height="600"></canvas>
+                <div id="roomDetails" class="room-details"></div>
+            </div>
+            
+            <div class="mt-3">
+                <button class="btn btn-outline-primary me-2" @click="zoomIn">Zoom +</button>
+                <button class="btn btn-outline-primary me-2" @click="zoomOut">Zoom -</button>
+                <button class="btn btn-outline-primary me-2" @click="resetView">Reset</button>
+                <button class="btn btn-outline-primary me-2" @click="toggleRoomLabels">
+                    {{ roomLabelsVisible ? 'Masquer' : 'Afficher' }} étiquettes
+                </button>
+                <button class="btn btn-outline-primary" @click="toggleRoomDetails">
+                    {{ roomDetailsVisible ? 'Masquer' : 'Afficher' }} détails pièces
+                </button>
+            </div>
+            
+            <!-- Légende -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="property-card p-3">
+                        <h5>Légende des Pièces</h5>
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="d-flex align-items-center">
+                                <div style="width: 20px; height: 20px; background-color: #E8F4FD; border: 1px solid #666; margin-right: 8px;"></div>
+                                <span>Salon/Séjour</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div style="width: 20px; height: 20px; background-color: #FFE6E6; border: 1px solid #666; margin-right: 8px;"></div>
+                                <span>Chambre</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div style="width: 20px; height: 20px; background-color: #FFF2CC; border: 1px solid #666; margin-right: 8px;"></div>
+                                <span>Cuisine</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div style="width: 20px; height: 20px; background-color: #E1D5E7; border: 1px solid #666; margin-right: 8px;"></div>
+                                <span>Salle de Bain</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="property-card p-3">
+                        <h5>Statut des Appartements</h5>
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="d-flex align-items-center">
+                                <div style="width: 20px; height: 20px; background-color: #28A745; border: 1px solid #666; margin-right: 8px;"></div>
+                                <span>Disponible</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div style="width: 20px; height: 20px; background-color: #FFC107; border: 1px solid #666; margin-right: 8px;"></div>
+                                <span>Réservé</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div style="width: 20px; height: 20px; background-color: #6C757D; border: 1px solid #666; margin-right: 8px;"></div>
+                                <span>Vendu</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Localisation -->
+        <section id="localisation" class="mb-5">
+            <h2 class="mb-4">Localisation</h2>
+            <div id="map" style="height: 400px; border-radius: 10px;"></div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact" class="mb-5">
+            <div class="property-card p-4 text-center">
+                <h3 class="text-primary">Contact Conciergerie</h3>
+                <p><i class="fas fa-phone me-2"></i>01 23 45 67 89</p>
+                <p><i class="fas fa-envelope me-2"></i>conciergerie@residence-les-jardins.fr</p>
+                <p><i class="fas fa-clock me-2"></i>Ouvert 24h/24, 7j/7</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts CDN -->
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Vue.js -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Fabric.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <!-- Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Axios -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.0/axios.min.js"></script>
+
+    <script>
+        // Données réalistes inspirées de vrais plans d'immeubles
+        const fakeData = {
+            floors: [
+                { // Rez-de-chaussée - 4 appartements + espaces communs
+                    level: 0,
+                    name: "Rez-de-chaussée",
+                    apartments: [
+                        { id: 1, number: "A001", surface: 45, rooms: 2, status: "available", orientation: "Nord" },
+                        { id: 2, number: "A002", surface: 60, rooms: 3, status: "sold", orientation: "Sud" },
+                        { id: 3, number: "A003", surface: 55, rooms: 3, status: "available", orientation: "Est" },
+                        { id: 4, number: "A004", surface: 70, rooms: 4, status: "reserved", orientation: "Ouest" }
+                    ]
+                },
+                { // 1er Étage - 6 appartements
+                    level: 1,
+                    name: "1er Étage",
+                    apartments: [
+                        { id: 5, number: "A101", surface: 50, rooms: 2, status: "sold", orientation: "Nord" },
+                        { id: 6, number: "A102", surface: 65, rooms: 3, status: "available", orientation: "Sud" },
+                        { id: 7, number: "A103", surface: 75, rooms: 4, status: "available", orientation: "Est" },
+                        { id: 8, number: "A104", surface: 55, rooms: 3, status: "sold", orientation: "Ouest" },
+                        { id: 9, number: "A105", surface: 80, rooms: 4, status: "reserved", orientation: "Sud" },
+                        { id: 10, number: "A106", surface: 60, rooms: 3, status: "available", orientation: "Nord" }
+                    ]
+                },
+                { // 2ème Étage - 5 appartements
+                    level: 2,
+                    name: "2ème Étage",
+                    apartments: [
+                        { id: 11, number: "A201", surface: 85, rooms: 4, status: "available", orientation: "Sud" },
+                        { id: 12, number: "A202", surface: 70, rooms: 3, status: "sold", orientation: "Nord" },
+                        { id: 13, number: "A203", surface: 90, rooms: 4, status: "available", orientation: "Est" },
+                        { id: 14, number: "A204", surface: 65, rooms: 3, status: "reserved", orientation: "Ouest" },
+                        { id: 15, number: "A205", surface: 75, rooms: 4, status: "available", orientation: "Sud" }
+                    ]
+                },
+                { // 3ème Étage - 4 appartements + terrasse
+                    level: 3,
+                    name: "3ème Étage",
+                    apartments: [
+                        { id: 16, number: "A301", surface: 95, rooms: 4, status: "available", orientation: "Sud" },
+                        { id: 17, number: "A302", surface: 85, rooms: 4, status: "sold", orientation: "Nord" },
+                        { id: 18, number: "A303", surface: 100, rooms: 5, status: "available", orientation: "Est" },
+                        { id: 19, number: "A304", surface: 80, rooms: 4, status: "reserved", orientation: "Ouest" }
+                    ]
+                }
+            ]
+        };
+
+        // Application Vue.js
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    floors: fakeData.floors,
+                    currentFloor: 1,
+                    canvas: null,
+                    zoomLevel: 0.8,
+                    roomLabelsVisible: true,
+                    roomDetailsVisible: true
+                }
+            },
+            computed: {
+                currentFloorData() {
+                    return this.floors.find(floor => floor.level === this.currentFloor);
+                }
+            },
+            mounted() {
+                this.initFloorPlan();
+                this.initMap();
+            },
+            methods: {
+                initFloorPlan() {
+                    this.canvas = new fabric.Canvas('floorPlanCanvas', {
+                        selection: false,
+                        backgroundColor: '#ffffff'
+                    });
+                    this.drawRealisticFloorPlan(this.currentFloor);
+                },
+
+                drawRealisticFloorPlan(floorLevel) {
+                    this.canvas.clear();
+                    
+                    const floor = this.floors.find(f => f.level === floorLevel);
+                    if (!floor) return;
+
+                    // Configuration réaliste par étage
+                    const floorConfigs = {
+                        0: this.drawGroundFloor.bind(this),
+                        1: this.drawFirstFloor.bind(this),
+                        2: this.drawSecondFloor.bind(this),
+                        3: this.drawThirdFloor.bind(this)
+                    };
+
+                    const drawFunction = floorConfigs[floorLevel];
+                    if (drawFunction) {
+                        drawFunction(floor);
+                    }
+
+                    this.canvas.renderAll();
+                },
+
+                // Rez-de-chaussée réaliste avec hall d'entrée
+                drawGroundFloor(floor) {
+                    // Bâtiment principal
+                    const building = new fabric.Rect({
+                        left: 100,
+                        top: 100,
+                        width: 1200,
+                        height: 400,
+                        fill: '#f8f9fa',
+                        stroke: '#2A4B7C',
+                        strokeWidth: 3
+                    });
+                    this.canvas.add(building);
+
+                    // Hall d'entrée central
+                    const hall = new fabric.Rect({
+                        left: 550,
+                        top: 100,
+                        width: 200,
+                        height: 100,
+                        fill: '#e9ecef',
+                        stroke: '#666',
+                        strokeWidth: 2
+                    });
+                    this.canvas.add(hall);
+
+                    const hallText = new fabric.Text("HALL\nD'ENTRÉE", {
+                        left: 590,
+                        top: 130,
+                        fontSize: 14,
+                        fill: '#666',
+                        fontFamily: 'Arial',
+                        fontWeight: 'bold',
+                        textAlign: 'center'
+                    });
+                    this.canvas.add(hallText);
+
+                    // Appartements autour du hall (4 appartements)
+                    const apts = [
+                        // Gauche du hall
+                        { apt: floor.apartments[0], x: 200, y: 100, w: 300, h: 200, rooms: 2 },
+                        { apt: floor.apartments[1], x: 200, y: 320, w: 300, h: 180, rooms: 3 },
+                        // Droite du hall
+                        { apt: floor.apartments[2], x: 800, y: 100, w: 300, h: 200, rooms: 3 },
+                        { apt: floor.apartments[3], x: 800, y: 320, w: 300, h: 180, rooms: 4 }
+                    ];
+
+                    apts.forEach(config => {
+                        this.drawRealisticApartment(config.apt, config.x, config.y, config.w, config.h, config.rooms);
+                    });
+
+                    // Escalier
+                    this.drawStaircase(650, 220, 50, 60);
+                    // Ascenseur
+                    this.drawElevator(720, 220, 40, 60);
+                },
+
+                // 1er Étage - 6 appartements en U
+                drawFirstFloor(floor) {
+                    const building = new fabric.Rect({
+                        left: 100,
+                        top: 100,
+                        width: 1200,
+                        height: 400,
+                        fill: '#f8f9fa',
+                        stroke: '#2A4B7C',
+                        strokeWidth: 3
+                    });
+                    this.canvas.add(building);
+
+                    // Couloir central
+                    const corridor = new fabric.Rect({
+                        left: 550,
+                        top: 150,
+                        width: 100,
+                        height: 300,
+                        fill: '#e9ecef',
+                        stroke: '#666',
+                        strokeWidth: 1
+                    });
+                    this.canvas.add(corridor);
+
+                    // 6 appartements (3 de chaque côté)
+                    const apts = [
+                        // Côté gauche
+                        { apt: floor.apartments[0], x: 150, y: 150, w: 350, h: 120, rooms: 2 },
+                        { apt: floor.apartments[1], x: 150, y: 290, w: 350, h: 110, rooms: 3 },
+                        { apt: floor.apartments[2], x: 150, y: 420, w: 350, h: 80, rooms: 4 },
+                        // Côté droit
+                        { apt: floor.apartments[3], x: 700, y: 150, w: 350, h: 120, rooms: 3 },
+                        { apt: floor.apartments[4], x: 700, y: 290, w: 350, h: 110, rooms: 4 },
+                        { apt: floor.apartments[5], x: 700, y: 420, w: 350, h: 80, rooms: 3 }
+                    ];
+
+                    apts.forEach(config => {
+                        this.drawRealisticApartment(config.apt, config.x, config.y, config.w, config.h, config.rooms);
+                    });
+
+                    this.drawStaircase(600, 250, 50, 60);
+                    this.drawElevator(670, 250, 40, 60);
+                },
+
+                // 2ème Étage - 5 appartements
+                drawSecondFloor(floor) {
+                    const building = new fabric.Rect({
+                        left: 100,
+                        top: 100,
+                        width: 1200,
+                        height: 400,
+                        fill: '#f8f9fa',
+                        stroke: '#2A4B7C',
+                        strokeWidth: 3
+                    });
+                    this.canvas.add(building);
+
+                    // 5 appartements avec distribution asymétrique
+                    const apts = [
+                        { apt: floor.apartments[0], x: 150, y: 150, w: 400, h: 150, rooms: 4 },
+                        { apt: floor.apartments[1], x: 150, y: 320, w: 400, h: 130, rooms: 3 },
+                        { apt: floor.apartments[2], x: 580, y: 150, w: 350, h: 150, rooms: 4 },
+                        { apt: floor.apartments[3], x: 580, y: 320, w: 350, h: 130, rooms: 3 },
+                        { apt: floor.apartments[4], x: 960, y: 150, w: 250, h: 300, rooms: 4 }
+                    ];
+
+                    apts.forEach(config => {
+                        this.drawRealisticApartment(config.apt, config.x, config.y, config.w, config.h, config.rooms);
+                    });
+
+                    this.drawStaircase(500, 250, 50, 60);
+                    this.drawElevator(570, 250, 40, 60);
+                },
+
+                // 3ème Étage - 4 appartements + terrasse
+                drawThirdFloor(floor) {
+                    const building = new fabric.Rect({
+                        left: 100,
+                        top: 100,
+                        width: 1200,
+                        height: 400,
+                        fill: '#f8f9fa',
+                        stroke: '#2A4B7C',
+                        strokeWidth: 3
+                    });
+                    this.canvas.add(building);
+
+                    // Terrasse centrale
+                    const terrace = new fabric.Rect({
+                        left: 500,
+                        top: 350,
+                        width: 400,
+                        height: 100,
+                        fill: '#d4edda',
+                        stroke: '#28a745',
+                        strokeWidth: 2,
+                        strokeDashArray: [5, 5]
+                    });
+                    this.canvas.add(terrace);
+
+                    const terraceText = new fabric.Text("TERRASSE\nCOMMUNE", {
+                        left: 600,
+                        top: 380,
+                        fontSize: 12,
+                        fill: '#28a745',
+                        fontFamily: 'Arial',
+                        textAlign: 'center'
+                    });
+                    this.canvas.add(terraceText);
+
+                    // 4 grands appartements
+                    const apts = [
+                        { apt: floor.apartments[0], x: 150, y: 150, w: 500, h: 180, rooms: 4 },
+                        { apt: floor.apartments[1], x: 150, y: 350, w: 300, h: 100, rooms: 4 },
+                        { apt: floor.apartments[2], x: 680, y: 150, w: 500, h: 180, rooms: 5 },
+                        { apt: floor.apartments[3], x: 830, y: 350, w: 350, h: 100, rooms: 4 }
+                    ];
+
+                    apts.forEach(config => {
+                        this.drawRealisticApartment(config.apt, config.x, config.y, config.w, config.h, config.rooms);
+                    });
+
+                    this.drawStaircase(600, 250, 50, 60);
+                    this.drawElevator(670, 250, 40, 60);
+                },
+
+                drawRealisticApartment(apartment, x, y, width, height, roomCount) {
+                    const aptColor = this.getApartmentColor(apartment.status);
+
+                    // Contour de l'appartement
+                    const aptOutline = new fabric.Rect({
+                        left: x,
+                        top: y,
+                        width: width,
+                        height: height,
+                        fill: 'rgba(255,255,255,0.3)',
+                        stroke: aptColor,
+                        strokeWidth: 2,
+                        selectable: false
+                    });
+                    this.canvas.add(aptOutline);
+
+                    // Dessin des pièces selon le nombre de pièces
+                    this.drawRealisticRooms(apartment, x, y, width, height, roomCount);
+
+                    // Numéro et surface
+                    const aptInfo = new fabric.Text(`${apartment.number}\n${apartment.surface}m²`, {
+                        left: x + 10,
+                        top: y + height + 5,
+                        fontSize: 11,
+                        fill: aptColor,
+                        fontFamily: 'Arial',
+                        fontWeight: 'bold'
+                    });
+                    this.canvas.add(aptInfo);
+
+                    // Interaction
+                    aptOutline.on('mousedown', () => {
+                        this.selectApartment(apartment);
+                    });
+                },
+
+                drawRealisticRooms(apartment, x, y, width, height, roomCount) {
+                    // Distribution réaliste des pièces selon le nombre
+                    const roomConfigs = {
+                        2: this.drawTwoRooms.bind(this),
+                        3: this.drawThreeRooms.bind(this),
+                        4: this.drawFourRooms.bind(this),
+                        5: this.drawFiveRooms.bind(this)
+                    };
+
+                    const drawFunction = roomConfigs[roomCount] || this.drawFourRooms.bind(this);
+                    drawFunction(apartment, x, y, width, height);
+                },
+
+                drawTwoRooms(apartment, x, y, width, height) {
+                    // Studio + SDB
+                    const salon = new fabric.Rect({
+                        left: x,
+                        top: y,
+                        width: width * 0.7,
+                        height: height,
+                        fill: '#E8F4FD',
+                        stroke: '#666',
+                        strokeWidth: 1
+                    });
+                    this.canvas.add(salon);
+
+                    const sdb = new fabric.Rect({
+                        left: x + width * 0.7,
+                        top: y,
+                        width: width * 0.3,
+                        height: height * 0.4,
+                        fill: '#E1D5E7',
+                        stroke: '#666',
+                        strokeWidth: 1
+                    });
+                    this.canvas.add(sdb);
+
+                    if (this.roomLabelsVisible) {
+                        this.addRoomLabel(x + 5, y + 5, "Studio", "35m²");
+                        this.addRoomLabel(x + width * 0.7 + 5, y + 5, "SDB", "8m²");
+                    }
+                },
+
+                drawThreeRooms(apartment, x, y, width, height) {
+                    // Salon, Chambre, SDB
+                    const salon = new fabric.Rect({
+                        left: x,
+                        top: y,
+                        width: width * 0.6,
+                        height: height * 0.6,
+                        fill: '#E8F4FD',
+                        stroke: '#666',
+                        strokeWidth: 1
+                    });
+                    this.canvas.add(salon);
+
+                    const chambre = new fabric.Rect({
+                        left: x + width * 0.6,
+                        top: y,
+                        width: width * 0.4,
+                        height: height * 0.6,
+                        fill: '#FFE6E6',
+                        stroke: '#666',
+                        strokeWidth: 1
+                    });
+                    this.canvas.add(chambre);
+
+                    const sdb = new fabric.Rect({
+                        left: x,
+                        top: y + height * 0.6,
+                        width: width,
+                        height: height * 0.4,
+                        fill: '#E1D5E7',
+                        stroke: '#666',
+                        strokeWidth: 1
+                    });
+                    this.canvas.add(sdb);
+
+                    if (this.roomLabelsVisible) {
+                        this.addRoomLabel(x + 5, y + 5, "Salon", "20m²");
+                        this.addRoomLabel(x + width * 0.6 + 5, y + 5, "Chambre", "12m²");
+                        this.addRoomLabel(x + 5, y + height * 0.6 + 5, "SDB", "8m²");
+                    }
+                },
+
+                drawFourRooms(apartment, x, y, width, height) {
+                    // Salon, 2 Chambres, SDB
+                    const salon = new fabric.Rect({
+                        left: x,
+                        top: y,
+                        width: width * 0.5,
+                        height: height * 0.6,
+                        fill: '#E8F4FD',
+                        stroke: '#666',
+                        strokeWidth: 1
+                    });
+                    this.canvas.add(salon);
+
+                    const chambre1 = new fabric.Rect({
+                        left: x + width * 0.5,
+                        top: y,
+                        width: width * 0.25,
+                        height: height * 0.6,
+                        fill: '#FFE6E6',
+                        stroke: '#666',
+                        strokeWidth: 1
+                    });
+                    this.canvas.add(chambre1);
+
+                    const chambre2 = new fabric.Rect({
+                        left: x + width * 0.75,
+                        top: y,
+                        width: width * 0.25,
+                        height: height * 0.6,
+                        fill: '#FFCCCC',
+                        stroke: '#666',
+                        strokeWidth: 1
+                    });
+                    this.canvas.add(chambre2);
+
+                    const sdb = new fabric.Rect({
+                        left: x,
+                        top: y + height * 0.6,
+                        width: width,
+                        height: height * 0.4,
+                        fill: '#E1D5E7',
+                        stroke: '#666',
+                        strokeWidth: 1
+                    });
+                    this.canvas.add(sdb);
+
+                    if (this.roomLabelsVisible) {
+                        this.addRoomLabel(x + 5, y + 5, "Salon", "25m²");
+                        this.addRoomLabel(x + width * 0.5 + 5, y + 5, "Chambre1", "10m²");
+                        this.addRoomLabel(x + width * 0.75 + 5, y + 5, "Chambre2", "10m²");
+                        this.addRoomLabel(x + 5, y + height * 0.6 + 5, "SDB", "8m²");
+                    }
+                },
+
+                drawFiveRooms(apartment, x, y, width, height) {
+                    // Grand salon, 3 Chambres, SDB
+                    const salon = new fabric.Rect({
+                        left: x,
+                        top: y,
+                        width: width * 0.6,
+                        height: height * 0.5,
+                        fill: '#E8F4FD',
+                        stroke: '#666',
+                        strokeWidth: 1
+                    });
+                    this.canvas.add(salon);
+
+                    const chambres = new fabric.Rect({
+                        left: x + width * 0.6,
+                        top: y,
+                        width: width * 0.4,
+                        height: height * 0.5,
+                        fill: '#FFE6E6',
+                        stroke: '#666',
+                        strokeWidth: 1
+                    });
+                    this.canvas.add(chambres);
+
+                    const sdb = new fabric.Rect({
+                        left: x,
+                        top: y + height * 0.5,
+                        width: width * 0.4,
+                        height: height * 0.5,
+                        fill: '#E1D5E7',
+                        stroke: '#666',
+                        strokeWidth: 1
+                    });
+                    this.canvas.add(sdb);
+
+                    const cuisine = new fabric.Rect({
+                        left: x + width * 0.4,
+                        top: y + height * 0.5,
+                        width: width * 0.6,
+                        height: height * 0.5,
+                        fill: '#FFF2CC',
+                        stroke: '#666',
+                        strokeWidth: 1
+                    });
+                    this.canvas.add(cuisine);
+
+                    if (this.roomLabelsVisible) {
+                        this.addRoomLabel(x + 5, y + 5, "Salon", "30m²");
+                        this.addRoomLabel(x + width * 0.6 + 5, y + 5, "Chambres", "25m²");
+                        this.addRoomLabel(x + 5, y + height * 0.5 + 5, "SDB", "10m²");
+                        this.addRoomLabel(x + width * 0.4 + 5, y + height * 0.5 + 5, "Cuisine", "12m²");
+                    }
+                },
+
+                addRoomLabel(x, y, name, surface) {
+                    if (!this.roomLabelsVisible) return;
+                    
+                    const label = new fabric.Text(`${name}\n${surface}`, {
+                        left: x,
+                        top: y,
+                        fontSize: 9,
+                        fill: '#000000',
+                        fontFamily: 'Arial'
+                    });
+                    this.canvas.add(label);
+                },
+
+                drawStaircase(x, y, width, height) {
+                    const stair = new fabric.Rect({
+                        left: x,
+                        top: y,
+                        width: width,
+                        height: height,
+                        fill: '#CCCCCC',
+                        stroke: '#666666',
+                        strokeWidth: 2
+                    });
+                    this.canvas.add(stair);
+
+                    const stairText = new fabric.Text("ESC", {
+                        left: x + 15,
+                        top: y + 20,
+                        fontSize: 12,
+                        fill: '#666666',
+                        fontFamily: 'Arial',
+                        fontWeight: 'bold'
+                    });
+                    this.canvas.add(stairText);
+                },
+
+                drawElevator(x, y, width, height) {
+                    const elevator = new fabric.Rect({
+                        left: x,
+                        top: y,
+                        width: width,
+                        height: height,
+                        fill: '#999999',
+                        stroke: '#666666',
+                        strokeWidth: 2
+                    });
+                    this.canvas.add(elevator);
+
+                    const elevatorText = new fabric.Text("ASC", {
+                        left: x + 10,
+                        top: y + 20,
+                        fontSize: 10,
+                        fill: '#FFFFFF',
+                        fontFamily: 'Arial',
+                        fontWeight: 'bold'
+                    });
+                    this.canvas.add(elevatorText);
+                },
+
+                showRoomDetails(room, apartmentNumber, x, y) {
+                    if (!this.roomDetailsVisible) return;
+                    
+                    const detailsDiv = document.getElementById('roomDetails');
+                    detailsDiv.innerHTML = `
+                        <strong>${room.name}</strong><br>
+                        <small>Surface: ${room.surface}</small><br>
+                        <em>Appartement ${apartmentNumber}</em>
+                    `;
+                    detailsDiv.style.display = 'block';
+                    detailsDiv.style.left = (x + 10) + 'px';
+                    detailsDiv.style.top = (y + 10) + 'px';
+                },
+
+                hideRoomDetails() {
+                    document.getElementById('roomDetails').style.display = 'none';
+                },
+
+                getApartmentColor(status) {
+                    switch(status) {
+                        case 'available': return '#28A745';
+                        case 'reserved': return '#FFC107';
+                        case 'sold': return '#6C757D';
+                        default: return '#CCCCCC';
+                    }
+                },
+
+                selectApartment(apartment) {
+                    alert(`Appartement ${apartment.number}\n\nSurface: ${apartment.surface}m²\nPièces: ${apartment.rooms}\nÉtage: ${apartment.orientation}\nStatut: ${apartment.status === 'available' ? 'Disponible' : apartment.status === 'reserved' ? 'Réservé' : 'Vendu'}`);
+                },
+
+                showFloor(floorLevel) {
+                    this.currentFloor = floorLevel;
+                    this.drawRealisticFloorPlan(floorLevel);
+                },
+
+                zoomIn() {
+                    this.zoomLevel *= 1.2;
+                    this.canvas.setZoom(this.zoomLevel);
+                },
+
+                zoomOut() {
+                    this.zoomLevel /= 1.2;
+                    this.canvas.setZoom(this.zoomLevel);
+                },
+
+                resetView() {
+                    this.zoomLevel = 0.8;
+                    this.canvas.setZoom(this.zoomLevel);
+                    this.canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+                },
+
+                toggleRoomLabels() {
+                    this.roomLabelsVisible = !this.roomLabelsVisible;
+                    this.drawRealisticFloorPlan(this.currentFloor);
+                },
+
+                toggleRoomDetails() {
+                    this.roomDetailsVisible = !this.roomDetailsVisible;
+                },
+
+                initMap() {
+                    const map = L.map('map').setView([48.8738, 2.2950], 15);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(map);
+
+                    L.marker([48.8738, 2.2950])
+                        .addTo(map)
+                        .bindPopup(`
+                            <strong>Résidence Les Jardins</strong><br>
+                            25 Avenue des Champs-Élysées<br>
+                            75008 Paris
+                        `)
+                        .openPopup();
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

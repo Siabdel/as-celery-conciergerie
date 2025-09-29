@@ -146,7 +146,7 @@ class AdditionalExpenseAdmin(admin.ModelAdmin):
  
 @admin.register(sm_models.Property)
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'owner', 'price_per_night_display', 'address_preview')
+    list_display = ('name', 'type', 'agency', 'owner', 'price_per_night_display', 'address_preview')
     list_filter = ('agency', 'type', 'owner')
     search_fields = ('name', 'address', 'owner__username')
     readonly_fields = ('created_at', 'updated_at', 'created_by')
@@ -155,7 +155,7 @@ class PropertyAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Property Information', {
             'fields': (
-                'name',
+                'name', 'agency',
                 ('type', 'owner'),
                 'price_per_night',
             )
@@ -194,8 +194,10 @@ class PropertyAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
             return qs
-        return qs.filter(owner=request.user)
-
+        # pour owner : ses biens
+        # pour employee : biens de son agence
+        return qs.for_user(request.user)
+    
     def reservation_count(self, obj):
         return obj.reservations.all().count()
     reservation_count.short_description = 'Réservations'
@@ -229,6 +231,12 @@ def duplicate_reservation(modeladmin, request, queryset):
         # Créer une nouvelle réservation avec les mêmes données
         try :
             new_reservation = Reservation.objects.create(
+                agency = reservation.agency,
+                guest_name = reservation.guest_name,
+                guest_email = reservation.guest_email,
+                guest_phone = reservation.guest_phone,
+                number_of_guests = reservation.number_of_guests,
+                total_price = reservation.total_price,
                 property = reservation.property,
                 check_in = now(),
                 check_out =  now(),
@@ -281,7 +289,7 @@ class ReservationAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Reservation Details', {
             'fields': (
-                ('property', 'reservation_status'),
+                ('agency', 'property', 'reservation_status'),
                 ('check_in', 'check_out'),
                 ('platform', ),
             )
@@ -339,7 +347,10 @@ class ReservationAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
             return qs
-        return qs.filter(property__owner=request.user)
+        #return qs.filter(property__owner=request.user)
+        # pour owner : ses biens
+        # pour employee : biens de son agence
+        return qs.for_user(request.user)
 
     def changelist_view(self, request, extra_context=None):
         response = super().changelist_view(request, extra_context=extra_context)

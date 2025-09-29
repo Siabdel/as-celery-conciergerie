@@ -1,0 +1,349 @@
+[
+{
+  "model": "staff.employee",
+  "pk": 1,
+  "fields": {
+    "agency": 3,
+    "user": 2,
+    "calendar": 1,
+    "role": "maintenance",
+    "phone_number": "+1-210-343-3218",
+    "hire_date": "2024-04-22",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": true,
+    "work_on_sunday": false,
+    "created_at": "2025-09-26T09:27:43.219Z",
+    "updated_at": "2025-09-26T09:27:43.219Z",
+    "services_offered": [
+      2,
+      4
+    ]
+  }
+},
+{
+  "model": "staff.employee",
+  "pk": 2,
+  "fields": {
+    "agency": 3,
+    "user": 3,
+    "calendar": 2,
+    "role": "maintenance",
+    "phone_number": "538.990.8386",
+    "hire_date": "2024-11-08",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": false,
+    "work_on_sunday": false,
+    "created_at": "2025-09-26T09:27:43.258Z",
+    "updated_at": "2025-09-26T09:27:43.258Z",
+    "services_offered": [
+      1,
+      2,
+      3
+    ]
+  }
+},
+{
+  "model": "staff.employee",
+  "pk": 3,
+  "fields": {
+    "agency": 3,
+    "user": 4,
+    "calendar": 3,
+    "role": "cleaner",
+    "phone_number": "001-740-326-542",
+    "hire_date": "2023-07-24",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": false,
+    "work_on_sunday": true,
+    "created_at": "2025-09-26T09:27:43.278Z",
+    "updated_at": "2025-09-26T09:27:43.278Z",
+    "services_offered": [
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "staff.employee",
+  "pk": 4,
+  "fields": {
+    "agency": 3,
+    "user": 5,
+    "calendar": 4,
+    "role": "cleaner",
+    "phone_number": "361-855-9407",
+    "hire_date": "2025-02-18",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": true,
+    "work_on_sunday": true,
+    "created_at": "2025-09-26T09:27:43.297Z",
+    "updated_at": "2025-09-26T09:27:43.297Z",
+    "services_offered": [
+      1,
+      3,
+      4
+    ]
+  }
+},
+{
+  "model": "staff.employee",
+  "pk": 5,
+  "fields": {
+    "agency": 3,
+    "user": 6,
+    "calendar": 5,
+    "role": "cleaner",
+    "phone_number": "584-695-9310",
+    "hire_date": "2023-12-02",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": true,
+    "work_on_sunday": false,
+    "created_at": "2025-09-26T09:27:43.319Z",
+    "updated_at": "2025-09-26T09:27:43.319Z",
+    "services_offered": [
+      2,
+      3,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "staff.employee",
+  "pk": 6,
+  "fields": {
+    "agency": 3,
+    "user": 7,
+    "calendar": 6,
+    "role": "cleaner",
+    "phone_number": "731-564-7525",
+    "hire_date": "2023-10-10",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": false,
+    "work_on_sunday": false,
+    "created_at": "2025-09-26T09:27:43.341Z",
+    "updated_at": "2025-09-26T09:27:43.341Z",
+    "services_offered": [
+      1,
+      2,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "staff.employee",
+  "pk": 7,
+  "fields": {
+    "agency": 3,
+    "user": 8,
+    "calendar": 7,
+    "role": "concierge",
+    "phone_number": "+1-241-592-8327",
+    "hire_date": "2024-11-29",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": true,
+    "work_on_sunday": false,
+    "created_at": "2025-09-26T09:27:43.366Z",
+    "updated_at": "2025-09-26T09:27:43.366Z",
+    "services_offered": [
+      2,
+      3
+    ]
+  }
+},
+{
+  "model": "staff.employee",
+  "pk": 8,
+  "fields": {
+    "agency": 3,
+    "user": 9,
+    "calendar": 8,
+    "role": "concierge",
+    "phone_number": "9568413953",
+    "hire_date": "2023-09-07",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": false,
+    "work_on_sunday": true,
+    "created_at": "2025-09-26T09:27:43.386Z",
+    "updated_at": "2025-09-26T09:27:43.386Z",
+    "services_offered": [
+      1,
+      2,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "staff.employee",
+  "pk": 9,
+  "fields": {
+    "agency": 3,
+    "user": 10,
+    "calendar": 9,
+    "role": "cleaner",
+    "phone_number": "+1-772-542-3884",
+    "hire_date": "2024-11-22",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": false,
+    "work_on_sunday": true,
+    "created_at": "2025-09-26T09:27:43.415Z",
+    "updated_at": "2025-09-26T09:27:43.415Z",
+    "services_offered": [
+      2,
+      3,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "staff.employee",
+  "pk": 10,
+  "fields": {
+    "agency": 3,
+    "user": 11,
+    "calendar": 10,
+    "role": "cleaner",
+    "phone_number": "(387)810-1226",
+    "hire_date": "2023-11-17",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": false,
+    "work_on_sunday": false,
+    "created_at": "2025-09-26T09:27:43.448Z",
+    "updated_at": "2025-09-26T09:27:43.448Z",
+    "services_offered": [
+      1,
+      3
+    ]
+  }
+},
+{
+  "model": "staff.employee",
+  "pk": 11,
+  "fields": {
+    "agency": 3,
+    "user": 12,
+    "calendar": 11,
+    "role": "cleaner",
+    "phone_number": "(897)484-8018x4",
+    "hire_date": "2023-07-30",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": false,
+    "work_on_sunday": false,
+    "created_at": "2025-09-26T09:27:43.483Z",
+    "updated_at": "2025-09-26T09:27:43.483Z",
+    "services_offered": [
+      1,
+      5
+    ]
+  }
+},
+{
+  "model": "staff.employee",
+  "pk": 12,
+  "fields": {
+    "agency": 3,
+    "user": 13,
+    "calendar": 12,
+    "role": "maintenance",
+    "phone_number": "704.482.8148x93",
+    "hire_date": "2024-01-09",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": true,
+    "work_on_sunday": false,
+    "created_at": "2025-09-26T09:27:43.522Z",
+    "updated_at": "2025-09-26T09:27:43.522Z",
+    "services_offered": [
+      1,
+      2,
+      3
+    ]
+  }
+},
+{
+  "model": "staff.employee",
+  "pk": 13,
+  "fields": {
+    "agency": 3,
+    "user": 14,
+    "calendar": 13,
+    "role": "cleaner",
+    "phone_number": "+1-680-595-7015",
+    "hire_date": "2023-09-29",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": true,
+    "work_on_sunday": true,
+    "created_at": "2025-09-26T09:27:43.553Z",
+    "updated_at": "2025-09-26T09:27:43.554Z",
+    "services_offered": [
+      1,
+      3,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "staff.employee",
+  "pk": 14,
+  "fields": {
+    "agency": 3,
+    "user": 15,
+    "calendar": 14,
+    "role": "cleaner",
+    "phone_number": "4399117182",
+    "hire_date": "2024-07-01",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": true,
+    "work_on_sunday": true,
+    "created_at": "2025-09-26T09:27:43.619Z",
+    "updated_at": "2025-09-26T09:27:43.619Z",
+    "services_offered": [
+      1,
+      2,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "staff.employee",
+  "pk": 15,
+  "fields": {
+    "agency": 3,
+    "user": 16,
+    "calendar": 15,
+    "role": "maintenance",
+    "phone_number": "+1-624-889-6383",
+    "hire_date": "2025-01-12",
+    "is_active": true,
+    "slot_duration": 30,
+    "work_on_saturday": true,
+    "work_on_sunday": false,
+    "created_at": "2025-09-26T09:27:43.766Z",
+    "updated_at": "2025-09-26T09:27:43.766Z",
+    "services_offered": [
+      1,
+      2,
+      3,
+      5
+    ]
+  }
+}
+]

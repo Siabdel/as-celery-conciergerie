@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conciergerie Immobilière Pro - Visites 3D</title>
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Icônes -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <!-- Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.min.js"></script>
+  <!-- Vue.js 3 -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <style>
+    :root {
+      --color-primary: #FF6B35;
+      --color-secondary: #005E9B;
+      --color-light: #FFFFFF;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .hero {
+      background: linear-gradient(120deg, var(--color-secondary), var(--color-primary));
+      color: white;
+      padding: 4rem 0;
+    }
+    .card-property {
+      border: none;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card-property:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 1rem 2rem rgba(0,0,0,0.15);
+    }
+    .property-img {
+      height: 220px;
+      object-fit: cover;
+    }
+    .property-price {
+      font-weight: bold;
+      font-size: 1.4rem;
+      color: var(--color-primary);
+    }
+    #map-container {
+      height: 200px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .view3d-container {
+      width: 100%;
+      height: 250px;
+      background: #111;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .btn-primary {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+    .btn-secondary {
+      background-color: var(--color-secondary);
+      border-color: var(--color-secondary);
+    }
+    footer a {
+      color: var(--color-secondary);
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Header -->
+  <header class="bg-white shadow-sm sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light container py-3">
+      <a class="navbar-brand fw-bold" href="#">
+        <i class="bi bi-building me-2"></i>Conciergerie Pro
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="#">Accueil</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Catalogue</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Services</a></li>
+          <li class="nav-item"><a class="nav-link btn btn-sm btn-outline-primary ms-lg-3" href="#">Espace Pro</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container text-center">
+      <h1 class="display-5 fw-bold mb-3">Solutions Immobilières pour Professionnels</h1>
+      <p class="lead mb-4">Visites 3D immersives • Gestion locative • Acquisition optimisée</p>
+      <button class="btn btn-light btn-lg px-4">Découvrir nos offres</button>
+    </div>
+  </section>
+
+  <main class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="h3 mb-0">Nos biens en vedette</h2>
+      <div>
+        <select class="form-select form-select-sm w-auto d-inline-block">
+          <option>Trier par prix</option>
+          <option>Plus récents</option>
+          <option>Localisation</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Liste des biens -->
+    <div class="row g-4">
+      <div v-for="property in properties" :key="property.id" class="col-12">
+        <div class="card card-property">
+          <div class="row g-0">
+            <!-- Visite 3D -->
+            <div class="col-md-6">
+              <div class="p-3">
+                <h5 class="card-title mb-3">📍 {{ property.titre }}</h5>
+                <div :id="'view3d-' + property.id" class="view3d-container"></div>
+                <div class="mt-3 text-center">
+                  <button class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-arrows-fullscreen"></i> Plein écran
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Détails -->
+            <div class="col-md-6">
+              <div class="card-body d-flex flex-column h-100">
+                <p class="card-text">{{ property.description }}</p>
+                
+                <div class="mb-3">
+                  <div id="map-container"></div>
+                </div>
+
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                  <div class="property-price">{{ property.prix }} €</div>
+                  <div>
+                    <span class="badge bg-secondary me-1">{{ property.type }}</span>
+                    <span class="badge bg-info">{{ property.surface }} m²</span>
+                  </div>
+                </div>
+                <div class="mt-3 d-grid gap-2 d-md-flex justify-content-md-end">
+                  <button class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-download"></i> Dossier
+                  </button>
+                  <button class="btn btn-sm btn-primary">
+                    <i class="bi bi-calendar-check"></i> Visiter
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-light text-center py-4 border-top mt-auto">
+    <div class="container">
+      <p class="mb-1">
+        <a href="#">Mentions légales</a> | 
+        <a href="#">Contact</a> | 
+        <a href="#">Support</a> | 
+        <a href="#">CGV</a>
+      </p>
+      <p class="text-muted small mb-0">&copy; 2025 ConciergeriePro. Tous droits réservés.</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+// Vue.js App
+const { createApp, ref, onMounted } = Vue;
+
+const app = createApp({
+  setup() {
+    const properties = ref([]);
+
+    // Fake data
+    const fakeData = [
+      {
+        id: 1,
+        titre: "Appartement Moderne Centre-Ville",
+        description: "Lumineux et récemment rénové, cet appartement offre un balcon et une vue dégagée. Proche des commerces et transports.",
+        prix: "345 000",
+        type: "Appartement",
+        surface: 78,
+        coords: [45.764043, 4.835659] // Lyon
+      },
+      {
+        id: 2,
+        titre: "Loft Industriel Quartier Créatif",
+        description: "Espace ouvert avec poutres apparentes, double vitrage et cuisine équipée. Idéal pour les professionnels en coworking.",
+        prix: "420 000",
+        type: "Loft",
+        surface: 95,
+        coords: [48.8566, 2.3522] // Paris
+      },
+      {
+        id: 3,
+        titre: "Bureau Vue Panoramique",
+        description: "Bureaux premium avec terrasse privative, fibre optique et accès sécurisé. Situation stratégique au cœur du quartier d'affaires.",
+        prix: "280 000",
+        type: "Bureaux",
+        surface: 65,
+        coords: [43.2965, 5.3698] // Marseille
+      }
+    ];
+
+    // Initialisation
+    onMounted(() => {
+      properties.value = fakeData;
+      initAll3DViews();
+      initAllMaps();
+    });
+
+    // Fonction pour initialiser toutes les visites 3D
+    const initAll3DViews = () => {
+      properties.value.forEach(property => {
+        init3DView(property.id);
+      });
+    };
+
+    // Fonction pour initialiser toutes les cartes
+    const initAllMaps = () => {
+      properties.value.forEach(property => {
+        setTimeout(() => initMap(property.id, property.coords), 300);
+      });
+    };
+
+    return {
+      properties
+    };
+  }
+});
+
+// Initialisation Three.js (Visite 3D simplifiée)
+function init3DView(id) {
+  const container = document.getElementById(`view3d-${id}`);
+  if (!container) return;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  container.innerHTML = '';
+  container.appendChild(renderer.domElement);
+
+  // Ambiance lumineuse
+  const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+  scene.add(ambientLight);
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  directionalLight.position.set(1, 1, 1);
+  scene.add(directionalLight);
+
+  // Pièce simple (cube)
+  const geometry = new THREE.BoxGeometry(2, 1.5, 3);
+  const material = new THREE.MeshPhongMaterial({ 
+    color: 0xf0f0f0,
+    wireframe: false,
+    transparent: true,
+    opacity: 0.9
+  });
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+  // Objets décoratifs
+  const furnitures = [
+    { size: [0.8, 0.8, 0.1], pos: [0, -0.35, -1.2], color: 0x4444dd }, // Table
+    { size: [0.5, 0.8, 0.5], pos: [-0.8, -0.35, 1], color: 0x22aa22 }, // Canapé
+    { size: [0.4, 1, 0.4], pos: [0.8, -0.25, 1], color: 0xaa5522 } // Lampe
+  ];
+
+  furnitures.forEach(f => {
+    const geo = new THREE.BoxGeometry(...f.size);
+    const mat = new THREE.MeshPhongMaterial({ color: f.color });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(...f.pos);
+    scene.add(mesh);
+  });
+
+  camera.position.z = 3;
+
+  // Animation
+  function animate() {
+    requestAnimationFrame(animate);
+    cube.rotation.y += 0.002;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // Responsive
+  window.addEventListener('resize', () => {
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(container.clientWidth, container.clientHeight);
+  });
+}
+
+// Initialisation Leaflet (Carte)
+function initMap(id, coords) {
+  const mapContainer = document.createElement('div');
+  mapContainer.id = `map-${id}`;
+  mapContainer.style.height = '200px';
+  const container = document.getElementById('map-container');
+  if (container) {
+    container.replaceWith(mapContainer);
+  }
+
+  const map = L.map(`map-${id}`).setView(coords, 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  L.marker(coords).addTo(map)
+    .bindPopup('Bien immobilier')
+    .openPopup();
+}
+
+app.mount('#app');
+</script>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
