@@ -1,0 +1,57 @@
+
+.floorplan-container {
+    padding: 2.5rem;
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.floorplan-canvas-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 80%; /* Aspect ratio */
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
+    overflow: hidden;
+}
+
+.floorplan-canvas-wrapper canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.floorplan-details h4 {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.floorplan-details .prompt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    color: #6c757d;
+    background-color: #f8f9fa;
+    border-radius: .5rem;
+    padding: 2rem;
+}
+
+.floorplan-details .room-list {
+    margin-top: 1.5rem;
+}
+
+.floorplan-details .room-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.floorplan-details .room-item:last-child {
+    border-bottom: none;
+}

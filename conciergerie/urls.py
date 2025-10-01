@@ -116,4 +116,9 @@ urlpatterns += [
 ##  endpoint pour les taches et reservations par periode
 urlpatterns += [
     path("api/dashboard/", co_api_views.DashboardWeekAPIView.as_view(), name="api-dashboard"),
+    # conciergerie/urls.py
+    path("api/dashboard/week/", co_api_views.DashboardWeekAPIView.as_view(), name="api-dashboard-week"),
+    path("api/dashboard/month/", co_api_views.DashboardMonthAPIView.as_view(), name="api-dashboard-month"),
+    path("api/dashboard/quarter/", co_api_views.DashboardQuarterAPIView.as_view(), name="api-dashboard-quarter"),
+    path("api/dashboard/year/", co_api_views.DashboardYearAPIView.as_view(), name="api-dashboard-year"),
 ]

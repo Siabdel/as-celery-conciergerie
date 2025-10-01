@@ -284,7 +284,7 @@ class ReservationAdmin(admin.ModelAdmin):
     ## readonly_fields = ('numero', 'created_at', 'invoice_total')
     
     search_fields = ('guest_name', 'guest_email', 'property__name')
-    readonly_fields = ('booking_date', 'created_at', )
+    readonly_fields = ('booking_date', 'created_at', 'agency')
 
     fieldsets = (
         ('Reservation Details', {
@@ -322,6 +322,20 @@ class ReservationAdmin(admin.ModelAdmin):
         }),
     )
     
+    # ------------------------------------------------------------------
+    def save_model(self, request, obj, form, change):
+        if not change:
+            if hasattr(request.user, "employee"):      # collaborateur
+                obj.agency = request.user.employee.agency
+                # owner = propriétaire du bien (inchangé)
+                obj.owner = obj.property.owner
+            elif request.user.properties_owned.exists():  # owner
+                obj.agency = obj.property.agency
+                obj.owner = request.user
+            else:
+                raise PermissionDenied("Vous n’êtes rattaché à aucune agence.")
+        super().save_model(request, obj, form, change)
+        
     def get_price_per_night(self, obj):
         return obj.property.get_price_for_date(obj.check_in)
     get_price_per_night.short_description = 'Prix par nuit'
@@ -337,20 +351,27 @@ class ReservationAdmin(admin.ModelAdmin):
     
     total_price_display.short_description = 'Total Price'
 
-    def save_model(self, request, obj, form, change):
-        try:
-            obj.save()
-        except ValidationError as err:
-            messages.error(request, str(err))
-   
+    # ------------------------------------------------------------------
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
             return qs
-        #return qs.filter(property__owner=request.user)
-        # pour owner : ses biens
-        # pour employee : biens de son agence
-        return qs.for_user(request.user)
+        # collaborateur : toutes les résas de son agence
+        if hasattr(request.user, "employee"):
+            return qs.filter(agency=request.user.employee.agency)
+        # owner : uniquement ses résas
+        return qs.filter(property__owner=request.user)
+
+    # ------------------------------------------------------------------
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "property":
+            if hasattr(request.user, "employee"):   # collaborateur
+                kwargs["queryset"] = Property.objects.filter(
+                    agency=request.user.employee.agency
+                )
+            elif request.user.properties_owned.exists():  # owner
+                kwargs["queryset"] = request.user.properties_owned.all()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def changelist_view(self, request, extra_context=None):
         response = super().changelist_view(request, extra_context=extra_context)

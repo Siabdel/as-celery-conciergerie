@@ -1,0 +1,60 @@
+
+{
+  "name": "Le Panoramique - Appartement 4B",
+  "address": {
+    "street": "123 Rue de la Vue",
+    "city": "Paris",
+    "zip": "75015",
+    "country": "France"
+  },
+  "owner": {
+    "name": "Jean Dupont",
+    "contact": "jean.dupont@email.com"
+  },
+  "price": "1,250,000 €",
+  "description": "Superbe appartement de 4 pièces situé au 4ème étage d'un immeuble de standing avec une vue imprenable sur la ville. Entièrement rénové avec des matériaux de haute qualité, il offre un cadre de vie exceptionnel. La résidence dispose d'un service de conciergerie complet pour votre confort quotidien.",
+  "images": [
+    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2940&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2800&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2940&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=2800&auto=format&fit=crop"
+  ],
+  "location": {
+    "lat": 48.8566,
+    "lng": 2.3522
+  },
+  "amenities": [
+    { "icon": "bi-rulers", "name": "120 m²" },
+    { "icon": "bi-door-open", "name": "4 Pièces" },
+    { "icon": "bi-building", "name": "4ème étage" },
+    { "icon": "bi-arrows-fullscreen", "name": "Balcon" },
+    { "icon": "bi-car-front-fill", "name": "Parking" },
+    { "icon": "bi-shield-lock", "name": "Sécurisé" }
+  ],
+  "floorPlan": {
+    "buildingPlan": [
+      { "id": "apt-1a", "label": "1A", "points": [{ "x": 10, "y": 10 }, { "x": 150, "y": 10 }, { "x": 150, "y": 150 }, { "x": 10, "y": 150 }] },
+      { "id": "apt-1b", "label": "1B", "points": [{ "x": 160, "y": 10 }, { "x": 300, "y": 10 }, { "x": 300, "y": 150 }, { "x": 160, "y": 150 }] },
+      { "id": "apt-2a", "label": "2A", "points": [{ "x": 10, "y": 160 }, { "x": 150, "y": 160 }, { "x": 150, "y": 300 }, { "x": 10, "y": 300 }] },
+      { "id": "apt-2b", "label": "2B", "points": [{ "x": 160, "y": 160 }, { "x": 300, "y": 160 }, { "x": 300, "y": 300 }, { "x": 160, "y": 300 }] },
+      { "id": "apt-3", "label": "3", "points": [{ "x": 310, "y": 10 }, { "x": 450, "y": 10 }, { "x": 450, "y": 300 }, { "x": 310, "y": 300 }] },
+      { "id": "apt-4a", "label": "4A", "points": [{ "x": 10, "y": 310 }, { "x": 225, "y": 310 }, { "x": 225, "y": 450 }, { "x": 10, "y": 450 }] },
+      { "id": "apt-4b", "label": "4B", "points": [{ "x": 235, "y": 310 }, { "x": 450, "y": 310 }, { "x": 450, "y": 450 }, { "x": 235, "y": 450 }] }
+    ],
+    "apartments": {
+      "apt-4b": {
+        "id": "apt-4b",
+        "name": "Appartement 4B",
+        "area": 120,
+        "rooms": [
+          { "name": "Séjour", "area": 45, "points": [{ "x": 10, "y": 10 }, { "x": 200, "y": 10 }, { "x": 200, "y": 150 }, { "x": 10, "y": 150 }] },
+          { "name": "Cuisine", "area": 15, "points": [{ "x": 210, "y": 10 }, { "x": 300, "y": 10 }, { "x": 300, "y": 80 }, { "x": 210, "y": 80 }] },
+          { "name": "Chambre 1", "area": 20, "points": [{ "x": 10, "y": 160 }, { "x": 150, "y": 160 }, { "x": 150, "y": 280 }, { "x": 10, "y": 280 }] },
+          { "name": "Chambre 2", "area": 18, "points": [{ "x": 160, "y": 160 }, { "x": 300, "y": 160 }, { "x": 300, "y": 280 }, { "x": 160, "y": 280 }] },
+          { "name": "SDB", "area": 10, "points": [{ "x": 210, "y": 90 }, { "x": 300, "y": 90 }, { "x": 300, "y": 150 }, { "x": 210, "y": 150 }] },
+          { "name": "Balcon", "area": 12, "points": [{ "x": 10, "y": 290 }, { "x": 300, "y": 290 }, { "x": 300, "y": 320 }, { "x": 10, "y": 320 }] }
+        ]
+      }
+    }
+  }
+}

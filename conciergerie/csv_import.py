@@ -40,125 +40,91 @@ def import_reservations_csv_pandas(file_obj, user) -> dict:
 
     # --- lecture + nettoyage pandas ---
     try:
-        df = pd.read_csv(file_obj, dtype=str).fillna("")  # toutes les colonnes string d'abord
+        df = pd.read_table(file_obj, dtype=str).fillna("")  # toutes les colonnes string d'abord
     except Exception as e:
-        return {"created": 0, "updated": 0, "errors": [f"CSV illisible : {e}"]}
+        return {"created": 0, "updated": 0, "errors": [f"CSV illisible !!!!: {e}"]}
 
-    # on renomme proprement
-    df.columns = (
-        df.columns.str.strip()  # enlève espaces
-        .str.lower()
-        .str.replace(" ", "_")
-        .str.replace("/", "_")
-    )
 
-    # mapping rapide
-    col_map = {
-        "date": "date",
-        "arrivée_au_plus_tard_le": "arrival_deadline_str",
-        "date_de_début": "check_in_str",
-        "date_de_fin": "check_out_str",
-        "nuits": "nights",
-        "voyageur": "guest_name",
-        "property": "property_name",
-        "devise": "currency",
-        "montant": "amount_paid",
-        "versé": "paid_str",  # ignoré ici (déjà dans montant)
-        "frais_de_service": "service_fee",
-        "frais_de_paiement_rapide": "quick_pay_fee",
-        "frais_de_ménage": "cleaning_fee",
-        "frais_pour_le_linge_de_maison": "linen_fee",
-        "revenus_bruts": "gross_revenue",
-    }
+    import pandas as pd
+    import os
+    import django
+    from decimal import Decimal
+    from django.contrib.auth.models import User
+    from conciergerie.models import Reservation, Property
+    from core.models import ResaStatus, PlatformChoices
 
-    for col in col_map.values():
-        if col not in df.columns:
-            df[col] = ""
+    # Django setup
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "your_project.settings")
+    django.setup()
 
-    # conversion en types natifs
-    df["check_in"] = pd.to_datetime(df["check_in_str"], errors="coerce").dt.date
-    df["check_out"] = pd.to_datetime(df["check_out_str"], errors="coerce").dt.date
-    df["arrival_deadline"] = pd.to_datetime(df["arrival_deadline_str"], errors="coerce").dt.date
-    df["nights"] = pd.to_numeric(df["nights"], errors="coerce").astype("Int64")
-    df["amount_paid"] = df["amount_paid"].apply(_to_decimal)
-    df["service_fee"] = df["service_fee"].apply(_to_decimal)
-    df["quick_pay_fee"] = df["quick_pay_fee"].apply(_to_decimal)
-    df["cleaning_fee"] = df["cleaning_fee"].apply(_to_decimal)
-    df["linen_fee"] = df["linen_fee"].apply(_to_decimal)
-    df["gross_revenue"] = df["gross_revenue"].apply(_to_decimal)
+    # 1. Charger le CSV
+    df = pd.read_csv("reservations_conciergerie.csv", delimiter=",", encoding="utf-8")
 
-    # itération ligne à ligne
-    for idx, row in df.iterrows():
-        try:
-            with transaction.atomic():
-                # --- Property ---
-                prop = Property.objects.filter(name__iexact=row["property_name"].strip()).first()
-                if not prop:
-                    errors.append(f"Ligne {idx+2} : Property « {row['property_name']} » inconnu")
-                    continue
+    # 2. Renommer les colonnes
+    df.rename(columns={
+        "Date": "date_reservation",
+       
+        "Date de début": "check_in",
+        "Date de fin": "check_out",
+        "Nuits": "nb_nuits",
+        "Voyageur": "guest_name",
+        "Property": "property_name",
+        "Devise": "devise",
+        "Montant": "total_price",
+        "Versé": "montant_verse",
+        "Frais de service": "service_fee",
+        "Frais de paiement rapide": "frais_paiement_rapide",
+        "Frais de ménage": "cleaning_fee",
+        "Frais pour le linge de maison": "frais_linge",
+        "Revenus bruts": "revenus_bruts"
+    }, inplace=True)
 
-                # --- dates obligatoires ---
-                if pd.isna(row["check_in"]) or pd.isna(row["check_out"]):
-                    errors.append(f"Ligne {idx+2} : dates manquantes")
-                    continue
+    # 3. Convertir les dates au format %Y%m%d
+    date_cols = ["date_reservation", "date_arrivee_max", "check_in", "check_out"]
+    for col in date_cols:
+        df[col] = pd.to_datetime(df[col], format="%Y%m%d", errors="coerce")
 
-                check_in_dt = timezone.make_aware(
-                    datetime.combine(row["check_in"], datetime.min.time())
-                ).replace(hour=14)
-                check_out_dt = timezone.make_aware(
-                    datetime.combine(row["check_out"], datetime.min.time())
-                ).replace(hour=11)
+    # 4. Nettoyer les montants
+    montant_cols = ["total_price", "service_fee", "cleaning_fee", "frais_linge", "revenus_bruts"]
+    for col in montant_cols:
+        df[col] = df[col].astype(str).str.replace(",", ".").astype(float)
 
-                # deadline facultative
-                arrival_deadline = None
-                if not pd.isna(row["arrival_deadline"]):
-                    arrival_deadline = timezone.make_aware(
-                        datetime.combine(row["arrival_deadline"], datetime.min.time())
-                    ).replace(hour=23, minute=59)
+    # 5. Supprimer les lignes avec dates invalides
+    df = df.dropna(subset=["check_in", "check_out"])
 
-                # --- création / mise à jour ---
-                reservation, created_flag = Reservation.objects.update_or_create(
-                    property=prop,
-                    check_in=check_in_dt,
-                    defaults={
-                        "check_out": check_out_dt,
-                        "arrival_deadline": arrival_deadline,
-                        "nights": row["nights"] or (row["check_out"] - row["check_in"]).days,
-                        "guest_name": row["guest_name"].strip(),
-                        "guest_email": f"{row['guest_name'].lower().replace(' ','')}@csv.import",
-                        "currency": row["currency"] or "MAD",
-                        "amount_paid": row["amount_paid"],
-                        "gross_revenue": row["gross_revenue"] or row["amount_paid"],
-                        "platform": PlatformChoices.DIRECT,
-                        "reservation_status": ResaStatus.CONFIRMED,
-                        "created_by": user,
-                    }
-                )
-                if created_flag:
-                    created += 1
-                else:
-                    updated += 1
+    # 6. Parcourir et insérer
+    for _, row in df.iterrows():
+        check_in = row["check_in"].to_pydatetime()
+        check_out = row["check_out"].to_pydatetime()
 
-                # --- AdditionalExpense pour les frais ---
-                total_fees = row["service_fee"] + row["quick_pay_fee"] + row["cleaning_fee"] + row["linen_fee"]
-                if total_fees:
-                    AdditionalExpense.objects.update_or_create(
-                        property=prop,
-                        expense_type="other",
-                        occurrence_date=row["check_in"],
-                        defaults={
-                            "service_fee": row["service_fee"],
-                            "quick_pay_fee": row["quick_pay_fee"],
-                            "cleaning_fee": row["cleaning_fee"],
-                            "linen_fee": row["linen_fee"],
-                            "amount": total_fees,
-                            "description": f"Frais CSV – résa {row['guest_name']} du {row['check_in']}",
-                            "created_by": user,
-                        }
-                    )
+        propriete, _ = Property.objects.get_or_create(
+            name=row["property_name"],
+            defaults={
+                "owner": User.objects.first(),
+                "type": "apartment",
+                "address": "Adresse non renseignée",
+                "latitude": 0.0,
+                "longitude": 0.0,
+                "price_per_night": 100.00,
+            }
+        )
 
-        except Exception as e:
-            logger.exception("Ligne %s", idx+2)
-            errors.append(f"Ligne {idx+2} : {e}")
+        Reservation.objects.get_or_create(
+            property=propriete,
+            check_in=check_in,
+            check_out=check_out,
+            defaults={
+                "reservation_status": ResaStatus.CONFIRMED,
+                "guest_name": row["guest_name"],
+                "guest_email": "inconnu@example.com",
+                "platform": PlatformChoices.DIRECT,
+                "number_of_guests": 1,
+                "total_price": Decimal(str(row["total_price"])),
+                "cleaning_fee": Decimal(str(row["cleaning_fee"])),
+                "service_fee": Decimal(str(row["service_fee"])),
+            }
+        )
+
+    print("✅ Import terminé.")
 
     return {"created": created, "updated": updated, "errors": errors}

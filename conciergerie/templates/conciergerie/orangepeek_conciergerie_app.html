@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrangePeak - Tableau de bord</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .card-shadow {
+            box-shadow: 0 4px 12px rgba(0, 94, 155, 0.08);
+        }
+        .nav-item.active {
+            border-bottom: 3px solid #FF6B35;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow-sm">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <button class="md:hidden">
+                        <i data-feather="menu" class="text-[#005E9B]"></i>
+                    </button>
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-[#FF6B35] flex items-center justify-center text-white font-bold">OP</div>
+                        <span class="ml-2 font-bold text-[#005E9B]">OrangePeak</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="relative">
+                        <i data-feather="bell" class="text-[#005E9B]"></i>
+                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-[#FF6B35] rounded-full text-white text-xs flex items-center justify-center">3</span>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                            <i data-feather="user" class="text-[#005E9B] w-4 h-4"></i>
+                        </div>
+                        <span class="hidden md:inline text-sm font-medium text-[#005E9B]">Admin</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto px-4 py-6">
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-lg card-shadow p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm text-gray-500">Biens actifs</p>
+                            <h3 class="text-2xl font-bold text-[#005E9B]">24</h3>
+                        </div>
+                        <div class="p-2 rounded-full bg-[#FF6B35]/10">
+                            <i data-feather="home" class="text-[#FF6B35] w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2">+2 depuis hier</p>
+                </div>
+                
+                <div class="bg-white rounded-lg card-shadow p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm text-gray-500">Check-ins</p>
+                            <h3 class="text-2xl font-bold text-[#005E9B]">8</h3>
+                        </div>
+                        <div class="p-2 rounded-full bg-[#FF6B35]/10">
+                            <i data-feather="log-in" class="text-[#FF6B35] w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2">Prochain dans 1h</p>
+                </div>
+                
+                <div class="bg-white rounded-lg card-shadow p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm text-gray-500">Check-outs</p>
+                            <h3 class="text-2xl font-bold text-[#005E9B]">6</h3>
+                        </div>
+                        <div class="p-2 rounded-full bg-[#FF6B35]/10">
+                            <i data-feather="log-out" class="text-[#FF6B35] w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2">2 en cours</p>
+                </div>
+                
+                <div class="bg-white rounded-lg card-shadow p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm text-gray-500">Services</p>
+                            <h3 class="text-2xl font-bold text-[#005E9B]">12</h3>
+                        </div>
+                        <div class="p-2 rounded-full bg-[#FF6B35]/10">
+                            <i data-feather="clipboard" class="text-[#FF6B35] w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2">3 urgents</p>
+                </div>
+            </div>
+
+            <!-- Chart & Quick Actions -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <!-- Occupation Chart -->
+                <div class="bg-white rounded-lg card-shadow p-4 lg:col-span-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-[#005E9B]">Taux d'occupation (7 jours)</h3>
+                        <div class="flex space-x-2">
+                            <button class="text-xs px-2 py-1 rounded bg-[#005E9B]/10 text-[#005E9B]">Semaine</button>
+                            <button class="text-xs px-2 py-1 rounded text-gray-500">Mois</button>
+                        </div>
+                    </div>
+                    <canvas id="occupationChart" height="200"></canvas>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="space-y-3">
+                    <button class="w-full flex items-center justify-between bg-[#FF6B35] text-white rounded-lg p-4 hover:bg-[#FF6B35]/90 transition">
+                        <span class="font-medium">+ Nouvelle réservation</span>
+                        <i data-feather="plus" class="w-5 h-5"></i>
+                    </button>
+                    <button class="w-full flex items-center justify-between bg-[#005E9B] text-white rounded-lg p-4 hover:bg-[#005E9B]/90 transition">
+                        <span class="font-medium">+ Nouveau service</span>
+                        <i data-feather="plus" class="w-5 h-5"></i>
+                    </button>
+                    <button class="w-full flex items-center justify-between bg-white text-[#005E9B] rounded-lg p-4 border border-[#005E9B] hover:bg-[#005E9B]/5 transition">
+                        <span class="font-medium">Voir calendrier</span>
+                        <i data-feather="calendar" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Interactive Table -->
+            <div class="bg-white rounded-lg card-shadow overflow-hidden">
+                <!-- Tabs -->
+                <div class="flex border-b">
+                    <button @click="activeTab = 'today'" :class="{'nav-item active text-[#005E9B] font-medium': activeTab === 'today', 'text-gray-500': activeTab !== 'today'}" class="px-4 py-3 text-sm">
+                        Aujourd'hui
+                    </button>
+                    <button @click="activeTab = 'tomorrow'" :class="{'nav-item active text-[#005E9B] font-medium': activeTab === 'tomorrow', 'text-gray-500': activeTab !== 'tomorrow'}" class="px-4 py-3 text-sm">
+                        Demain
+                    </button>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="p-4 border-b flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div class="relative flex-grow max-w-md">
+                        <i data-feather="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4"></i>
+                        <input type="text" placeholder="Rechercher..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:border-[#005E9B] focus:ring-1 focus:ring-[#005E9B]/50">
+                    </div>
+                    <div class="flex space-x-2 overflow-x-auto pb-1 md:pb-0">
+                        <button class="text-xs px-3 py-1 rounded-full bg-[#005E9B]/10 text-[#005E9B] whitespace-nowrap">Tous</button>
+                        <button class="text-xs px-3 py-1 rounded-full bg-white text-gray-500 border border-gray-200 whitespace-nowrap">Check-in</button>
+                        <button class="text-xs px-3 py-1 rounded-full bg-white text-gray-500 border border-gray-200 whitespace-nowrap">Check-out</button>
+                        <button class="text-xs px-3 py-1 rounded-full bg-white text-gray-500 border border-gray-200 whitespace-nowrap">Ménage</button>
+                        <button class="text-xs px-3 py-1 rounded-full bg-white text-gray-500 border border-gray-200 whitespace-nowrap">Maintenance</button>
+                    </div>
+                </div>
+
+                <!-- Table Content -->
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3">Type</th>
+                                <th class="px-6 py-3">Bien</th>
+                                <th class="px-6 py-3">Client</th>
+                                <th class="px-6 py-3">Heure</th>
+                                <th class="px-6 py-3">Statut</th>
+                                <th class="px-6 py-3"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 text-sm">
+                            <template v-if="activeTab === 'today'">
+                                <tr v-for="item in todayItems" :key="item.id" class="hover:bg-gray-50">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div :class="getTypeClass(item.type)" class="w-8 h-8 rounded-full flex items-center justify-center">
+                                                <i :data-feather="getTypeIcon(item.type)" class="w-4 h-4 text-white"></i>
+                                            </div>
+                                            <span class="ml-2">{{ item.type }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-medium text-[#005E9B]">{{ item.property }}</td>
+                                    <td class="px-6 py-4">{{ item.client }}</td>
+                                    <td class="px-6 py-4">{{ item.time }}</td>
+                                    <td class="px-6 py-4">
+                                        <span :class="getStatusClass(item.status)" class="px-2 py-1 rounded-full text-xs">{{ item.status }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button class="text-[#005E9B] hover:text-[#FF6B35]">
+                                            <i data-feather="more-vertical" class="w-5 h-5"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else>
+                                <tr v-for="item in tomorrowItems" :key="item.id" class="hover:bg-gray-50">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div :class="getTypeClass(item.type)" class="w-8 h-8 rounded-full flex items-center justify-center">
+                                                <i :data-feather="getTypeIcon(item.type)" class="w-4 h-4 text-white"></i>
+                                            </div>
+                                            <span class="ml-2">{{ item.type }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-medium text-[#005E9B]">{{ item.property }}</td>
+                                    <td class="px-6 py-4">{{ item.client }}</td>
+                                    <td class="px-6 py-4">{{ item.time }}</td>
+                                    <td class="px-6 py-4">
+                                        <span :class="getStatusClass(item.status)" class="px-2 py-1 rounded-full text-xs">{{ item.status }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button class="text-[#005E9B] hover:text-[#FF6B35]">
+                                            <i data-feather="more-vertical" class="w-5 h-5"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t mt-8">
+            <div class="container mx-auto px-4 py-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-sm text-gray-500 mb-4 md:mb-0">
+                        OrangePeak Dashboard v1.2.4
+                    </div>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-sm text-[#005E9B] hover:text-[#FF6B35]">Admin</a>
+                        <a href="#" class="text-sm text-[#005E9B] hover:text-[#FF6B35]">Support</a>
+                        <a href="#" class="text-sm text-[#005E9B] hover:text-[#FF6B35]">Changelog</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        feather.replace();
+        
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    activeTab: 'today',
+                    todayItems: [
+                        { id: 1, type: 'Check-in', property: 'Villa Soleil', client: 'Martin Dupont', time: '10:00', status: 'Confirmé' },
+                        { id: 2, type: 'Ménage', property: 'Appartement Riviera', client: '-', time: '11:30', status: 'En cours' },
+                        { id: 3, type: 'Check-out', property: 'Maison Bleue', client: 'Sophie Leroy', time: '09:00', status: 'Terminé' },
+                        { id: 4, type: 'Maintenance', property: 'Chalet Alpin', client: '-', time: '15:00', status: 'Programmé' },
+                        { id: 5, type: 'Check-in', property: 'Studio Méditerranée', client: 'Thomas Moreau', time: '16:00', status: 'Confirmé' }
+                    ],
+                    tomorrowItems: [
+                        { id: 6, type: 'Check-in', property: 'Villa Azur', client: 'Laura Bernard', time: '14:00', status: 'Confirmé' },
+                        { id: 7, type: 'Check-out', property: 'Appartement Central', client: 'Pierre Lambert', time: '11:00', status: 'À faire' },
+                        { id: 8, type: 'Ménage', property: 'Maison Verte', client: '-', time: '10:00', status: 'À faire' }
+                    ]
+                }
+            },
+            methods: {
+                getTypeClass(type) {
+                    return {
+                        'Check-in': 'bg-[#005E9B]',
+                        'Check-out': 'bg-[#FF6B35]',
+                        'Ménage': 'bg-purple-500',
+                        'Maintenance': 'bg-amber-500'
+                    }[type] || 'bg-gray-500';
+                },
+                getTypeIcon(type) {
+                    return {
+                        'Check-in': 'log-in',
+                        'Check-out': 'log-out',
+                        'Ménage': 'droplet',
+                        'Maintenance': 'tool'
+                    }[type] || 'help-circle';
+                },
+                getStatusClass(status) {
+                    return {
+                        'Confirmé': 'bg-green-100 text-green-800',
+                        'En cours': 'bg-blue-100 text-blue-800',
+                        'Terminé': 'bg-gray-100 text-gray-800',
+                        'Programmé': 'bg-amber-100 text-amber-800',
+                        'À faire': 'bg-red-100 text-red-800'
+                    }[status] || 'bg-gray-100 text-gray-800';
+                }
+            },
+            mounted() {
+                // Chart.js initialization
+                const ctx = document.getElementById('occupationChart');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+                        datasets: [{
+                            label: 'Taux d\'occupation',
+                            data: [65, 59, 80, 81, 56, 55, 90],
+                            borderColor: '#FF6B35',
+                            backgroundColor: 'rgba(255, 107, 53, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+
+.navbar {
+  transition: background-color 0.3s ease-in-out;
+  padding: 1rem 0;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.8rem;
+}
+
+.navbar-brand span {
+  color: var(--secondary-color);
+}
+
+.nav-link {
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: var(--secondary-color) !important;
+}
+
+.navbar-custom {
+    background-color: var(--primary-color);
+}

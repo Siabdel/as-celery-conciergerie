@@ -22,60 +22,46 @@ from django.db.models import Q
 User = get_user_model()
 
 
+# staff/admin.py
+from django.contrib import admin
+from django.contrib.auth import get_user_model
+from django import forms
+from staff.models import Employee
+from core.models import Agency
+
+User = get_user_model()
+
+
 class EmployeeForm(forms.ModelForm):
-    """Formulaire qui filtre la liste des users par agence."""
+    """Formulaire qui :
+    - filtre la liste déroulante « user » par agence du manager
+    - masque l’agence (auto-remplie)
+    """
     class Meta:
         model = Employee
         fields = ("user", "role", "phone_number", "work_on_saturday", "work_on_sunday")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # on limite la liste déroulante user
+        # on limite les users à ceux de l’agence du manager connecté
         if "user" in self.fields:
-            try :
-                agency = self.current_user.employee.agency
-                self.fields["user"].queryset = User.objects.filter(
-                    Q(employee__agency=agency) | Q(properties_owned__agency=agency)
-                ).distinct()
-            except Employee.DoesNotExist:
-                pass
+            agency = self.current_user.employee.agency
+            self.fields["user"].queryset = User.objects.filter(
+                Q(employee__agency=agency) | Q(properties_owned__agency=agency)
+            ).distinct()
 
 
 
+# staff/admin.py
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    form = EmployeeForm
-    list_display = ("user_full_name", 'agency', 'get_calendar_name', 'role', 'phone_number', 'is_active', 'created_at')
-    search_fields = ("user_full_name",)
+    list_display = ("user", "agency", "role", "phone_number")
     list_filter = ("agency", "role")
-    readonly_fields = ("agency",)   # ← pas de liste déroulante
-    
-    readonly_fields = ("user_full_name",)
+    readonly_fields = ("agency",)
 
-    def user_full_name(self, obj):
-        return obj.user.get_full_name()
-    user_full_name.short_description = "Nom complet"
-    
-
-    def get_calendar_name(self, obj):
-        return obj.calendar.name if obj.calendar else "Pas de calendrier"
-    get_calendar_name.short_description = 'Calendrier'
-    
-  
-   # ------------------------------------------------------------------
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        form.current_user = request.user              # passe l’utilisateur au formulaire
-        return form
-    
     def save_model(self, request, obj, form, change):
-        if not change:                       # création uniquement
-            if request.user.is_superuser:
-                # super-user : on prend l’agence du **premier** bien qu’il voit
-                first = Property.objects.first()
-                obj.agency = first.agency if first else None
-            elif hasattr(request.user, "employee"):
-                # collaborateur : son propre employeur
+        if not change:                       # création
+            if hasattr(request.user, "employee"):
                 obj.agency = request.user.employee.agency
             else:
                 raise PermissionDenied("Vous n’êtes rattaché à aucune agence.")
@@ -85,16 +71,10 @@ class EmployeeAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
             return qs
-        # collaborateur : uniquement les employees de son agence
-        try:
-            if hasattr(request.user, "employee"):
-                return qs.filter(agency=request.user.employee.agency)
-        
-        except staff_models.Employee.DoesNotExist:
-            pass
-        
+        if hasattr(request.user, "employee"):
+            return qs.filter(agency=request.user.employee.agency)
         return qs.none()
-
+    
 @admin.register(Absence)
 class AbsenceAdmin(admin.ModelAdmin):
     list_display = ('get_employee', 'start_date', 'end_date', 'type_absence', )

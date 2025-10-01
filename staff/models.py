@@ -165,7 +165,7 @@ class Employee(models.Model):
     ]
     agency = models.ForeignKey(Agency, on_delete=models.CASCADE) # new field
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="employee")
-    calendar = models.ForeignKey(CustomCalendar, on_delete=models.CASCADE)
+    calendar = models.ForeignKey(CustomCalendar, on_delete=models.CASCADE, null=True, blank=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='cleaner')
     phone_number = models.CharField(max_length=15, null=True)
     hire_date = models.DateField( null=True, blank=True ) # date d'embauche

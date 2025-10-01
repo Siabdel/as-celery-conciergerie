@@ -1,0 +1,40 @@
+
+.concierge-section {
+    padding: 5rem 0;
+    background: linear-gradient(to right, var(--primary-color), #0d6efdca);
+    color: white;
+}
+
+.concierge-card {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.concierge-card:hover {
+    transform: translateY(-10px);
+    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.concierge-icon {
+    font-size: 3rem;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+}
+
+.concierge-card h4 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.concierge-section .section-title {
+    color: white;
+}
+.concierge-section .section-title::after {
+    background-color: white;
+}
