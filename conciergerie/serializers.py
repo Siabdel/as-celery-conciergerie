@@ -216,6 +216,8 @@ class CheckEventSerializer(serializers.Serializer):
     guest_name = serializers.CharField()
     reservation_status = serializers.CharField()
     platform = serializers.CharField(source="get_platform_display", required=False)
+    check_in = serializers.DateTimeField()
+    check_out = serializers.DateTimeField()
 
 
 class ServiceEventSerializer(serializers.Serializer):

@@ -268,8 +268,12 @@ class ReservationResource(resources.ModelResource):
         # Logique personnalisée après l'import de chaque ligne
         pass
 
+#-------------------
+#- Reservation Admin
+#---------------------------------
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
+    ## list_display = [f.name for f in Reservation._meta.fields if f.name.endswith('agency')] ['agency']
     list_display = ["agency", "property", "guest_name", "check_in", "check_out", "reservation_status",
                     'platform', 'get_price_per_night', 'total_price']
     list_filter = ["agency", "reservation_status", "platform"]

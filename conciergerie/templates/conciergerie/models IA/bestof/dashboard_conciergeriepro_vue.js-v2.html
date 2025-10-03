@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conciergerie Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .calendar-container {
+            height: 600px;
+        }
+        @media (max-width: 768px) {
+            .calendar-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-indigo-700 text-white w-64 flex-shrink-0 md:block hidden">
+            <div class="p-4">
+                <h1 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-concierge-bell mr-2"></i>
+                    Conciergerie Pro
+                </h1>
+                <p class="text-indigo-200 text-sm mt-1">Gestion des réservations</p>
+            </div>
+            <nav class="mt-6">
+                <div class="px-4">
+                    <div class="py-2 text-indigo-200 uppercase text-xs font-semibold">Navigation</div>
+                    <a href="#" class="block py-2.5 px-4 rounded-lg bg-indigo-800 text-white font-medium">
+                        <i class="fas fa-home mr-2"></i> Tableau de bord
+                    </a>
+                    <a href="#" class="block py-2.5 px-4 rounded-lg hover:bg-indigo-800 text-indigo-100 font-medium mt-1">
+                        <i class="fas fa-calendar-alt mr-2"></i> Réservations
+                    </a>
+                    <a href="#" class="block py-2.5 px-4 rounded-lg hover:bg-indigo-800 text-indigo-100 font-medium mt-1">
+                        <i class="fas fa-building mr-2"></i> Appartements
+                    </a>
+                    <a href="#" class="block py-2.5 px-4 rounded-lg hover:bg-indigo-800 text-indigo-100 font-medium mt-1">
+                        <i class="fas fa-chart-line mr-2"></i> Statistiques
+                    </a>
+                    <a href="#" class="block py-2.5 px-4 rounded-lg hover:bg-indigo-800 text-indigo-100 font-medium mt-1">
+                        <i class="fas fa-cog mr-2"></i> Paramètres
+                    </a>
+                </div>
+            </nav>
+            <div class="absolute bottom-0 w-full p-4">
+                <div class="bg-indigo-800 rounded-lg p-3">
+                    <div class="flex items-center">
+                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" class="w-10 h-10 rounded-full">
+                        <div class="ml-3">
+                            <p class="text-white font-medium">Admin User</p>
+                            <p class="text-indigo-200 text-xs">Administrateur</p>
+                        </div>
+                    </div>
+                    <button class="mt-3 w-full py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 rounded text-sm">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Déconnexion
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Top bar -->
+            <header class="bg-white shadow-sm py-3 px-4 flex items-center justify-between">
+                <div class="flex items-center">
+                    <button id="sidebarToggle" class="md:hidden text-gray-600 mr-2">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <h2 class="text-xl font-semibold text-gray-800">Tableau de bord</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                    <div class="relative md:hidden">
+                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" class="w-8 h-8 rounded-full">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main content area -->
+            <main class="p-4">
+                <!-- Stats cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white rounded-lg shadow-sm p-5 card-hover transition-all duration-300">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Occupancy Rate</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">78%</h3>
+                                <p class="text-green-500 text-sm mt-1"><i class="fas fa-arrow-up mr-1"></i> 5% vs last month</p>
+                            </div>
+                            <div class="bg-indigo-100 p-3 rounded-full text-indigo-600">
+                                <i class="fas fa-bed text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-5 card-hover transition-all duration-300">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Monthly Revenue</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">€12,450</h3>
+                                <p class="text-green-500 text-sm mt-1"><i class="fas fa-arrow-up mr-1"></i> 12% vs last month</p>
+                            </div>
+                            <div class="bg-green-100 p-3 rounded-full text-green-600">
+                                <i class="fas fa-euro-sign text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-5 card-hover transition-all duration-300">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Active Bookings</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">24</h3>
+                                <p class="text-blue-500 text-sm mt-1"><i class="fas fa-exchange-alt mr-1"></i> 3 new today</p>
+                            </div>
+                            <div class="bg-blue-100 p-3 rounded-full text-blue-600">
+                                <i class="fas fa-calendar-check text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-5 card-hover transition-all duration-300">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Available Apartments</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-1">8/15</h3>
+                                <p class="text-yellow-500 text-sm mt-1"><i class="fas fa-info-circle mr-1"></i> 53% available</p>
+                            </div>
+                            <div class="bg-yellow-100 p-3 rounded-full text-yellow-600">
+                                <i class="fas fa-building text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Calendar section -->
+                    <div class="lg:col-span-2 bg-white rounded-lg shadow-sm p-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Planning des réservations</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
+                                    <i class="fas fa-plus mr-1"></i> Nouvelle réservation
+                                </button>
+                                <div class="relative">
+                                    <select class="appearance-none bg-gray-100 border border-gray-300 rounded px-3 py-1 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                        <option>Tous les appartements</option>
+                                        <option>Appartement 1</option>
+                                        <option>Appartement 2</option>
+                                        <option>Appartement 3</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                        <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="calendar-container" id="calendar"></div>
+                    </div>
+
+                    <!-- Recent bookings and quick actions -->
+                    <div class="space-y-6">
+                        <!-- Recent bookings -->
+                        <div class="bg-white rounded-lg shadow-sm p-4">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">Dernières réservations</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-start p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                                    <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 mr-3">
+                                        <i class="fas fa-calendar-day"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-gray-800">Appartement Luxe</p>
+                                        <p class="text-sm text-gray-500">15-20 Juin 2023</p>
+                                        <p class="text-xs text-indigo-600 mt-1">Jean Dupont</p>
+                                    </div>
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Confirmé</span>
+                                </div>
+                                <div class="flex items-start p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                                    <div class="bg-blue-100 p-2 rounded-lg text-blue-600 mr-3">
+                                        <i class="fas fa-calendar-day"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-gray-800">Studio Moderne</p>
+                                        <p class="text-sm text-gray-500">18-25 Juin 2023</p>
+                                        <p class="text-xs text-blue-600 mt-1">Marie Lambert</p>
+                                    </div>
+                                    <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">En attente</span>
+                                </div>
+                                <div class="flex items-start p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                                    <div class="bg-purple-100 p-2 rounded-lg text-purple-600 mr-3">
+                                        <i class="fas fa-calendar-day"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-gray-800">Suite Familiale</p>
+                                        <p class="text-sm text-gray-500">22-30 Juin 2023</p>
+                                        <p class="text-xs text-purple-600 mt-1">Famille Martin</p>
+                                    </div>
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Confirmé</span>
+                                </div>
+                                <div class="flex items-start p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                                    <div class="bg-pink-100 p-2 rounded-lg text-pink-600 mr-3">
+                                        <i class="fas fa-calendar-day"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-medium text-gray-800">Appartement Vue Mer</p>
+                                        <p class="text-sm text-gray-500">1-8 Juillet 2023</p>
+                                        <p class="text-xs text-pink-600 mt-1">Sophie Leroy</p>
+                                    </div>
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Confirmé</span>
+                                </div>
+                            </div>
+                            <button class="mt-3 w-full py-2 px-3 bg-gray-100 hover:bg-gray-200 rounded text-sm text-gray-600 font-medium">
+                                Voir toutes les réservations
+                            </button>
+                        </div>
+
+                        <!-- Quick actions -->
+                        <div class="bg-white rounded-lg shadow-sm p-4">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">Actions rapides</h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button class="flex flex-col items-center justify-center p-3 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors">
+                                    <div class="bg-indigo-100 p-3 rounded-full text-indigo-600 mb-2">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-700">Nouvelle réservation</span>
+                                </button>
+                                <button class="flex flex-col items-center justify-center p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+                                    <div class="bg-green-100 p-3 rounded-full text-green-600 mb-2">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-700">Ajouter appartement</span>
+                                </button>
+                                <button class="flex flex-col items-center justify-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                                    <div class="bg-blue-100 p-3 rounded-full text-blue-600 mb-2">
+                                        <i class="fas fa-file-invoice-dollar"></i>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-700">Générer facture</span>
+                                </button>
+                                <button class="flex flex-col items-center justify-center p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
+                                    <div class="bg-purple-100 p-3 rounded-full text-purple-600 mb-2">
+                                        <i class="fas fa-chart-pie"></i>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-700">Voir statistiques</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apartments list -->
+                <div class="mt-8 bg-white rounded-lg shadow-sm p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Liste des appartements</h3>
+                        <button class="px-3 py-1 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
+                            <i class="fas fa-plus mr-1"></i> Ajouter
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacité</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix/nuit</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600">
+                                                <i class="fas fa-home"></i>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Appartement Luxe</div>
+                                                <div class="text-sm text-gray-500">Étage 2</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2 pièces</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2 personnes</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">€120</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Disponible</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                                                <i class="fas fa-home"></i>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Studio Moderne</div>
+                                                <div class="text-sm text-gray-500">Étage 1</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Studio</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1-2 personnes</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">€80</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Occupé</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600">
+                                                <i class="fas fa-home"></i>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Suite Familiale</div>
+                                                <div class="text-sm text-gray-500">Étage 3</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3 pièces</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4-6 personnes</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">€180</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Disponible</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Initialize calendar
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'fr',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: [
+                    {
+                        title: 'Appartement Luxe',
+                        start: '2023-06-15',
+                        end: '2023-06-20',
+                        color: '#6366f1'
+                    },
+                    {
+                        title: 'Studio Moderne',
+                        start: '2023-06-18',
+                        end: '2023-06-25',
+                        color: '#3b82f6'
+                    },
+                    {
+                        title: 'Suite Familiale',
+                        start: '2023-06-22',
+                        end: '2023-06-30',
+                        color: '#8b5cf6'
+                    },
+                    {
+                        title: 'Appartement Vue Mer',
+                        start: '2023-07-01',
+                        end: '2023-07-08',
+                        color: '#ec4899'
+                    }
+                ],
+                eventClick: function(info) {
+                    alert('Réservation: ' + info.event.title + '\n' +
+                          'Du: ' + info.event.start.toLocaleDateString() + '\n' +
+                          'Au: ' + info.event.end.toLocaleDateString());
+                }
+            });
+            calendar.render();
+
+            // Toggle sidebar on mobile
+            $('#sidebarToggle').click(function() {
+                $('.sidebar').toggleClass('hidden');
+            });
+
+            // Sample API calls
+            function fetchApartments() {
+                axios.get('/api/apartments')
+                    .then(function(response) {
+                        console.log('Apartments data:', response.data);
+                    })
+                    .catch(function(error) {
+                        console.error('Error fetching apartments:', error);
+                        alert('Erreur lors du chargement des appartements');
+                    });
+            }
+
+            function fetchBookings() {
+                axios.get('/api/bookings')
+                    .then(function(response) {
+                        console.log('Bookings data:', response.data);
+                    })
+                    .catch(function(error) {
+                        console.error('Error fetching bookings:', error);
+                        alert('Erreur lors du chargement des réservations');
+                    });
+            }
+
+            function fetchStatistics() {
+                axios.get('/api/statistics')
+                    .then(function(response) {
+                        console.log('Statistics data:', response.data);
+                    })
+                    .catch(function(error) {
+                        console.error('Error fetching statistics:', error);
+                        alert('Erreur lors du chargement des statistiques');
+                    });
+            }
+
+            // Initial data load
+            fetchApartments();
+            fetchBookings();
+            fetchStatistics();
+        });
+    </script>
+</body>
+</html>

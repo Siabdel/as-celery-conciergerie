@@ -24,7 +24,7 @@ from conciergerie import models as co_models
 logger = logging.getLogger(__name__)
 
 def home(request):
-    return render(request, "conciergerie/home_page.html", {})
+    return render(request, "conciergerie/dashboard_conciergeriepro.html", {})
 
 def conciergerie_page(request):
     return render(request, "dashboard_page.html")

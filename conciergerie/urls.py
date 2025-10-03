@@ -70,6 +70,9 @@ urlpatterns = [
     # API métiers
     path("api/", include(router.urls)),
 
+    # api properties
+    path("api/properties/myagency/", PropertyViewSet.as_view({'get': 'mine'}), name="property-my_agency"),
+
     # Auth JWT
     path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),

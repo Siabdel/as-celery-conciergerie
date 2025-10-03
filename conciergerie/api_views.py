@@ -29,6 +29,11 @@ from conciergerie.serializers import (
     OccupancySerializer,
 )
 
+# conciergerie/views.py
+from django.utils import timezone
+from rest_framework.decorators import action
+from core.models import ResaStatus
+
 
 class PropertyViewSet(viewsets.ModelViewSet):
     queryset = Property.objects.all()
@@ -40,6 +45,27 @@ class PropertyViewSet(viewsets.ModelViewSet):
     search_fields = ["name", "address"]
     ordering_fields = ["price_per_night", "name"]
 
+    def get_queryset(self):
+        # **filtrage par agence de l’utilisateur connecté**
+        return Property.objects.for_user(self.request.user)
+
+    # ------------------------------------------------------------------
+    #  ✅ Disponibles uniquement
+    # ------------------------------------------------------------------
+    @action(detail=False, methods=['get'])
+    def available(self, request):
+        """Biens disponibles (is_active=True) de l’agence connectée."""
+        qs = self.get_queryset().filter(is_active=True)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def myagency(self, request):
+        """Biens de l’agence de l’utilisateur connecté."""
+        queryset = self.get_queryset()  # déjà filtré par for_user()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
     @action(detail=True, methods=["get"])
     def revenue(self, request, pk=None):
         property = self.get_object()
@@ -52,6 +78,47 @@ class PropertyViewSet(viewsets.ModelViewSet):
         total_days = sum(r.get_duration() for r in property.reservations.all())
         return Response({"property": property.name, "occupancy_days": total_days})
 
+
+
+    @action(detail=False, methods=['get'])
+    def available_for_period(self, request):
+        """
+        Biens **disponibles** (aucune réservation ACTIVE chevauchant la période).
+        URL : /api/properties/available-for-period/?start=YYYY-MM-DD&end=YYYY-MM-DD
+        """
+        start_str = request.query_params.get("start")
+        end_str = request.query_params.get("end")
+        if not start_str or not end_str:
+            return Response({"error": "Paramètres 'start' et 'end' requis."}, status=400)
+
+        start = timezone.make_aware(datetime.fromisoformat(start_str))
+        end = timezone.make_aware(datetime.fromisoformat(end_str))
+
+        # ------------------------------------------------------------------
+        #  1.  Réservations ACTIVES chevauchant la période
+        # ------------------------------------------------------------------
+        booked_property_ids = (
+            Reservation.objects.for_user(request.user)
+            .filter(
+                reservation_status__in=[
+                    ResaStatus.CONFIRMED,
+                    ResaStatus.IN_PROGRESS,
+                    ResaStatus.CHECKED_IN,
+                    ResaStatus.CHECKED_OUT,
+                ],
+                # chevauche la période
+                check_in__lt=end,
+                check_out__gt=start,
+            )
+            .values_list("property_id", flat=True)
+        )
+
+        # ------------------------------------------------------------------
+        #  2.  Biens NON réservés pendant la période
+        # ------------------------------------------------------------------
+        qs = self.get_queryset().exclude(id__in=booked_property_ids)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
 
 class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
