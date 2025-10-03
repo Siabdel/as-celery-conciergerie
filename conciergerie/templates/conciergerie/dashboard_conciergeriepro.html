@@ -120,6 +120,22 @@
                         </div>
                     </div>
                     <!-- Stats cards -->
+                      <!-- Cartes récapitulatives -->
+                   <div class="col-12 mb-4">
+                        <div class="row g-4" id="22">
+                        <!-- Cartes injectées via JS -->
+                            <div v-for="card in recapCards" :key="card.id" class="col-12 col-sm-6 col-lg-3">
+                                    <div class="card dashboard-card">
+                                        <div class="card-body text-center">
+                                            <i :class="card.class" style="color: #005E9B;"></i>
+                                            <h3 class="card-value">[[ card.value ]]</h3>
+                                            <p class="card-text text-muted">[[ card.title ]]</p>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         <div class="bg-white rounded-lg shadow-sm p-5 card-hover transition-all duration-300">
                             <div class="flex justify-between items-start">
@@ -363,13 +379,18 @@
                     calendar: null,
                     events: [],
                     properties: [],
+                    recapCards: [],
+                    checkingInsToday : 0,
+                    checkOutsToday : 0,
+                    servicesToday : 0,
                     //----
                 }
             },
             mounted () {
                 this.loadDashboard();
                 this.loadProperties(); // ← nouvel appel
-                this.buildCalendarEvents(); // charge ²vénements    
+                this.buildCalendarEvents(); // charge ²vénements   
+                this.buildCard(); // charge les cartes récapitulatives 
 
                 this.$nextTick(() => this.initCalendar());
                 console.log("last latestReservations =", this.checkins);
@@ -385,6 +406,34 @@
             },
             methods: {
                 //----
+                buildCard(){
+                    // Injecter les cartes récapitulatives
+                    this.recapCards = [{
+                            class : "fas fa-building fa-2x mb-2",
+                            title: 'Biens actifs',
+                            value: 12,
+                        },
+                        {
+                            class : "fas fa-sign-in-alt fa-2x mb-2",
+                            title: 'Check-ins à faire',
+                            value: this.checkingInsToday
+                        },
+                        {
+                            class: "fas fa-sign-out-alt fa-2x mb-2",
+                            title: 'Départs',
+                            value: this.checkOutsToday
+                        },
+                        {
+                            icon: 'broom',
+                            class: "fas fa-broom fa-2x mb-2",
+                            title: 'Services à faire',
+                            value: this.servicesToday
+                        }
+                    ]
+                },
+                //---------------
+                //- buildCalendarEvents
+                //---------------
                 buildCalendarEvents() {
                     this.events = [
                         ...this.checkins.map(r => ({
