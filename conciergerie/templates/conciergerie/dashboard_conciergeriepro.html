@@ -26,8 +26,6 @@
 
 {% block content %}
     <div id="app" class="container mt-4">
-        <h2 class="mb-3">Dashboard – Vue.js 2 [[ message ]] </h2>
-
         <div class="flex h-screen overflow-hidden">
             <!-- Sidebar -->
             <div class="sidebar bg-indigo-700 text-white w-64 flex-shrink-0 md:block hidden">
@@ -126,9 +124,10 @@
                         <div class="bg-white rounded-lg shadow-sm p-5 card-hover transition-all duration-300">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <p class="text-gray-500 text-sm">Occupancy Rate</p>
+                                    <p class="text-gray-500 text-sm">Taux d'Occupation</p>
                                     <h3 class="text-2xl font-bold text-gray-800 mt-1"> [[ occupancyRate ]] %</h3>
-                                    <p class="text-green-500 text-sm mt-1"><i class="fas fa-arrow-up mr-1"></i> 5% vs last month</p>
+                                    <p class="text-green-500 text-sm mt-1">
+                                        <i class="fas fa-arrow-up mr-1"></i> 5% vs last month</p>
                                 </div>
                                 <div class="bg-indigo-100 p-3 rounded-full text-indigo-600">
                                     <i class="fas fa-bed text-xl"></i>
@@ -138,7 +137,7 @@
                         <div class="bg-white rounded-lg shadow-sm p-5 card-hover transition-all duration-300">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <p class="text-gray-500 text-sm">Monthly Revenue</p>
+                                    <p class="text-gray-500 text-sm">Revenue du mois</p>
                                     <h3 class="text-2xl font-bold text-gray-800 mt-1"> € [[ stats.revenue  ]] [[ agency.currency ]]</h3>
                                     <p class="text-green-500 text-sm mt-1"><i class="fas fa-arrow-up mr-1"></i> 12% vs last month</p>
                                 </div>
@@ -150,7 +149,7 @@
                         <div class="bg-white rounded-lg shadow-sm p-5 card-hover transition-all duration-300">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <p class="text-gray-500 text-sm">Active Bookings</p>
+                                    <p class="text-gray-500 text-sm"> nombre de réservations en cours </p>
                                     <h3 class="text-2xl font-bold text-gray-800 mt-1"> [[ stats.active_properties]] </h3>
                                     <p class="text-blue-500 text-sm mt-1"><i class="fas fa-exchange-alt mr-1"></i> 3 new today</p>
                                 </div>
@@ -162,7 +161,7 @@
                         <div class="bg-white rounded-lg shadow-sm p-5 card-hover transition-all duration-300">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <p class="text-gray-500 text-sm">Available Apartments</p>
+                                    <p class="text-gray-500 text-sm"> pourcentage d’appartements disponibles </p>
                                     <h3 class="text-2xl font-bold text-gray-800 mt-1">8/15</h3>
                                     <p class="text-yellow-500 text-sm mt-1"><i class="fas fa-info-circle mr-1"></i> 53% available</p>
                                 </div>
@@ -350,7 +349,7 @@
                     today: new Date().toLocaleDateString("fr-FR"),
                     period: 'quarter',
                     // pickedDate: new Date().toISOString().slice(0, 10),
-                    pickedDate: "2025-09-28",
+                    pickedDate: "2025-09-15",
                     stats: {},
                     agency: {},
                     checkins: [],
@@ -370,6 +369,8 @@
             mounted () {
                 this.loadDashboard();
                 this.loadProperties(); // ← nouvel appel
+                this.buildCalendarEvents(); // charge ²vénements    
+
                 this.$nextTick(() => this.initCalendar());
                 console.log("last latestReservations =", this.checkins);
             },
@@ -403,16 +404,18 @@
                 //- initCalendar
                 //--------------
                 initCalendar() {
-                    if(!this.$refs.calendar) return;
-                    if (this.calendar) this.calendar.destroy();
+                    //if(!this.$refs.calendar) return;
+                    //if (this.calendar) this.calendar.destroy();
 
                     this.calendar = new FullCalendar.Calendar(this.$refs.calendar, {
                         locale: 'fr',
                         initialView: 'dayGridMonth',
+                        initialDate: this.pickedDate,
                         headerToolbar: {
                         left: 'prev,next today',
                         center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,listWeek'
+                        right: 'dayGridMonth,timeGridWeek,listWeek',
+                        dateAlignment: 'center',
                         },
                         events: this.events, // tableau d’événements (voir plus bas)
                         dateClick: info => {
@@ -473,7 +476,11 @@
                         this.checkouts = response.data.checkouts;
                         this.services = response.data.services;
                         this.occupancy = response.data.occupancy_last7;
-                        this.occupancyRate = this.occupancy.length ? Math.round(this.occupancy.reduce((sum, o) => sum + o.rate, 0) / this.occupancy.length) : 0;
+                        //this.occupancy.reduce((sum, o) => sum + Number(o.rate), 0) / this.occupancy.length;  
+                        this.occupancyRate = this.occupancy.length ? Math.round(this.occupancy.reduce((sum, o) => sum + Number(o.rate || 0), 0) / this.occupancy.length)
+                         : 0;
+
+
                         this.totalProperties = this.stats.active_properties || 0;
                         this.drawCharts();
                         this.buildCalendarEvents();
