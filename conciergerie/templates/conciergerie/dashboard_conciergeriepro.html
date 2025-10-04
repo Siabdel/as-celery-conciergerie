@@ -124,15 +124,38 @@
                    <div class="col-12 mb-4">
                         <div class="row g-4" id="22">
                         <!-- Cartes injectées via JS -->
-                            <div v-for="card in recapCards" :key="card.id" class="col-12 col-sm-6 col-lg-3">
+
+                            <div class="col-12 col-sm-6 col-lg-3">
                                     <div class="card dashboard-card">
                                         <div class="card-body text-center">
-                                            <i :class="card.class" style="color: #005E9B;"></i>
-                                            <h3 class="card-value">[[ card.value ]]</h3>
-                                            <p class="card-text text-muted">[[ card.title ]]</p>
+                                            <i class="fas fa-building fa-2x mb-2" style="color: #005E9B;"></i>
+                                            <h3 class="card-value">[[ totalProperties ]]</h3>
+                                            <p class="card-text text-muted">Biens actifs</p>
                                         </div>
                                     </div>
                             </div>
+                             <div class="col-12 col-sm-6 col-lg-3">
+
+                                    <div class="card dashboard-card">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-sign-out-alt fa-2x mb-2" style="color: #005E9B;"></i>
+                                            <h3 class="card-value">[[ checkingInsToday ]]</h3>
+                                            <p class="card-text text-muted"> Check-ins à faire </p>
+                                        </div>
+                                    </div>
+                            </div>
+
+                            <div class="col-12 col-sm-6 col-lg-3">
+
+                                    <div class="card dashboard-card">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-broom fa-2x mb-2" style="color: #005E9B;"></i>
+                                            <h3 class="card-value">[[ servicesToday ]]</h3>
+                                            <p class="card-text text-muted"> Service à faire </p>
+                                        </div>
+                                    </div>
+                            </div>
+
                         </div>
                     </div>
 
@@ -361,7 +384,7 @@
             delimiters: ['[[', ']]'],
             data() {
                 return {
-                    message: "Happy Bee Bonjour !",
+                    message: "Happy Bee Bonjour ",
                     today: new Date().toLocaleDateString("fr-FR"),
                     period: 'quarter',
                     // pickedDate: new Date().toISOString().slice(0, 10),
@@ -386,11 +409,14 @@
                     //----
                 }
             },
+            //----------------------------------------------------------------
+            //  Lifecycle hook
+            //----------------------------------------------------------------
             mounted () {
                 this.loadDashboard();
                 this.loadProperties(); // ← nouvel appel
                 this.buildCalendarEvents(); // charge ²vénements   
-                this.buildCard(); // charge les cartes récapitulatives 
+                this.feetchTodayCheckins();// charge les arrivées aujourd'hui
 
                 this.$nextTick(() => this.initCalendar());
                 console.log("last latestReservations =", this.checkins);
@@ -404,33 +430,11 @@
                     return this.checkins.slice(0, 3);
                 }
             },
+            // ------------------------------------------------------------------
+            //  Methods
+            // ------------------------------------------------------------------
+
             methods: {
-                //----
-                buildCard(){
-                    // Injecter les cartes récapitulatives
-                    this.recapCards = [{
-                            class : "fas fa-building fa-2x mb-2",
-                            title: 'Biens actifs',
-                            value: 12,
-                        },
-                        {
-                            class : "fas fa-sign-in-alt fa-2x mb-2",
-                            title: 'Check-ins à faire',
-                            value: this.checkingInsToday
-                        },
-                        {
-                            class: "fas fa-sign-out-alt fa-2x mb-2",
-                            title: 'Départs',
-                            value: this.checkOutsToday
-                        },
-                        {
-                            icon: 'broom',
-                            class: "fas fa-broom fa-2x mb-2",
-                            title: 'Services à faire',
-                            value: this.servicesToday
-                        }
-                    ]
-                },
                 //---------------
                 //- buildCalendarEvents
                 //---------------
@@ -491,7 +495,25 @@
                         this.properties = [];
                     }
                 },
+                // ------------------------------------------------------------------
+                //  Liste des arrivées aujourd'hui (branchée sur les données)
+                // ------------------------------------------------------------------
+                async feetchTodayCheckins(){
+                    try {
+                        const res = await axios.get("/api/today-checkins/", {
+                        headers: { Authorization: `Bearer ${localStorage.getItem("access") || ""}` }
+                    });
+                    this.checkins = res.data.results || res.data; // compat DRF / liste
+                    this.checkingInsToday = res.data.length; // compat DRF / liste
+                    console.log("Today Checkins loaded", { ...this.checkins });
+                    } catch (err) {
+                        console.error("Today Checkins error", err);
+                        this.checkins = [];
+                    }   
+                },
+                // ------------------------------------------------------------------
                 // 7.  Liste des appartements (branchée sur les données)
+                // ------------------------------------------------------------------
                 latestApartments() {
                     // on prend les 10 premiers (ou tous)
                     console.log("Properties loaded", { ...this.properties.slice(0, 3) });
@@ -622,6 +644,9 @@
                     };
                     return map[status] || 'bg-gray-500';
                 },
+                // ------------------------------------------------------------------
+                //   Statut badges
+                // ------------------------------------------------------------------
                 statusBadgeClass(status) {
                     const map = {
                     'CONFIRMED': 'bg-green-100 text-green-800',
@@ -633,6 +658,9 @@
                     };
                     return map[status] || 'bg-gray-100 text-gray-800';
                 },
+                //------------------------------------------------------------------
+                //   Statut libellé
+                //------------------------------------------------------------------
                 statusLabel(status) {
                     const map = {
                     'CONFIRMED': 'Confirmé',
@@ -644,6 +672,9 @@
                     };
                     return map[status] || status;
                 },
+                // ------------------------------------------------------------------
+                //  Format date FR
+                // ------------------------------------------------------------------
                 formatDate(dt) {
                     return new Date(dt).toLocaleDateString("fr-FR");
                 }

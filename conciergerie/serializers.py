@@ -66,11 +66,16 @@ class AdditionalExpenseSerializer(serializers.ModelSerializer):
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
+    fullname = serializers.SerializerMethodField()
     class Meta:
         model = Employee
-        fields = ["id", "name", "role", "phone_number", "hire_date", "is_active"]
+        fields = ["id", "fullname", "role", "phone_number", "hire_date", "is_active"]
         # serializer
         full_name = serializers.CharField(source="user.get_full_name", read_only=True)
+    
+        def get_fullname(self, obj):
+            # Retourne le prénom + espace + nom
+            return f"{obj.first_name} {obj.last_name}".strip()
 
 # conciergerie/ota_webhooks/serializers.py
 
