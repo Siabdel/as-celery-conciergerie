@@ -15,6 +15,7 @@ from django.db.models import Sum, F
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core.exceptions import ValidationError
 from core.models import Agency
+from staff.models import Employee
 from conciergerie.managers import ReservationManager, PropertyManager, ServiceTaskManager, PricingRuleManager
 
 # Create your models here.
@@ -50,10 +51,11 @@ class Property(ASBaseTimestampMixin):
         ('house', 'House'),
         ('villa', 'Villa'),
     ]
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
+    agency = models.ForeignKey(Agency, on_delete=models.PROTECT)
     name = models.CharField(max_length=100)
+    gerant = models.ForeignKey(Employee, null=True, blank=True, on_delete=models.SET_NULL)
     type = models.CharField(max_length=20, choices=PROPERTY_TYPES)
-    owner = models.ForeignKey(auth_models.User, on_delete=models.CASCADE, related_name='properties_owned')   # ← indispe
+    owner = models.ForeignKey(auth_models.User, on_delete=models.PROTECT, related_name='properties_owned')   # ← indispe
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     address = models.CharField(max_length=255)
     latitude = models.FloatField(blank=True, null=True)
@@ -162,13 +164,14 @@ class Reservation(ASBaseTimestampMixin):
     check_out = models.DateTimeField(default=timezone.now)
     guest_name = models.CharField(max_length=100)
     guest_email = models.EmailField()
+    guest_phone = models.CharField(max_length=20, blank=True)
+    guest_nationality = models.CharField(max_length=20, blank=True)
     platform = models.CharField(max_length=20, choices=PlatformChoices.choices,
                                 default=PlatformChoices.AIRBNB, null=True)
     number_of_guests = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     cleaning_fee = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     service_fee = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-    guest_phone = models.CharField(max_length=20, blank=True)
     booking_date = models.DateTimeField(auto_now_add=True)
      # =====  NEW FIELDS  =====
     arrival_deadline = models.DateTimeField( _("Arrivée au plus tard le"), null=True, blank=True,

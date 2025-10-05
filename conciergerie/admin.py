@@ -158,6 +158,7 @@ class PropertyAdmin(admin.ModelAdmin):
                 'name', 'agency',
                 ('type', 'owner'),
                 'price_per_night',
+                'gerant',
             )
         }),
         ('Location', {
@@ -274,7 +275,8 @@ class ReservationResource(resources.ModelResource):
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
     ## list_display = [f.name for f in Reservation._meta.fields if f.name.endswith('agency')] ['agency']
-    list_display = ["agency", "property", "guest_name", "check_in", "check_out", "reservation_status",
+    list_display = ["agency", "property", "guest_name", "guest_nationality","check_in", 
+                    "check_out", "reservation_status",
                     'platform', 'get_price_per_night', 'total_price']
     list_filter = ["agency", "reservation_status", "platform"]
     search_fields = ["guest_name", "guest_email"]

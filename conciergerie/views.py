@@ -109,3 +109,9 @@ def calendar_reservation(request):
 ## CustomCalendar reservations
 def calendar_employee(request):
     return render(request, 'fullcalendar_emp.html')
+
+#-------------------
+#- 
+
+def details_reservation(request, resa):
+    return render(request, "conciergerie/checkin_details_page.html" , {'reservation_id': resa})

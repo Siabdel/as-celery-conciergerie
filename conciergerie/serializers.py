@@ -3,31 +3,28 @@ from rest_framework import serializers
 from conciergerie.models import Property, Reservation, ServiceTask, Incident, AdditionalExpense
 from staff.models import Employee
 from datetime import datetime
+from staff.serializers import EmployeeSerializer
 
 
 
 class PropertySerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField(read_only=True)
+    gerant = EmployeeSerializer()
 
     class Meta:
         model = Property
-        fields = [
-            "id", "name", "type", "owner", "price_per_night",
-            "address", "latitude", "longitude", "capacity"
-        ]
+        fields = "__all__"
 
 
 class ReservationSerializer(serializers.ModelSerializer):
     property = serializers.StringRelatedField()
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    property = PropertySerializer()
 
     class Meta:
         model = Reservation
-        fields = [
-            "id", "property", "check_in", "check_out", "guest_name",
-            "guest_email", "platform", "number_of_guests",
-            "total_price", "cleaning_fee", "service_fee", "reservation_status"
-        ]
+        fields = "__all__" 
+        ## ("id", "property", "check_in", "check_out", "guest_name", "guest_email", "platform", "number_of_guests", "total_price", "cleaning_fee", "service_fee", "reservation_status")
 
 
 class ServiceTaskSerializer(serializers.ModelSerializer):

@@ -130,7 +130,7 @@
                                         <div class="card-body text-center">
                                             <i class="fas fa-building fa-2x mb-2" style="color: #005E9B;"></i>
                                             <h3 class="card-value">[[ totalProperties ]]</h3>
-                                            <p class="card-text text-muted">Biens actifs</p>
+                                            <p class="card-text text-muted"> <a href="#list_appt">  Biens actifs </a></p>
                                         </div>
                                     </div>
                             </div>
@@ -140,7 +140,7 @@
                                         <div class="card-body text-center">
                                             <i class="fas fa-sign-out-alt fa-2x mb-2" style="color: #005E9B;"></i>
                                             <h3 class="card-value">[[ checkingInsToday ]]</h3>
-                                            <p class="card-text text-muted"> Check-ins à faire </p>
+                                            <p class="card-text text-muted"> <a href="#checkins_todo" >Check-ins à faire  </a></p> 
                                         </div>
                                     </div>
                             </div>
@@ -303,64 +303,96 @@
 
                     <!-- Apartments list -->
                      <!-- 7.  Liste des appartements (branchée sur les données) -->
-                    <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-semibold text-gray-800">Liste des appartements</h3>
-                            <button class="px-3 py-1 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
-                                <i class="fas fa-plus mr-1"></i> Ajouter
-                            </button>
-                        </div>
-                        <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                            <tr>
-                                <th>Nom</th>
-                                <th>Type</th>
-                                <th>Capacité</th>
-                                <th>Prix/nuit</th>
-                                <th>Statut</th>
-                                <th>Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="apt in properties" :key="apt.id">
-                                <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-indigo-100 rounded-3 d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">
-                                    <i class="fas fa-home text-indigo-600"></i>
-                                    </div>
-                                    <div>
-                                    <p class="mb-0 fw-bold">[[ apt.name ]]</p>
-                                    <small class="text-muted">[[ apt.address ]]</small>
-                                    </div>
-                                </div>
-                                </td>
-                                <td>[[ apt.type ]]</td>
-                                <td>[[ apt.capacity ]] pers.</td>
-                                <td>[[ apt.price_per_night ]] [[ agency.currency ]]</td>
-                                <td>
-                                <span :class="statusClass(apt.is_active)" class="px-2 py-1 rounded-pill small">
-                                    [[ statusLabel(apt.is_active) ]] [[ apt.is_active ]]
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Disponible</span>
-                                        </td>
-                                </span>
-                                </td>
-                                <td>
-                                <button class="btn btn-sm btn-outline-primary me-1" @click="editApartment(apt.id)">
-                                    <i class="fas fa-edit"></i>
+                    <div class="row mb-4" id="list_appt">
+                        <div class="col-12">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold text-gray-800">Liste des appartements</h3>
+                                <button class="px-3 py-1 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
+                                    <i class="fas fa-plus mr-1"></i> Ajouter
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger" @click="deleteApartment(apt.id)">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        <p v-if="properties.length === 0" class="text-muted">Aucun appartement pour cette agence.</p>
+                            </div>
+                            <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Type</th>
+                                    <th>Capacité</th>
+                                    <th>Prix/nuit</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="apt in properties" :key="apt.id">
+                                    <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-indigo-100 rounded-3 d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">
+                                        <i class="fas fa-home text-indigo-600"></i>
+                                        </div>
+                                        <div>
+                                        <p class="mb-0 fw-bold">[[ apt.name ]]</p>
+                                        <small class="text-muted">[[ apt.address ]]</small>
+                                        </div>
+                                    </div>
+                                    </td>
+                                    <td>[[ apt.type ]]</td>
+                                    <td>[[ apt.capacity ]] pers.</td>
+                                    <td>[[ apt.price_per_night ]] [[ agency.currency ]]</td>
+                                    <td>
+                                    <span :class="statusClass(apt.is_active)" class="px-2 py-1 rounded-pill small">
+                                        [[ statusLabel(apt.is_active) ]] [[ apt.is_active ]]
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Disponible</span>
+                                            </td>
+                                    </span>
+                                    </td>
+                                    <td>
+                                    <button class="btn btn-sm btn-outline-primary me-1" @click="editApartment(apt.id)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" @click="deleteApartment(apt.id)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <p v-if="properties.length === 0" class="text-muted">Aucun appartement pour cette agence.</p>
+                            </div>
                         </div>
                     </div>
+                    <!-- 5.  checkin a faire  réservations  -->
+                    <div class="row mb-4" id="checkins_todo">
+                        <div class="bg-white rounded-lg shadow-sm p-4">
+                            
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">  Checkins à faire aujourdhui </h3>
+                            <div class="space-y-3">
+                            <div v-for="resa in checkinsTodo" :key="resa.id" class="flex items-start p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                                
+                                <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 mr-3">
+                                    <i class="fas fa-calendar-day"></i>
+                                </div>
+                                <div class="flex-1">
+                                <p class="font-medium text-gray-800">[[ resa.property_name ]]</p>
+                                <p class="text-sm text-gray-500">[[ formatDate(resa.check_in) ]] → [[ formatDate(resa.check_out) ]]</p>
+                                <p class="text-xs mt-1">[[ resa.guest_name ]]</p>
+                                </div>
+                                <span class="bg-red-100 text-green-800 text-xs px-2 py-1"> [[ formatHeureMin(resa.check_in) ]] </span>
+                                <span :class="statusBadgeClass(resa.status)" class="px-2 py-1 rounded-full text-xs font-medium">
+                                [[ statusLabel(resa.status) ]]
+                                </span>
+                                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Confirmé</span>
+                                <button class="btn btn-sm btn-outline-primary me-1 p-md-2" @click="editApartment(apt.id)">
+                                    <a :href="urlCheckin(resa.id)" target="_blank">Voir le check-in</a>
+
+                                </button>
+                            </div>
+                            <button class="mt-3 w-full py-2 px-3 bg-gray-100 hover:bg-gray-200 rounded text-sm text-gray-600 font-medium">
+                                Voir toutes les réservations
+                            </button>
+                            </div>
+                        </div>
                     </div>
                 </main>
             </div>
@@ -380,6 +412,11 @@
         // ------------------------------------------------------------------
 
         const { createApp } = Vue;
+        // filters 
+        
+        //------------
+        //- createApp
+        //----------------
         createApp({
             delimiters: ['[[', ']]'],
             data() {
@@ -406,6 +443,7 @@
                     checkingInsToday : 0,
                     checkOutsToday : 0,
                     servicesToday : 0,
+                    checkinsTodo : [],
                     //----
                 }
             },
@@ -453,6 +491,14 @@
                     ];
                 this.initCalendar();
                 },
+                //------------------
+                //-
+                //-----------------
+                urlCheckin(reservation_id) {
+                    // Adapte l’URL selon ton namespaces et patterne Django
+                        if (!reservation_id) return '#'
+                        return `/resa/${reservation_id}/show/`
+                 },
                 //--------------
                 //- initCalendar
                 //--------------
@@ -503,7 +549,7 @@
                         const res = await axios.get("/api/today-checkins/", {
                         headers: { Authorization: `Bearer ${localStorage.getItem("access") || ""}` }
                     });
-                    this.checkins = res.data.results || res.data; // compat DRF / liste
+                    this.checkinsTodo = res.data.results || res.data; // compat DRF / liste
                     this.checkingInsToday = res.data.length; // compat DRF / liste
                     console.log("Today Checkins loaded", { ...this.checkins });
                     } catch (err) {
@@ -677,7 +723,12 @@
                 // ------------------------------------------------------------------
                 formatDate(dt) {
                     return new Date(dt).toLocaleDateString("fr-FR");
-                }
+                },
+
+                formatHeureMin(dateStr) {
+                    if (!dateStr) return ''
+                    return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                },
             }
         }).mount('#app');
 

@@ -1,0 +1,261 @@
+{% extends "base_service.html" %}
+{% load static %}
+
+{% block title %}
+    Conciergerie Pro Manager 
+{% endblock %}
+
+
+{% block custom_css %}
+{% endblock %}
+
+
+{% block extra_js  %}
+    <script> console.log("JS dashboard chargé"); </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+{% endblock %}
+
+{% block extra_block_hero %} {% endblock %}    
+    
+
+
+{% block content %}
+    <div id="app">
+        <div v-if="loading" class="d-flex justify-content-center align-items-center vh-100">
+            <div class="loader"></div>
+        </div>
+
+        <div v-else class="container py-5">
+            <!-- Header -->
+            <header class="hero-section text-white rounded-4 p-5 mb-5">
+                <h1 class="display-4 fw-bold">Bienvenue chez vous</h1>
+                <p class="lead">Votre séjour commence maintenant [[checkinTodo.guest_name ]]</p>
+                <button @click="fetchData" class="btn btn-light mt-3">
+                    <i class="bi bi-arrow-clockwise"></i> Recharger
+                </button>
+            </header>
+
+            <!-- Client Info -->
+            <section class="mb-5 fade-in" style="animation-delay: 0.1s">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title h4"><i class="bi bi-person-fill service-icon"></i> Informations client</h2>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Proprité  :</strong> [[ checkinTodo.property.name ]]</p>
+                                <p><strong>Plateforme   :</strong> [[ checkinTodo.plateform ]]</p>
+                                <p><strong>nombre de client   :</strong> [[ checkinTodo.number_of_guests ]]</p>
+                                <p><strong>Nom :</strong> [[ checkinTodo.guest_name ]]</p>
+                                <p><strong>Email :</strong> [[ checkinTodo.guets_email ]]</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Téléphone :</strong> [[ checkinTodo.guest_phone ]]</p>
+                                <p><strong>Nationalité :</strong> [[ checkinTodo.guest_nationalite ]]</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dates -->
+            <section class="mb-5 fade-in" style="animation-delay: 0.2s">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title h4"><i class="bi bi-calendar-check service-icon"></i> Dates de séjour</h2>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Arrivée :</strong> [[ formatDate(checkinTodo.check_in) ]]</p>
+                                <p><strong>Heure d'arrivée estimée :</strong> 
+                                    [[ formatHeureMin(checkinTodo.check_in) ]]</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Départ :</strong> [[ formatDate(checkinTodo.check_out) ]]</p>
+                                <p><strong>Nombre de nuits :</strong> [[ checkinTodo.nights ]]</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Additional Requests -->
+            <section class="mb-5 fade-in" style="animation-delay: 0.3s">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title h4"><i class="bi bi-megaphone service-icon"></i> Demandes supplémentaires</h2>
+                        <hr>
+                        <ul class="list-group list-group-flush" v-if="checkinTodo.special_requests">
+                            <li class="list-group-item" >
+                                [[ checkinTodo.special_requests ]]
+                            </li>
+                        </ul>
+                        <p v-else class="text-muted">Aucune demande supplémentaire</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Services -->
+            <section class="mb-5 fade-in" style="animation-delay: 0.4s">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title h4"><i class="bi bi-list-check service-icon"></i> Services à effectuer avant arrivée</h2>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6" v-for="(service, index) in checkinTodo.services" :key="index">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i :class="'bi ' + getServiceIcon(service.nom) + ' service-icon'"></i>
+                                    <div>
+                                        <h5 class="mb-0">[[ service.nom ]]</h5>
+                                        <small class="text-muted">[[ service.description ]]</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Agent -->
+            <section class="mb-5 fade-in" style="animation-delay: 0.5s">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title h4"><i class="bi bi-person-badge service-icon"></i> Votre collaborateur dédié</h2>
+                        <hr>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <img :src="'http://static.photos/people/200x200/'" 
+                                        class="rounded-circle" width="80" height="80" alt="Photo collaborateur">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5>[[ checkinTodo.property.gerant.full_name]] </h5>
+                                <p class="mb-1">[[ checkinTodo.property.gerant.get_staff_member_first_name ]]</p>
+                                <p class="mb-0 text-muted">
+                                    <i class="bi bi-envelope"></i> [[ checkinTodo.property.gerant.user.email ]]
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js_plus %}
+
+     <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            delimiters: ['[[', ']]'],
+            data() {
+                return {
+                    loading: false,
+                    checkInData: null,
+                    error: null,
+                    checkinTodo : [],
+                }
+            },
+
+            // Lifecycle hook
+            created() {
+               this.feetchTodayCheckins();
+            },
+            methods: {
+                
+                // ------------------------------------------------------------------
+                //  Liste des arrivées aujourd'hui (branchée sur les données)
+                // ------------------------------------------------------------------
+                async feetchTodayCheckins(){
+                    try {
+                        const res = await axios.get("/api/reservations/208/", {
+                        headers: { Authorization: `Bearer ${localStorage.getItem("access") || ""}` }
+                    });
+                    this.checkinTodo = res.data.results || res.data; // compat DRF / liste
+                    this.checkingInsToday = res.data.length; // compat DRF / liste
+                    console.log("Today CheckinTodo loaded", { ...this.checkinTodo });
+                    } catch (err) {
+                        console.error("Today Checkins error", err);
+                        this.checkins = [];
+                    }   
+                },
+
+                formatDate(dateString) {
+                    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                    return new Date(dateString).toLocaleDateString('fr-FR', options);
+                },
+                //--------------------
+                formatHeureMin(dateStr) {
+                    if (!dateStr) return ''
+                    return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                },
+                getServiceIcon(serviceName) {
+                    const icons = {
+                        'Ménage': 'bi-house-check',
+                        'Restauration': 'bi-cup-hot',
+                        'Transport': 'bi-car-front',
+                        'Guide': 'bi-book',
+                        'Shopping': 'bi-bag',
+                        'Spa': 'bi-emoji-sunglasses',
+                        'Baby-sitting': 'bi-balloon-heart',
+                        'Autre': 'bi-question-circle'
+                    };
+                    
+                    for (const key in icons) {
+                        if (serviceName.includes(key)) {
+                            return icons[key];
+                        }
+                    }
+                    return icons['Autre'];
+                }
+            }
+        }).mount('#app');
+    </script>
+
+{% endblock %}
+
+
+{% block extra_css %}
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+     <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        .card {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #0d6efd;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .service-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+            color: #0d6efd;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        }
+    </style>
+{% endblock %}
