@@ -115,3 +115,7 @@ def calendar_employee(request):
 
 def details_reservation(request, resa):
     return render(request, "conciergerie/checkin_details_page.html" , {'reservation_id': resa})
+
+def property_details_plus(request, property_id):
+    return render(request, "conciergerie/property_details_page.html" , {'property_id': property_id})
+    

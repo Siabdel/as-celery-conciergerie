@@ -32,7 +32,8 @@ from conciergerie.reporting_views import (
 )
 from conciergerie.ota_views import airbnb_webhook, booking_webhook
 from conciergerie import views as co_views
-from conciergerie import api_views_dashboard as co_api_views
+from conciergerie import api_views_dashboard as co_api_dashboard
+from conciergerie import api_views as co_api_views
 # api_reporting_views
 from conciergerie import api_reporting_views as api_report
 
@@ -69,6 +70,7 @@ urlpatterns = [
     path('show/<int:pk>/', co_views.PropertyDetail.as_view(), name='property_detail'),
     path('resa/(?P<reservation_id>[0-9]+)/show/', co_views.details_reservation, name='checkin_detail'),
     path('resa/<int:resa>/show/', co_views.details_reservation, name='checkin_detail'),
+    path('property/<int:property_id>/show/', co_views.property_details_plus, name='property_details_plus'),
 
     # API métiers
     path("api/", include(router.urls)),
@@ -123,12 +125,12 @@ urlpatterns += [
 
 ##  endpoint pour les taches et reservations par periode
 urlpatterns += [
-    path("api/dashboard/", co_api_views.DashboardWeekAPIView.as_view(), name="api-dashboard"),
+    path("api/dashboard/", co_api_dashboard.DashboardWeekAPIView.as_view(), name="api-dashboard"),
     # conciergerie/urls.py
-    path("api/dashboard/week/", co_api_views.DashboardWeekAPIView.as_view(), name="api-dashboard-week"),
-    path("api/dashboard/month/", co_api_views.DashboardMonthAPIView.as_view(), name="api-dashboard-month"),
-    path("api/dashboard/quarter/", co_api_views.DashboardQuarterAPIView.as_view(), name="api-dashboard-quarter"),
-    path("api/dashboard/year/", co_api_views.DashboardYearAPIView.as_view(), name="api-dashboard-year"),
+    path("api/dashboard/week/", co_api_dashboard.DashboardWeekAPIView.as_view(), name="api-dashboard-week"),
+    path("api/dashboard/month/", co_api_dashboard.DashboardMonthAPIView.as_view(), name="api-dashboard-month"),
+    path("api/dashboard/quarter/", co_api_dashboard.DashboardQuarterAPIView.as_view(), name="api-dashboard-quarter"),
+    path("api/dashboard/year/", co_api_dashboard.DashboardYearAPIView.as_view(), name="api-dashboard-year"),
 ]
 
 ## 
@@ -152,4 +154,26 @@ urlpatterns += [
     path("api/kpi/acceptance/", api_report.AcceptanceRateAPIView.as_view(), name="kpi-acceptance"),
     path("api/kpi/clv/", api_report.CLVAPIView.as_view(), name="kpi-clv"),
     path("api/kpi/cac/", api_report.CACAPIView.as_view(), name="kpi-cac"),
+]
+
+
+# --------------  DETAIL SUPPLY  -----------------
+# single property full payload
+urlpatterns += [
+    path("apiplus/properties/<int:pk>/", co_api_views.PropertyDetailAPIView.as_view(),
+     name="property-detail"),
+
+    # reservations linked to ONE property (calendar & check-ins)
+    path("apiplus/reservations/property/<int:property_id>/",
+        co_api_views.ReservationByPropertyListAPIView.as_view(),
+        name="resa-by-property"),
+
+    # revenue & occupancy dedicated to ONE property
+    path("api/reports/property/<int:property_id>/revenue/",
+        co_api_views.PropertyRevenueAPIView.as_view(),
+        name="property-revenue"),
+
+    path("api/reports/property/<int:property_id>/occupancy/",
+        co_api_views.PropertyOccupancyAPIView.as_view(),
+        name="property-occupancy"),
 ]

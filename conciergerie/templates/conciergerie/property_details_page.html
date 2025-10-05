@@ -1,0 +1,773 @@
+{% extends  "base_service.html" %}
+{% load static %}
+
+
+{% block extra_block_hero %} {% endblock %}    
+
+{% block extra_head %}
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+
+{% endblock %}
+    
+{% block extra_js %}
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% endblock %}
+
+
+{% block custom_css %}
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        .floor-plan-container {
+            border: 2px solid #FB923C;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .room-hover {
+            opacity: 0.9;
+            stroke: #3B82F6 !important;
+            stroke-width: 2px !important;
+        }
+        .map-container {
+            height: 400px;
+            border-radius: 12px;
+        }
+        .photo-carousel {
+            height: 500px;
+            object-fit: cover;
+        }
+        @media (max-width: 768px) {
+            .photo-carousel {
+                height: 300px;
+            }
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div id="app" class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 flex items-center">
+                            <i data-feather="home" class="text-orange-500 w-8 h-8"></i>
+                            <span class="ml-2 text-xl font-bold text-gray-900">DreamKey</span>
+                        </div>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:items-center md:space-x-8">
+                        <a href="#property" class="text-gray-900 hover:text-orange-500 px-3 py-2 text-sm font-medium">Le Bien</a>
+                        <a href="#floor-plan" class="text-gray-900 hover:text-orange-500 px-3 py-2 text-sm font-medium">Plan</a>
+                        <a href="#location" class="text-gray-900 hover:text-orange-500 px-3 py-2 text-sm font-medium">Localisation</a>
+                        <a href="#concierge" class="text-gray-900 hover:text-orange-500 px-3 py-2 text-sm font-medium">Conciergerie</a>
+                        <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition duration-300">
+                            Contactez-nous
+                        </button>
+                    </div>
+                    <div class="-mr-2 flex items-center md:hidden">
+                        <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500">
+                            <i data-feather="menu" class="h-6 w-6"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Property Header -->
+        <header class="bg-gradient-to-r from-orange-50 to-blue-50 py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="md:flex md:items-center md:justify-between">
+                    <div class="flex-1 min-w-0">
+                        <h1 class="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl">
+                            [[ property.title ]]
+                        </h1>
+                        <div class="mt-2 flex items-center text-gray-500">
+                            <i data-feather="map-pin" class="h-4 w-4 mr-1"></i>
+                            <span>[[ property.address ]]</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex md:mt-0 md:ml-4">
+                        <span class="inline-flex rounded-md shadow-sm">
+                            <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-50 active:text-gray-800 transition duration-150 ease-in-out">
+                                <i data-feather="share-2" class="mr-2 h-4 w-4"></i>
+                                Partager
+                            </button>
+                        </span>
+                        <span class="ml-3 inline-flex rounded-md shadow-sm">
+                            <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:border-orange-700 focus:shadow-outline-orange active:bg-orange-700 transition duration-150 ease-in-out">
+                                <i data-feather="heart" class="mr-2 h-4 w-4"></i>
+                                Favoris
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Photo Carousel & Quick Facts -->
+            <section id="property" class="mb-12">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Carousel -->
+                    <div class="lg:col-span-2">
+                        <div class="relative overflow-hidden rounded-xl shadow-lg photo-carousel">
+                            <img :src="property.images[currentImage]" class="w-full h-full object-cover transition-opacity duration-500" :class="{ 'opacity-100': currentImage === index, 'opacity-0': currentImage !== index }" v-for="(image, index) in property.images" :key="index" :alt="'Photo du bien ' + (index + 1)">
+                            <button @click="prevImage" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100">
+                                <i data-feather="chevron-left" class="h-5 w-5 text-gray-800"></i>
+                            </button>
+                            <button @click="nextImage" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100">
+                                <i data-feather="chevron-right" class="h-5 w-5 text-gray-800"></i>
+                            </button>
+                            <div class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
+                                <button v-for="(image, index) in property.images" :key="index" @click="currentImage = index" class="w-3 h-3 rounded-full" :class="currentImage === index ? 'bg-orange-500' : 'bg-white bg-opacity-60'"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Facts -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-xl font-bold text-gray-900 mb-4">Informations clés</h2>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex items-center">
+                                <i data-feather="maximize" class="h-5 w-5 text-orange-500 mr-2"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Surface</p>
+                                    <p class="font-medium">[[ property.surface ]] m²</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <i data-feather="layers" class="h-5 w-5 text-orange-500 mr-2"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Étage</p>
+                                    <p class="font-medium">[[ property.floor ]]</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <i data-feather="home" class="h-5 w-5 text-orange-500 mr-2"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Type</p>
+                                    <p class="font-medium">[[ property.type ]]</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <i data-feather="calendar" class="h-5 w-5 text-orange-500 mr-2"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Année</p>
+                                    <p class="font-medium">[[ property.year ]]</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <i data-feather="square" class="h-5 w-5 text-orange-500 mr-2"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Terrain</p>
+                                    <p class="font-medium">[[ property.land ]] m²</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <i data-feather="droplet" class="h-5 w-5 text-orange-500 mr-2"></i>
+                                <div>
+                                    <p class="text-sm text-gray-500">Salles de bain</p>
+                                    <p class="font-medium">[[ property.bathrooms ]]</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 border-t border-gray-200 pt-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Prix</h3>
+                            <p class="text-3xl font-bold text-orange-500">[[ property.price.toLocaleString() ]] €</p>
+                            <p class="text-sm text-gray-500 mt-1">[[ property.pricePerSquare ]] €/m²</p>
+                        </div>
+
+                        <button class="mt-6 w-full bg-orange-500 hover:bg-orange-600 text-white py-3 px-4 rounded-lg font-medium transition duration-300 flex items-center justify-center">
+                            <i data-feather="phone-call" class="mr-2 h-5 w-5"></i>
+                            Contacter l'agent
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Property Details -->
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-xl font-bold text-gray-900 mb-4">Description</h2>
+                        <p class="text-gray-700 mb-6">[[ property.description ]]</p>
+
+                        <h2 class="text-xl font-bold text-gray-900 mb-4">Caractéristiques</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div v-for="(feature, index) in property.features" :key="index" class="flex items-start">
+                                <i data-feather="check" class="h-4 w-4 text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-700">[[ feature ]]</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-xl font-bold text-gray-900 mb-4">Conciergerie</h2>
+                        <div class="flex items-start mb-4">
+                            <i data-feather="star" class="h-5 w-5 text-orange-500 mr-3 mt-1"></i>
+                            <div>
+                                <h3 class="font-medium text-gray-900">Services Premium</h3>
+                                <p class="text-sm text-gray-500">Ménage, livraison, conciergerie 24/7</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start mb-4">
+                            <i data-feather="shield" class="h-5 w-5 text-orange-500 mr-3 mt-1"></i>
+                            <div>
+                                <h3 class="font-medium text-gray-900">Sécurité</h3>
+                                <p class="text-sm text-gray-500">Surveillance 24h/24, accès sécurisé</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i data-feather="wifi" class="h-5 w-5 text-orange-500 mr-3 mt-1"></i>
+                            <div>
+                                <h3 class="font-medium text-gray-900">Équipements</h3>
+                                <p class="text-sm text-gray-500">Fibre, climatisation, domotique</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h2 class="text-xl font-bold text-gray-900 mb-4">Contact</h2>
+                        <div class="flex items-center mb-4">
+                            <div class="relative">
+                                <img src="http://static.photos/people/200x200/42" class="h-12 w-12 rounded-full object-cover" alt="Agent immobilier">
+                                <div class="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white"></div>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="font-medium text-gray-900">[[ property.agent.name ]]</h3>
+                                <p class="text-sm text-gray-500">[[ property.agent.role ]]</p>
+                            </div>
+                        </div>
+                        <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-medium text-sm transition duration-300 flex items-center justify-center mb-3">
+                            <i data-feather="message-square" class="mr-2 h-4 w-4"></i>
+                            Envoyer un message
+                        </button>
+                        <button class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded-lg font-medium text-sm transition duration-300 flex items-center justify-center">
+                            <i data-feather="phone" class="mr-2 h-4 w-4"></i>
+                            Appeler maintenant
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Floor Plan Section -->
+            <section id="floor-plan" class="mb-12">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-bold text-gray-900">Plan d'étage interactif</h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex space-x-2">
+                                <button @click="showFloorPlan('floor1')" class="px-4 py-2 rounded-md" :class="activeFloor === 'floor1' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'">Rez-de-chaussée</button>
+                                <button @click="showFloorPlan('floor2')" class="px-4 py-2 rounded-md" :class="activeFloor === 'floor2' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'">Étage 1</button>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button @click="zoomIn" class="p-2 rounded-md bg-gray-100 hover:bg-gray-200">
+                                    <i data-feather="plus" class="h-4 w-4"></i>
+                                </button>
+                                <button @click="zoomOut" class="p-2 rounded-md bg-gray-100 hover:bg-gray-200">
+                                    <i data-feather="minus" class="h-4 w-4"></i>
+                                </button>
+                                <button @click="resetZoom" class="p-2 rounded-md bg-gray-100 hover:bg-gray-200">
+                                    <i data-feather="refresh-cw" class="h-4 w-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="floor-plan-container relative">
+                            <canvas id="floor-plan-canvas" width="800" height="600" class="w-full bg-gray-50"></canvas>
+                            <div v-if="selectedRoom" class="absolute top-4 right-4 bg-white p-4 rounded-lg shadow-lg max-w-xs">
+                                <h3 class="font-bold text-lg">[[ selectedRoom.name ]]</h3>
+                                <p class="text-gray-600">[[ selectedRoom.area ]] m²</p>
+                                <p class="text-sm text-gray-500 mt-2">[[ selectedRoom.description ]]</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mt-4">
+                            <div v-for="(roomType, index) in roomTypes" :key="index" class="flex items-center">
+                                <div class="w-4 h-4 rounded-full mr-2" :style="{ backgroundColor: roomType.color }"></div>
+                                <span class="text-sm">[[ roomType.name ]]</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Location Section -->
+            <section id="location" class="mb-12">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-bold text-gray-900">Localisation</h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div>
+                                <div class="map-container" id="property-map"></div>
+                                <div class="mt-4 flex items-center justify-between">
+                                    <button @click="locateUser" class="flex items-center text-blue-500 hover:text-blue-700">
+                                        <i data-feather="navigation" class="h-4 w-4 mr-1"></i>
+                                        Ma position
+                                    </button>
+                                    <a :href="'https://www.google.com/maps/dir/?api=1&destination=' + property.coordinates.lat + ',' + property.coordinates.lng" target="_blank" class="flex items-center text-orange-500 hover:text-orange-700">
+                                        <i data-feather="map" class="h-4 w-4 mr-1"></i>
+                                        Itinéraire
+                                    </a>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-900 mb-3">Environnement</h3>
+                                <div class="space-y-4">
+                                    <div v-for="(amenity, index) in property.amenities" :key="index" class="flex items-start">
+                                        <i :data-feather="amenity.icon" class="h-5 w-5 text-orange-500 mr-3 mt-1"></i>
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">[[ amenity.name ]]</h4>
+                                            <p class="text-sm text-gray-500">[[ amenity.distance ]]</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Concierge Services Section -->
+            <section id="concierge" class="mb-12">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-bold text-gray-900">Services de conciergerie</h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div v-for="(service, index) in conciergeServices" :key="index" class="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-shadow duration-300">
+                                <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mb-4">
+                                    <i :data-feather="service.icon" class="h-6 w-6 text-orange-500"></i>
+                                </div>
+                                <h3 class="font-bold text-lg mb-2">[[ service.title ]]</h3>
+                                <p class="text-gray-600">[[ service.description ]]</p>
+                                <button class="mt-4 text-orange-500 hover:text-orange-700 text-sm font-medium flex items-center">
+                                    En savoir plus
+                                    <i data-feather="arrow-right" class="h-4 w-4 ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-900 text-white py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div>
+                        <h3 class="text-lg font-bold mb-4">DreamKey Concierge</h3>
+                        <p class="text-gray-400">Votre partenaire immobilier premium pour une expérience de vie exceptionnelle.</p>
+                        <div class="flex space-x-4 mt-4">
+                            <a href="#" class="text-gray-400 hover:text-white">
+                                <i data-feather="facebook" class="h-5 w-5"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white">
+                                <i data-feather="twitter" class="h-5 w-5"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white">
+                                <i data-feather="instagram" class="h-5 w-5"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white">
+                                <i data-feather="linkedin" class="h-5 w-5"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold mb-4">Services</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white">Location saisonnière</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Gestion immobilière</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Conciergerie premium</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Entretien et maintenance</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold mb-4">Entreprise</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white">À propos</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Équipe</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Carrières</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Presse</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold mb-4">Contact</h3>
+                        <address class="not-italic text-gray-400">
+                            <p class="mb-2">22 Rue de la République</p>
+                            <p class="mb-2">69002 Lyon, France</p>
+                            <p class="mb-2">+33 4 28 29 30 31</p>
+                            <p>contact@dreamkey.fr</p>
+                        </address>
+                    </div>
+                </div>
+                <div class="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-400 text-sm">© 2023 DreamKey Concierge. Tous droits réservés.</p>
+                    <div class="flex space-x-6 mt-4 md:mt-0">
+                        <a href="#" class="text-gray-400 hover:text-white text-sm">Confidentialité</a>
+                        <a href="#" class="text-gray-400 hover:text-white text-sm">Conditions</a>
+                        <a href="#" class="text-gray-400 hover:text-white text-sm">Cookies</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+{% endblock %}
+
+{% block extra_js_plus  %}
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        const app = createApp({
+            delimiters: ['[[', ']]'],
+            setup() {
+                // Property Data
+                const property = ref({
+                    title: "Appartement haut standing avec conciergerie",
+                    address: "22 Rue de la République, 69002 Lyon",
+                    surface: 85,
+                    floor: "2ème étage",
+                    type: "Appartement",
+                    year: 2018,
+                    land: 0,
+                    bathrooms: 2,
+                    price: 650000,
+                    pricePerSquare: 7647,
+                    description: "Cet appartement lumineux et spacieux de 85m² est situé en plein cœur de Lyon. Entièrement rénové avec des matériaux haut de gamme, il offre une vue dégagée sur la ville. La résidence dispose d'une conciergerie 24/7 et de services premium pour un confort de vie inégalé.",
+                    features: [
+                        "Ascenseur", 
+                        "Parking sécurisé", 
+                        "Terrasse", 
+                        "Cuisine équipée", 
+                        "Fibre optique", 
+                        "Domotique", 
+                        "Double vitrage", 
+                        "Chauffage central", 
+                        "Climatisation", 
+                        "Interphone", 
+                        "Digicode"
+                    ],
+                    images: [
+                        "http://static.photos/luxury/1200x630/1",
+                        "http://static.photos/luxury/1200x630/2",
+                        "http://static.photos/luxury/1200x630/3",
+                        "http://static.photos/luxury/1200x630/4"
+                    ],
+                    coordinates: {
+                        lat: 45.764043,
+                        lng: 4.835659
+                    },
+                    amenities: [
+                        { name: "Métro", distance: "300m (Ligne A)", icon: "train" },
+                        { name: "École", distance: "450m", icon: "book" },
+                        { name: "Commerces", distance: "À proximité immédiate", icon: "shopping-bag" },
+                        { name: "Parc", distance: "Tête d'Or à 1.2km", icon: "tree" },
+                        { name: "Hôpital", distance: "1.5km", icon: "heart" }
+                    ],
+                    agent: {
+                        name: "Sophie Martin",
+                        role: "Agent immobilier certifié",
+                        phone: "+33 6 12 34 56 78",
+                        email: "sophie.martin@dreamkey.fr"
+                    }
+                });
+
+                // Concierge Services
+                const conciergeServices = ref([
+                    {
+                        title: "Ménage professionnel",
+                        description: "Service de nettoyage complet par notre équipe qualifiée, disponible à la demande ou en programmation régulière.",
+                        icon: "home"
+                    },
+                    {
+                        title: "Livraison courses",
+                        description: "Faites vos courses depuis notre application et nous les livrons directement à votre domicile.",
+                        icon: "shopping-cart"
+                    },
+                    {
+                        title: "Réservation & Billetterie",
+                        description: "Nous réservons pour vous restaurants, spectacles, transports et toutes vos activités culturelles.",
+                        icon: "calendar"
+                    },
+                    {
+                        title: "Service voiturier",
+                        description: "Gestion de votre véhicule pour lavage, parking ou déplacement selon vos besoins.",
+                        icon: "car"
+                    },
+                    {
+                        title: "Assistance 24/7",
+                        description: "Une équipe disponible en permanence pour répondre à toutes vos demandes et urgences.",
+                        icon: "phone"
+                    },
+                    {
+                        title: "Pet care",
+                        description: "Promenade, garde et soins pour vos animaux de compagnie par des professionnels.",
+                        icon: "github"
+                    }
+                ]);
+
+                // Room types for floor plan
+                const roomTypes = ref([
+                    { name: "Salon", color: "#F59E0B" },
+                    { name: "Chambre", color: "#3B82F6" },
+                    { name: "Cuisine", color: "#10B981" },
+                    { name: "Salle de bain", color: "#8B5CF6" },
+                    { name: "Entrée", color: "#EC4899" },
+                    { name: "Balcon", color: "#14B8A6" }
+                ]);
+
+                // Current image in carousel
+                const currentImage = ref(0);
+                const nextImage = () => {
+                    currentImage.value = (currentImage.value + 1) % property.value.images.length;
+                };
+                const prevImage = () => {
+                    currentImage.value = (currentImage.value - 1 + property.value.images.length) % property.value.images.length;
+                };
+
+                // Floor plan variables
+                const activeFloor = ref('floor1');
+                const selectedRoom = ref(null);
+                const canvas = ref(null);
+                const fabricCanvas = ref(null);
+                const zoomLevel = ref(1);
+
+                // Initialize floor plan
+                const initFloorPlan = () => {
+                    fabricCanvas.value = new fabric.Canvas('floor-plan-canvas', {
+                        backgroundColor: '#f8fafc',
+                        selection: false
+                    });
+
+                    // Sample floor plan data
+                    const rooms = [
+                        { id: 1, name: "Entrée", type: "Entrée", points: [100, 100, 200, 100, 200, 200, 100, 200], area: 5, description: "Entrée spacieuse avec placard", color: "#EC4899" },
+                        { id: 2, name: "Salon", type: "Salon", points: [200, 100, 400, 100, 400, 300, 200, 300], area: 30, description: "Grand salon lumineux avec vue sur la ville", color: "#F59E0B" },
+                        { id: 3, name: "Cuisine", type: "Cuisine", points: [400, 100, 500, 100, 500, 200, 400, 200], area: 10, description: "Cuisine équipée haut de gamme", color: "#10B981" },
+                        { id: 4, name: "Chambre principale", type: "Chambre", points: [200, 300, 350, 300, 350, 450, 200, 450], area: 20, description: "Chambre principale avec dressing", color: "#3B82F6" },
+                        { id: 5, name: "Salle de bain", type: "Salle de bain", points: [350, 300, 450, 300, 450, 400, 350, 400], area: 8, description: "Salle de bain avec douche italienne", color: "#8B5CF6" },
+                        { id: 6, name: "Balcon", type: "Balcon", points: [100, 200, 200, 200, 200, 300, 100, 300], area: 12, description: "Balcon exposé sud avec vue dégagée", color: "#14B8A6" }
+                    ];
+
+                    // Add rooms to canvas
+                    rooms.forEach(room => {
+                        const polygon = new fabric.Polygon(room.points.map((p, i) => {
+                            return { x: p, y: room.points[(i + 1) % 2 === 0 ? i : (i + 1)] };
+                        }), {
+                            fill: room.color + '80',
+                            stroke: room.color,
+                            strokeWidth: 1,
+                            selectable: false,
+                            hoverCursor: 'pointer',
+                            objectCaching: false,
+                            name: room.name,
+                            data: room
+                        });
+
+                        // Add room number/label
+                        const text = new fabric.Text(room.id.toString(), {
+                            left: room.points[0] + 20,
+                            top: room.points[1] + 20,
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                            fill: '#ffffff',
+                            selectable: false
+                        });
+
+                        // Add room name label
+                        const nameText = new fabric.Text(room.name, {
+                            left: room.points[0] + 20,
+                            top: room.points[1] + 40,
+                            fontSize: 12,
+                            fill: '#ffffff',
+                            selectable: false
+                        });
+
+                        const group = new fabric.Group([polygon, text, nameText], {
+                            selectable: false
+                        });
+
+                        // Add hover effects
+                        group.on('mouseover', function() {
+                            polygon.set('strokeWidth', 3);
+                            polygon.set('stroke', '#3B82F6');
+                            fabricCanvas.value.renderAll();
+                        });
+
+                        group.on('mouseout', function() {
+                            polygon.set('strokeWidth', 1);
+                            polygon.set('stroke', room.color);
+                            fabricCanvas.value.renderAll();
+                        });
+
+                        group.on('mousedown', function() {
+                            selectedRoom.value = room;
+                        });
+
+                        fabricCanvas.value.add(group);
+                    });
+
+                    // Add measurement scale
+                    const scale = new fabric.Line([50, 50, 150, 50], {
+                        stroke: '#000000',
+                        strokeWidth: 2,
+                        selectable: false
+                    });
+
+                    const scaleText = new fabric.Text('5m', {
+                        left: 100,
+                        top: 30,
+                        fontSize: 12,
+                        fill: '#000000',
+                        selectable: false,
+                        textAlign: 'center'
+                    });
+
+                    fabricCanvas.value.add(scale);
+                    fabricCanvas.value.add(scaleText);
+                };
+
+                // Floor plan controls
+                const showFloorPlan = (floor) => {
+                    activeFloor.value = floor;
+                    // In a real app, this would load different floor data
+                };
+
+                const zoomIn = () => {
+                    zoomLevel.value += 0.1;
+                    fabricCanvas.value.setZoom(zoomLevel.value);
+                };
+
+                const zoomOut = () => {
+                    if (zoomLevel.value > 0.2) {
+                        zoomLevel.value -= 0.1;
+                        fabricCanvas.value.setZoom(zoomLevel.value);
+                    }
+                };
+
+                const resetZoom = () => {
+                    zoomLevel.value = 1;
+                    fabricCanvas.value.setZoom(1);
+                    fabricCanvas.value.viewportTransform = [1, 0, 0, 1, 0, 0];
+                };
+
+                // Map initialization
+                let map = null;
+                let userMarker = null;
+                const initMap = () => {
+                    map = L.map('property-map').setView([property.value.coordinates.lat, property.value.coordinates.lng], 16);
+                    
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+
+                    // Add property marker
+                    const propertyIcon = L.icon({
+                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png',
+                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    });
+
+                    L.marker([property.value.coordinates.lat, property.value.coordinates.lng], { icon: propertyIcon })
+                        .addTo(map)
+                        .bindPopup('<b>' + property.value.title + '</b><br>' + property.value.address);
+                };
+
+                const locateUser = () => {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                                const userLat = position.coords.latitude;
+                                const userLng = position.coords.longitude;
+                                
+                                if (userMarker) {
+                                    map.removeLayer(userMarker);
+                                }
+                                
+                                const userIcon = L.icon({
+                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                                    iconSize: [25, 41],
+                                    iconAnchor: [12, 41],
+                                    popupAnchor: [1, -34],
+                                    shadowSize: [41, 41]
+                                });
+                                
+                                userMarker = L.marker([userLat, userLng], { icon: userIcon })
+                                    .addTo(map)
+                                    .bindPopup('<b>Votre position</b>');
+                                
+                                // Add line between user and property
+                                const line = L.polyline([
+                                    [userLat, userLng],
+                                    [property.value.coordinates.lat, property.value.coordinates.lng]
+                                ], { color: 'blue', dashArray: '5,5' }).addTo(map);
+                                
+                                // Fit map to show both markers
+                                const group = new L.featureGroup([userMarker, line]);
+                                map.fitBounds(group.getBounds().pad(0.5));
+                            },
+                            (error) => {
+                                console.error("Error getting location:", error);
+                                alert("Impossible d'obtenir votre position. Veuillez vérifier les permissions de géolocalisation.");
+                            }
+                        );
+                    } else {
+                        alert("La géolocalisation n'est pas supportée par votre navigateur.");
+                    }
+                };
+
+                // Initialize components on mount
+                onMounted(() => {
+                    feather.replace();
+                    initFloorPlan();
+                    initMap();
+                });
+
+                return {
+                    property,
+                    currentImage,
+                    nextImage,
+                    prevImage,
+                    activeFloor,
+                    selectedRoom,
+                    showFloorPlan,
+                    zoomIn,
+                    zoomOut,
+                    resetZoom,
+                    roomTypes,
+                    conciergeServices,
+                    locateUser
+                };
+            }
+        });
+
+        app.mount('#app')
+
+        app.config.compilerOptions.delimiters = ['[[', ']]']
+
+    </script>
+{% endblock %}
