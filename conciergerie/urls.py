@@ -164,7 +164,7 @@ urlpatterns += [
      name="property-detail"),
 
     # reservations linked to ONE property (calendar & check-ins)
-    path("apiplus/reservations/property/<int:property_id>/",
+    path("api/reservations/property/<int:property_id>/",
         co_api_views.ReservationByPropertyListAPIView.as_view(),
         name="resa-by-property"),
 

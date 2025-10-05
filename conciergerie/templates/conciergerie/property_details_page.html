@@ -350,7 +350,7 @@
             <section id="concierge" class="mb-12">
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                     <div class="p-6 border-b border-gray-200">
-                        <h2 class="text-xl font-bold text-gray-900">Services de conciergerie</h2>
+                        <h2 class="text-xl font-bold text-gray-900">Services de conciergerie [[ locateUser ]]</h2>
                     </div>
                     <div class="p-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -740,11 +740,44 @@
                     }
                 };
 
+                // dans le composant « property-detail »
+                const property2   = ref({});
+                const reservations = ref([]);   // pour FullCalendar
+                const revenue    = ref(0);
+                const occupancy  = ref(0);
+
+                const loadAll = async () => {
+                const id = new URLSearchParams(location.search).get('id') || 26;
+
+                // --- période souhaitée (ici : ce mois-ci) ---
+                const now   = new Date();
+                const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);   // 1er jour du mois
+                const end   = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10); // dernier jour
+
+                const [
+                    { data: p },
+                    { data: resa },
+                    { data: rev },
+                    { data: occ }
+                ] = await Promise.all([
+                    axios.get(`/api/properties/${id}/`),
+                    axios.get(`/api/reservations/property/${id}/`, { params: { start, end } }),
+                    axios.get(`/api/reports/property/${id}/revenue/`, { params: { start, end } }),
+                    axios.get(`/api/reports/property/${id}/occupancy/`, { params: { start, end } })
+                ]);
+                property2.value   = p;
+                reservations.value = resa;   // events pour FullCalendar
+                revenue.value    = rev.revenue;
+                occupancy.value  = occ.occupancy_rate;
+                console.log("property = ", property2.value)
+                };
+
                 // Initialize components on mount
                 onMounted(() => {
                     feather.replace();
                     initFloorPlan();
                     initMap();
+                    loadAll();
                 });
 
                 return {
