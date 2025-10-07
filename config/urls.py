@@ -41,6 +41,8 @@ urlpatterns = [
     ##path('pandas/', include('pandas_report.urls')),
     # fullcalendar
     ## path('calendar/', include('fullcalendar.urls')),
+    path('rh/', include('staff.urls')),
+
 ]
 """ 
 # JWT Auth
