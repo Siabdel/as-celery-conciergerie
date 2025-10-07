@@ -71,6 +71,8 @@ urlpatterns = [
     path('resa/(?P<reservation_id>[0-9]+)/show/', co_views.details_reservation, name='checkin_detail'),
     path('resa/<int:resa>/show/', co_views.details_reservation, name='checkin_detail'),
     path('property/<int:property_id>/show/', co_views.property_details_plus, name='property_details_plus'),
+    ## reprt 
+    path('property/<int:property_id>/report/', co_views.property_report, name='property_report'),
 
     # API métiers
     path("api/", include(router.urls)),
@@ -177,3 +179,9 @@ urlpatterns += [
         co_api_views.PropertyOccupancyAPIView.as_view(),
         name="property-occupancy"),
 ]
+
+from conciergerie import api_property_public_views as api_appart
+
+# --------------  DETAIL SUPPLY  -----------------
+# single property full payload
+#------------------------------------------------

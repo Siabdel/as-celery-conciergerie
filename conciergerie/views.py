@@ -119,3 +119,9 @@ def details_reservation(request, resa):
 def property_details_plus(request, property_id):
     return render(request, "conciergerie/property_details_page.html" , {'property_id': property_id})
     
+
+#---------------
+# appart report 
+def property_report(request, property_id):
+    return render(request, "conciergerie/property_report.html" , {'property_id': property_id})
+    

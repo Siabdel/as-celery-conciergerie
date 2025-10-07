@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DIMA Conciergerie - Gestion complète</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .fc-event {
+      cursor: pointer;
+    }
+    #calendar, #mini-calendar {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <div id="app" class="container py-4">
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+      <h1 class="h4">DIMA Conciergerie</h1>
+      <div>
+        <button class="btn btn-outline-primary btn-sm me-2" @click="currentView = 'dashboard'">Dashboard</button>
+        <button class="btn btn-outline-primary btn-sm me-2" @click="currentView = 'agenda'">Agenda</button>
+        <button class="btn btn-outline-primary btn-sm me-2" @click="currentView = 'stats'">Statistiques</button>
+        <button class="btn btn-outline-primary btn-sm" @click="currentView = 'apartments'">Appartements</button>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div v-if="currentView === 'dashboard'">
+      <div class="row g-4 mb-4">
+        <div class="col-md-3" v-for="card in dashboardCards" :key="card.title">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h6 class="card-title">{{ card.title }}</h6>
+              <h4>{{ card.value }}</h4>
+              <p class="text-muted small">{{ card.subtitle }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <canvas id="revenueChart"></canvas>
+        </div>
+        <div class="col-md-6">
+          <canvas id="occupancyChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agenda -->
+    <div v-if="currentView === 'agenda'">
+      <div class="mb-3">
+        <label for="aptSelect">Filtrer par appartement :</label>
+        <select v-model="selectedApartment" class="form-select w-auto d-inline-block" id="aptSelect">
+          <option value="">Tous</option>
+          <option v-for="apt in apartments" :value="apt.id">{{ apt.name }}</option>
+        </select>
+      </div>
+      <div id="calendar"></div>
+    </div>
+
+    <!-- Statistiques -->
+    <div v-if="currentView === 'stats'">
+      <h3>Statistiques par Appartement</h3>
+      <table class="table table-bordered mt-3">
+        <thead>
+          <tr>
+            <th>Appartement</th>
+            <th>Taux d'occupation</th>
+            <th>Revenus (mois)</th>
+            <th>Réservations</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="apt in apartments">
+            <td>{{ apt.name }}</td>
+            <td>{{ apt.occupancyRate }}%</td>
+            <td>{{ apt.revenue }} €</td>
+            <td>{{ apt.bookings.length }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Appartements -->
+    <div v-if="currentView === 'apartments'">
+      <div class="row">
+        <div class="col-md-4" v-for="apt in apartments" :key="apt.id">
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5>{{ apt.name }}</h5>
+              <p>{{ apt.address }}</p>
+              <button class="btn btn-primary btn-sm" @click="viewDetails(apt)">Voir détails</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Détail Appartement -->
+    <div v-if="currentView === 'details'">
+      <button class="btn btn-secondary btn-sm mb-3" @click="currentView = 'apartments'">← Retour</button>
+      <h2>{{ selectedApartment.name }}</h2>
+      <p><strong>Adresse:</strong> {{ selectedApartment.address }}</p>
+      <p><strong>Superficie:</strong> {{ selectedApartment.area }} m²</p>
+      <p><strong>Couchages:</strong> {{ selectedApartment.beds }}</p>
+      <p><strong>Statut:</strong> {{ selectedApartment.status }}</p>
+      <h5 class="mt-4">Dernière réservation:</h5>
+      <p v-if="selectedApartment.bookings.length">
+        {{ selectedApartment.bookings[selectedApartment.bookings.length - 1].client }}
+        du {{ selectedApartment.bookings[selectedApartment.bookings.length - 1].start }} au
+        {{ selectedApartment.bookings[selectedApartment.bookings.length - 1].end }}
+        ({{ selectedApartment.bookings[selectedApartment.bookings.length - 1].amount }} €)
+      </p>
+      <h5 class="mt-4">Calendrier</h5>
+      <div id="mini-calendar"></div>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        currentView: 'dashboard',
+        selectedApartment: null,
+        selectedApartmentId: '',
+        apartments: [
+          {
+            id: 1,
+            name: 'Appartement Montmartre',
+            address: '12 Rue des Abbesses, Paris',
+            area: 60,
+            beds: 4,
+            status: 'occupé',
+            occupancyRate: 82,
+            revenue: 2600,
+            bookings: [
+              { client: 'Dupont', start: '2025-07-01', end: '2025-07-04', amount: 360 },
+              { client: 'Martin', start: '2025-07-10', end: '2025-07-12', amount: 240 }
+            ]
+          },
+          {
+            id: 2,
+            name: 'Studio Marais',
+            address: '8 Rue de Turenne, Paris',
+            area: 30,
+            beds: 2,
+            status: 'disponible',
+            occupancyRate: 60,
+            revenue: 1400,
+            bookings: [
+              { client: 'Camille', start: '2025-07-05', end: '2025-07-07', amount: 180 }
+            ]
+          }
+        ]
+      },
+      computed: {
+        dashboardCards() {
+          return [
+            {
+              title: 'Taux global d\'occupation',
+              value: this.globalOccupancy() + '%',
+              subtitle: 'Moyenne sur les appartements'
+            },
+            {
+              title: 'Revenus hebdomadaires',
+              value: this.totalRevenue() + ' €',
+              subtitle: 'Total estimé cette semaine'
+            },
+            {
+              title: 'Réservations en cours',
+              value: this.totalBookings(),
+              subtitle: 'Nombre total ce mois'
+            },
+            {
+              title: 'Appartement le + occupé',
+              value: this.mostOccupied().name,
+              subtitle: this.mostOccupied().occupancyRate + '% d\'occupation'
+            }
+          ];
+        }
+      },
+      mounted() {
+        this.initCharts();
+        this.initCalendar();
+      },
+      methods: {
+        viewDetails(apt) {
+          this.selectedApartment = apt;
+          this.currentView = 'details';
+          this.$nextTick(() => {
+            new FullCalendar.Calendar(document.getElementById('mini-calendar'), {
+              initialView: 'dayGridMonth',
+              height: 300,
+              events: apt.bookings.map(b => ({
+                title: 'Réservation ' + b.client,
+                start: b.start,
+                end: b.end
+              }))
+            }).render();
+          });
+        },
+        initCalendar() {
+          const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+            initialView: 'timeGridWeek',
+            height: 600,
+            events: this.allEvents()
+          });
+          calendar.render();
+        },
+        allEvents() {
+          return this.apartments.flatMap(apt =>
+            apt.bookings.map(b => ({
+              title: apt.name + ' - ' + b.client,
+              start: b.start,
+              end: b.end
+            }))
+          );
+        },
+        totalRevenue() {
+          return this.apartments.reduce((sum, a) => sum + a.revenue, 0);
+        },
+        totalBookings() {
+          return this.apartments.reduce((sum, a) => sum + a.bookings.length, 0);
+        },
+        globalOccupancy() {
+          return Math.round(
+            this.apartments.reduce((sum, a) => sum + a.occupancyRate, 0) / this.apartments.length
+          );
+        },
+        mostOccupied() {
+          return this.apartments.reduce((prev, curr) => (prev.occupancyRate > curr.occupancyRate ? prev : curr));
+        },
+        initCharts() {
+          new Chart(document.getElementById('revenueChart'), {
+            type: 'bar',
+            data: {
+              labels: this.apartments.map(a => a.name),
+              datasets: [{
+                label: 'Revenus (€)',
+                data: this.apartments.map(a => a.revenue),
+                backgroundColor: 'rgba(54, 162, 235, 0.6)'
+              }]
+            }
+          });
+
+          new Chart(document.getElementById('occupancyChart'), {
+            type: 'line',
+            data: {
+              labels: this.apartments.map(a => a.name),
+              datasets: [{
+                label: 'Taux d\'occupation (%)',
+                data: this.apartments.map(a => a.occupancyRate),
+                backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                borderColor: 'rgba(255, 206, 86, 1)',
+                fill: true
+              }]
+            }
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+

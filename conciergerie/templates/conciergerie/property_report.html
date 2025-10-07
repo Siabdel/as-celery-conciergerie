@@ -1,0 +1,354 @@
+{% extends  "base_service.html" %}
+{% load static %}
+
+
+{% block extra_block_hero %} {% endblock %}    
+
+{% block extra_head %}
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+
+{% endblock %}
+    
+{% block extra_js %}
+  <script> console.log("JS dashboard chargé"); </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.min.js"></script>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% endblock %}
+
+
+{% block custom_css %}
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+ 
+  <style>
+    .fc-event {
+      cursor: pointer;
+    }
+    #calendar, #mini-calendar {
+      font-size: 14px;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+
+  <main class="container-fluid bg-light">
+    <div id="app" class="container py-4">
+      <div class="mb-3 d-flex justify-content-between align-items-center">
+        <h1 class="h4">DIMA Conciergerie</h1>
+        <div>
+          <button class="btn btn-outline-primary btn-sm me-2" @click="currentView = 'dashboard'">Dashboard</button>
+          <button class="btn btn-outline-primary btn-sm me-2" @click="currentView = 'agenda'">Agenda</button>
+          <button class="btn btn-outline-primary btn-sm me-2" @click="currentView = 'stats'">Statistiques</button>
+          <button class="btn btn-outline-primary btn-sm" @click="currentView = 'apartments'">Appartements</button>
+        </div>
+      </div>
+
+      <!-- Dashboard -->
+      <div v-if="currentView === 'dashboard'">
+        <div class="row g-4 mb-4">
+          <div class="col-md-3" v-for="card in dashboardCards" :key="card.title">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <h6 class="card-title">[[ card.title ]]</h6>
+                <h4>[[ card.value ]]</h4>
+                <p class="text-muted small">[[ card.subtitle ]]</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <canvas id="revenueChart"></canvas>
+          </div>
+          <div class="col-md-6">
+            <canvas id="occupancyChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agenda -->
+      <div v-if="currentView === 'agenda'">
+        <div class="mb-3">
+          <label for="aptSelect">Filtrer par appartement :</label>
+          <select v-model="selectedApartment" class="form-select w-auto d-inline-block" id="aptSelect">
+            <option value="">Tous</option>
+            <option v-for="apt in apartments" :value="apt.id">[[ apt.name ]]</option>
+          </select>
+        </div>
+        <div id="calendar" ref="calendar"></div>
+      </div>
+
+      <!-- Statistiques -->
+      <div v-if="currentView === 'stats'">
+        <h3>Statistiques par Appartement</h3>
+        <table class="table table-bordered mt-3">
+          <thead>
+            <tr>
+              <th>Appartement</th>
+              <th>Taux d'occupation</th>
+              <th>Revenus (mois)</th>
+              <th>Réservations</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="apt in apartments">
+              <td>[[ apt.name ]]</td>
+              <td>[[ apt.occupancyRate ]]%</td>
+              <td>[[ apt.revenue ]] €</td>
+              <td>[[ apt.bookings.length ]]</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Appartements -->
+      <div v-if="currentView === 'apartments'">
+        <div class="row">
+          <div class="col-md-4" v-for="apt in apartments" :key="apt.id">
+            <div class="card mb-4">
+              <div class="card-body">
+                <h5>[[ apt.name ]]</h5>
+                <p>[[ apt.address ]]</p>
+                <button class="btn btn-primary btn-sm" @click="viewDetails(apt)">Voir détails</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Détail Appartement -->
+      <div v-if="currentView === 'details'">
+        <button class="btn btn-secondary btn-sm mb-3" @click="currentView = 'apartments'">← Retour</button>
+        <h2>[[ selectedApartment.name ]]</h2>
+        <p><strong>Adresse:</strong> [[ selectedApartment.address ]]</p>
+        <p><strong>Superficie:</strong> [[ selectedApartment.area ]] m²</p>
+        <p><strong>Couchages:</strong> [[ selectedApartment.beds ]]</p>
+        <p><strong>Statut:</strong> [[ selectedApartment.status ]]</p>
+        <h5 class="mt-4">Dernière réservation:</h5>
+        <p v-if="selectedApartment.bookings.length">
+          [[ selectedApartment.bookings[selectedApartment.bookings.length - 1].client ]]
+          du [[ selectedApartment.bookings[selectedApartment.bookings.length - 1].start ]] au
+          [[ selectedApartment.bookings[selectedApartment.bookings.length - 1].end ]]
+          ([[ selectedApartment.bookings[selectedApartment.bookings.length - 1].amount ]] €)
+        </p>
+        <h5 class="mt-4">Calendrier</h5>
+        <div id="mini-calendar"></div>
+      </div>
+    </div>
+
+    
+  </main>
+ 
+{% endblock %}
+
+
+{% block extra_js_plus  %}
+
+  <script type="module">
+
+
+
+    /* ---------- helper : agency of current user ---------- */
+    function _agencyOf(user) {
+      if (!user || user.is_superuser) return null
+      if (user.employee?.agency) return user.employee.agency
+      return user.properties_owned?.[0]?.agency || null
+    }
+
+    /* ---------- Axios defaults (JWT) ---------- */
+    axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('access') || ''}`
+
+    // ------------------------------------------------------------------
+    //  Vue 2  Options API
+    // ------------------------------------------------------------------
+
+    const { createApp } = Vue;
+    // filters 
+    const agencyFilter = { agency: 1 };
+
+    //------------
+    //- createApp
+    //----------------
+    createApp({
+        delimiters: ['[[', ']]'],
+        data() {
+            return {
+              currentView: 'dashboard',
+              user: 1,                 // populated after login
+              apartments: [],             // real list
+              reservations: [],           // all reservations of agency
+              selectedApartment: null,    // for detail view
+              dashboardCards: [],         // KPIs
+              calendar: null,             // FullCalendar instance
+              miniCalendar: null,         // detail calendar
+              startDate: '',              // period filters
+              endDate: ''
+            }
+        },
+        //- computed
+        computed: {
+          agencyFilter() {
+            /* returns { agency: <id> } or {} for super-user */
+            const agency = _agencyOf(this.user)
+            return agency ? { agency } : {}
+          }
+        },
+        //-- mounted
+        mounted() {
+          // simple user stub – replace by your auth system
+          this.user = { id: 1, is_superuser: false, employee: { agency: 1 } };
+          this.setDefaultPeriod();
+          this.loadKPIs() ;
+          this.loadApartments(); 
+          this.loadReservations();
+          this.initCharts();
+          if (this.currentView === 'agenda') this.initCalendar();
+        },
+        //------------
+        //-- Methods
+        //------------
+        methods: {
+          /* ---------- date helpers ---------- */
+          setDefaultPeriod() {
+            const now = new Date()
+            this.startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10)
+            this.endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10)
+          },
+          isoMonday(date) {
+            const d = new Date(date)
+            const day = d.getDay()
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+            return new Date(d.setDate(diff)).toISOString().slice(0, 10)
+          },
+
+          /* ---------- API loaders ---------- */
+          async loadKPIs() {
+            const params = { start: this.startDate, end: this.endDate, ...this.agencyFilter }
+            const [
+              occ, rev, active, mostOcc
+            ] = await Promise.all([
+              axios.get('/api/kpi/occupancy/', { params }).then(r => r.data.occupancy_rate),
+              axios.get('/api/kpi/revpar/', { params }).then(r => r.data.revpar),
+              axios.get('/api/kpi/active-bookings/', { params }).then(r => r.data.active_bookings),
+              this.mostOccupiedApartment()
+            ])
+            this.dashboardCards = [
+              { title: 'Taux global d\'occupation', value: `${occ}%`, subtitle: 'Moyenne sur les appartements' },
+              { title: 'Revenus hebdomadaires', value: `${(rev * 7).toFixed(0)} €`, subtitle: 'Total estimé cette semaine' },
+              { title: 'Réservations en cours', value: active, subtitle: 'Nombre total ce mois' },
+              { title: 'Appartement le + occupé', value: mostOcc.name, subtitle: `${mostOcc.occupancy_rate}% d'occupation` }
+            ]
+          },
+          //--------------
+          
+          async loadApartments() {
+            try {
+                const res = await axios.get("/api/properties/myagency/", {
+                    headers: { Authorization: `Bearer ${localStorage.getItem("access") || ""}` }
+                });
+                const arr = res.data.results || res.data;          // compat DRF / liste
+                const enriched = [];
+
+                for (const apt of arr) {
+                    // récupération séquentielle (simple à lire)
+                    const occ   = await this.aptOccupancy(apt.id);
+                    const rev   = await this.aptRevenue(apt.id);
+                    const books = await this.aptBookings(apt.id);
+
+                    enriched.push({
+                        ...apt,
+                        occupancy_rate: occ,
+                        revenue: rev,
+                        bookings: books
+                    });
+                }
+
+                this.apartments = enriched;
+                console.log("Apartments loaded", enriched);
+            } catch (err) {
+                console.error("Apartments error", err);
+                this.apartments = [];
+            }
+        },
+          //-------------------------------
+          async loadReservations() {
+            const { data } = await axios.get('/api/reservations/', { params: { start: this.startDate, end: this.endDate, ...this.agencyFilter } })
+            this.reservations = data
+          },
+
+          /* ---------- per-apartment helpers ---------- */
+          async aptOccupancy(id) {
+            const { data } = await axios.get(`/api/reports/property/${id}/occupancy/`, { params: { start: this.startDate, end: this.endDate } })
+            return data.occupancy_rate
+          },
+          async aptRevenue(id) {
+            const { data } = await axios.get(`/api/reports/property/${id}/monthly-revenue/`)
+            return data.revenue
+          },
+          async aptBookings(id) {
+            const { data } = await axios.get('/api/reservations/', { params: { property: id, start: this.startDate, end: this.endDate } })
+            return data
+          },
+          async mostOccupiedApartment() {
+            if (!this.apartments.length) return { name: '-', occupancy_rate: 0 }
+            return this.apartments.reduce((max, apt) => (apt.occupancy_rate > max.occupancy_rate ? apt : max))
+          },
+
+          /* ---------- UI ---------- */
+          viewDetails(apt) {
+            this.selectedApartment = apt
+            this.currentView = 'details'
+            this.$nextTick(() => this.initMiniCalendar(apt))
+          },
+          initCharts() {
+            const revenue = this.apartments.map(a => a.revenue)
+            const labels  = this.apartments.map(a => a.name)
+            new Chart(document.getElementById('revenueChart'), {
+              type: 'bar',
+              data: { labels, datasets: [{ label: 'Revenus (€)', data: revenue, backgroundColor: 'rgba(54,162,235,0.6)' }] }
+            })
+            new Chart(document.getElementById('occupancyChart'), {
+              type: 'line',
+              data: { labels, datasets: [{ label: 'Taux d\'occupation (%)', data: this.apartments.map(a => a.occupancy_rate), fill: true, borderColor: 'rgba(255,206,86,1)', backgroundColor: 'rgba(255,206,86,0.2)' }] }
+            })
+          },
+          initCalendar() {
+            this.calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+              initialView: 'timeGridWeek',
+              height: 600,
+              events: this.reservations.map(r => ({
+                title: `${r.property.name} - ${r.guest_name}`,
+                start: r.check_in,
+                end:   r.check_out
+              }))
+            })
+            this.calendar.render()
+          },
+          initMiniCalendar(apt) {
+            this.miniCalendar = new FullCalendar.Calendar(document.getElementById('mini-calendar'), {
+              initialView: 'dayGridMonth',
+              height: 300,
+              events: apt.bookings.map(b => ({
+                title: b.guest_name,
+                start: b.check_in,
+                end:   b.check_out
+              }))
+            })
+            this.miniCalendar.render()
+          }
+        }// fin methods
+      }).mount('#app');
+  </script>
+
+{% endblock %}
