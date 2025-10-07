@@ -1,7 +1,7 @@
 # conciergerie/staff_dashboard_api_views.py
 from django.utils.dateparse import parse_date
 from django.utils import timezone
-from django.db.models import Q, Count, Sum
+from django.db.models import Q, Count, Sum, Avg
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response

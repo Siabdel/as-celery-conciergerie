@@ -20,10 +20,20 @@ from staff.staff_dashboard_api_views import (
     StaffCSATKPIView,
 )
 
+from staff import views as rh_views
+
 app_name = "staff"
 
 
 urlpatterns = [
+    path('home/', rh_views.home , name='rh_home'),
+]
+
+#-----------------------------
+# - API
+#-----------------------------
+#
+urlpatterns += [
     # employees
     path('api/employees/', EmployeeListAPIView.as_view(), name='api-employee-list'),
     # absences

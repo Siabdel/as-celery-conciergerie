@@ -17,47 +17,29 @@ class UserSimpleSerializer(serializers.ModelSerializer):
 # Employee Serializer
 class EmployeeSerializer(serializers.ModelSerializer):
     user = UserSimpleSerializer(read_only=True)
-    full_name = serializers.SerializerMethodField()
+    fullname = serializers.SerializerMethodField()
+    photo = serializers.SerializerMethodField()
+
     class Meta:
         model = Employee
-        fields = '__all__'
+        fields = ['id', 'user', 'role', 'is_active', 'phone_number', 'photo', 'fullname']
     
-    def get_full_name(self, obj):
+    def get_fullname(self, obj):
         if obj.user:
             return f"{obj.user.first_name} {obj.user.last_name}".strip()
         return ""
 
-# Absence Serializer
-class AbsenceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Absence
-        fields = '__all__'
+    def get_photo(self, obj):
+        # si vous avez un champ image ; sinon avatar externe
+        if obj.user:
+            return f"https://ui-avatars.com/api/?name={obj.user.first_name}+{obj.user.last_name}&background=6366f1&color=fff"
+        return "https://ui-avatars.com/api/?name=Unknown&background=6366f1&color=fff"
 
 # Service Serializer
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
         fields = '__all__'
-
-
-
-# -------------------- STAFF --------------------
-class UserShortSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'first_name', 'last_name', 'username']
-
-class EmployeeSerializer(serializers.ModelSerializer):
-    user = UserShortSerializer(read_only=True)
-    photo = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Employee
-        fields = ['id', 'user', 'role', 'is_active', 'phone_number', 'photo']
-
-    def get_photo(self, obj):
-        # si vous avez un champ image ; sinon avatar externe
-        return f"https://ui-avatars.com/api/?name={obj.user.first_name}+{obj.user.last_name}&background=6366f1&color=fff"
 
 class AbsenceSerializer(serializers.ModelSerializer):
     employee = EmployeeSerializer(read_only=True)
@@ -69,8 +51,13 @@ class AbsenceSerializer(serializers.ModelSerializer):
 # -------------------- TASKS --------------------
 class ServiceTaskShortSerializer(serializers.ModelSerializer):
     property_name = serializers.CharField(source='property.name', read_only=True)
-    employee_name = serializers.CharField(source='employee.user.get_full_name', read_only=True)
+    employee_name = serializers.SerializerMethodField()
 
     class Meta:
         model = ServiceTask
         fields = ['id', 'property_name', 'employee_name', 'start_date', 'end_date', 'type_service', 'completed']
+    
+    def get_employee_name(self, obj):
+        if obj.employee and obj.employee.user:
+            return obj.employee.user.get_full_name()
+        return ""

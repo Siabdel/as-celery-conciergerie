@@ -32,6 +32,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 urlpatterns = [
     path('', include('conciergerie.urls')),
     path("admin/", admin.site.urls),
+    path('staff/', include('staff.urls')),
     # fullcalendar
     path('calendar/', include('fullcalendar.urls')),
     ## path('report/', include('slick_report.urls')),
@@ -41,7 +42,6 @@ urlpatterns = [
     ##path('pandas/', include('pandas_report.urls')),
     # fullcalendar
     ## path('calendar/', include('fullcalendar.urls')),
-    path('rh/', include('staff.urls')),
 
 ]
 """ 
