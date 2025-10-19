@@ -69,21 +69,14 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # new
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = 'auth.User' ## (par défaut)
+AUTH_USER_MODEL = "core.CustomUser"
+
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    # local apps
-    'schedule', # django fullcalendar
-    'core', # common models 
-    'staff',
-    'fullcalendar', # fullcalendar scheduler
-    ## 'slick_report', 
-    ## 'pandas_report',
-    ##'services_menage', 
-    "conciergerie",
+   
      # apps par defaut
     "django.contrib.admin",
     "django.contrib.auth",
@@ -117,6 +110,14 @@ INSTALLED_APPS = [
     'explorer',
     # local
     'django_celery_beat',
+     # local apps
+    'core', # common models 
+    'staff',
+    'fullcalendar', # fullcalendar scheduler
+    ## 'slick_report', 
+    ## 'pandas_report',
+    ##'services_menage', 
+    "conciergerie",
     
 ]
 

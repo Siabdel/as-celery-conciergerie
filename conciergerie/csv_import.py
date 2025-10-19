@@ -6,7 +6,7 @@ from datetime import datetime
 from django.utils import timezone
 from django.db import transaction
 from .models import Property, Reservation, AdditionalExpense
-from core.models import ResaStatus, PlatformChoices
+from core.models import ReservationStatus, PlatformChoices
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ def import_reservations_csv_pandas(file_obj, user) -> dict:
     from decimal import Decimal
     from django.contrib.auth.models import User
     from conciergerie.models import Reservation, Property
-    from core.models import ResaStatus, PlatformChoices
+    from core.models import ReservationStatus, PlatformChoices
 
     # Django setup
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "your_project.settings")
@@ -114,7 +114,7 @@ def import_reservations_csv_pandas(file_obj, user) -> dict:
             check_in=check_in,
             check_out=check_out,
             defaults={
-                "reservation_status": ResaStatus.CONFIRMED,
+                "reservation_status": ReservationStatus.CONFIRMED,
                 "guest_name": row["guest_name"],
                 "guest_email": "inconnu@example.com",
                 "platform": PlatformChoices.DIRECT,

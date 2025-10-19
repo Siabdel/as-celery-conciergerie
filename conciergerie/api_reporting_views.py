@@ -15,12 +15,12 @@ from decimal import Decimal
 from conciergerie.models import (
     Property, Reservation, AdditionalExpense, Incident, Employee, ServiceTask
 )
-from core.models import ResaStatus
+from core.models import ReservationStatus
 # conciergerie/views.py
 from rest_framework.generics import ListAPIView
 from conciergerie.models import Reservation
 from conciergerie.serializers import ReservationSerializer
-from core.models import ResaStatus
+from core.models import ReservationStatus
 
 
 
@@ -62,7 +62,7 @@ class TodayCheckinsView(ListAPIView):
             Reservation.objects.filter(
                 agency=self.request.user.employee.agency,
                 check_in__date=today,
-                reservation_status=ResaStatus.CONFIRMED
+                reservation_status=ReservationStatus.CONFIRMED
             )
             .select_related("property", )
             .order_by("check_in")
@@ -81,7 +81,7 @@ class AvailableApartmentsAPIView(APIView):
                 check_in__date__lte=date,
                 check_out__date__gt=date
             )
-            .exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            .exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .values_list("property_id", flat=True)
         )
         free = _filter_by_agency(Property.objects, request.user).filter(
@@ -113,7 +113,7 @@ class VacancyRateAPIView(APIView):
                 check_in__date__gte=start,
                 check_out__date__lte=end,
             )
-            .exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            .exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .aggregate(
                 s=Sum(
                     ExpressionWrapper(
@@ -150,7 +150,7 @@ class OccupancyRateAPIView(APIView):
                 check_in__date__gte=start,
                 check_out__date__lte=end,
             )
-            .exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            .exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .aggregate(
                 s=Sum(
                     ExpressionWrapper(
@@ -175,7 +175,7 @@ class ActiveBookingsAPIView(APIView):
         qs = (
             _filter_by_agency(Reservation.objects, request.user)
             .filter(check_out__gte=now)
-            .exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            .exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .count()
         )
         return Response({"active_bookings": qs})
@@ -204,7 +204,7 @@ class RevPARAPIView(APIView):
                 check_in__date__gte=start,
                 check_out__date__lte=end,
             )
-            .exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            .exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .aggregate(total=Sum("total_price"))["total"]
             or 0
         )
@@ -229,7 +229,7 @@ class AvgBasketAPIView(APIView):
                 check_in__date__gte=start,
                 check_out__date__lte=end,
             )
-            .exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            .exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .aggregate(
                 revenue=Sum("total_price", default=0),
                 count=Count("id")
@@ -257,7 +257,7 @@ class GrossMarginAPIView(APIView):
                 check_in__date__gte=start,
                 check_out__date__lte=end,
             )
-            .exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            .exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .aggregate(total=Sum("total_price"))["total"]
             or 0
         )
@@ -290,7 +290,7 @@ class LoyaltyRateAPIView(APIView):
                 check_in__date__gte=start,
                 check_out__date__lte=end,
             )
-            .exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            .exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .values_list("guest_email", flat=True)
             .distinct()
         )
@@ -324,7 +324,7 @@ class CSATAPIView(APIView):
                 check_out__date__lte=end,
                 guest_rating__isnull=False,
             )
-            .exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            .exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .aggregate(avg=Avg("guest_rating"))["avg"]
         )
         return Response({"csat": round(avg_rating or 0, 2)})
@@ -388,7 +388,7 @@ class AvgStayDurationAPIView(APIView):
                 check_in__date__gte=start,
                 check_out__date__lte=end,
             )
-            .exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            .exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .aggregate(avg=Avg("nights"))["avg"]
         )
         return Response({"avg_stay_nights": round(avg_nights or 0, 2)})
@@ -434,7 +434,7 @@ class CLVAPIView(APIView):
                 check_in__date__gte=start,
                 check_out__date__lte=end,
             )
-            .exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            .exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .values("guest_email")
             .annotate(clv=Sum("total_price"))
             .aggregate(avg=Avg("clv"))["avg"]
@@ -468,7 +468,7 @@ class CACAPIView(APIView):
                 check_in__date__gte=start,
                 check_out__date__lte=end,
             )
-            .exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            .exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .values_list("guest_email", flat=True)
             .distinct()
         )

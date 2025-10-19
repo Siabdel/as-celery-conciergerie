@@ -10,7 +10,7 @@ from rest_framework.generics import ListAPIView
 
 from staff.models import Employee, Absence
 from conciergerie.models import ServiceTask, Reservation
-from core.models import ResaStatus
+from core.models import ReservationStatus
 from staff.serializers import (
     EmployeeSerializer,
     AbsenceSerializer,

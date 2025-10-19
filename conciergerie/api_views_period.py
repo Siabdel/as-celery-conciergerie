@@ -11,7 +11,7 @@ from .serializers import ReservationSerializer, ServiceTaskSerializer
 
 from django.db.models import Count, Q
 from rest_framework import status
-from core.models import ResaStatus
+from core.models import ReservationStatus
 from staff.models import Employee
 
 

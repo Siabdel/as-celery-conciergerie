@@ -12,7 +12,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from staff.models import Employee
 from core.models import ASBaseTimestampMixin
 from django.conf import settings    
-from core.models import ResaStatus, TaskTypeService, PlatformChoices, BaseImage
+from core.models import ReservationStatus, TaskTypeService, PlatformChoices, BaseImage
 from core import models as cr_models 
 from django.utils.text import slugify
 from staff.models import Employee
@@ -137,8 +137,8 @@ class PricingRule(models.Model):
 class Reservation(ASBaseTimestampMixin):
     
     reservation_status = models.CharField(max_length=20, 
-                                          choices=ResaStatus.choices, 
-                                          default=ResaStatus.PENDING)
+                                          choices=ReservationStatus.choices, 
+                                          default=ReservationStatus.PENDING)
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='reservations')
 
     check_in = models.DateTimeField(default=timezone.now().replace(hour=14, minute=0, second=0, microsecond=0))
@@ -186,23 +186,23 @@ class Reservation(ASBaseTimestampMixin):
         
         # Vérification des statuts incohérents avec la date actuelle et les dates de check-in/check-out
         if self.check_out and aujourdhui > self.check_out:
-            if self.reservation_status == ResaStatus.PENDING:
+            if self.reservation_status == ReservationStatus.PENDING:
                 raise ValidationError("Le statut 'PENDING' est impossible si la date actuelle est après le check-out.")
-            if self.reservation_status == ResaStatus.CONFIRMED:
+            if self.reservation_status == ReservationStatus.CONFIRMED:
                 raise ValidationError("Le statut 'CONFIRMED' est impossible après la date de check-out.")
-            if self.reservation_status == ResaStatus.CHECKED_IN:
+            if self.reservation_status == ReservationStatus.CHECKED_IN:
                 raise ValidationError("Le statut 'CHECKED_IN' est impossible après la date de check-out.")
 
-        if self.check_in and aujourdhui > self.check_in and self.reservation_status == ResaStatus.PENDING:
+        if self.check_in and aujourdhui > self.check_in and self.reservation_status == ReservationStatus.PENDING:
             raise ValidationError("Le statut 'PENDING' est impossible si la date actuelle est après la date de check-in.")
         
-        if self.reservation_status == ResaStatus.CHECKED_OUT and aujourdhui < self.check_out:
+        if self.reservation_status == ReservationStatus.CHECKED_OUT and aujourdhui < self.check_out:
             raise ValidationError("Le statut 'CHECKED_OUT' ne peut pas être défini avant le check-out.")
 
-        if self.reservation_status == ResaStatus.EXPIRED and aujourdhui <= self.check_out:
+        if self.reservation_status == ReservationStatus.EXPIRED and aujourdhui <= self.check_out:
             raise ValidationError("Le statut 'EXPIRED' ne peut être défini que si la date de check-out est passée.")
 
-        if self.reservation_status == ResaStatus.COMPLETED and aujourdhui <= self.check_out:
+        if self.reservation_status == ReservationStatus.COMPLETED and aujourdhui <= self.check_out:
             raise ValidationError("Le statut 'COMPLETED' ne peut être défini que si la date de check-out n'est pas passée.")
 
     def save(self, *args, **kwargs):
@@ -226,8 +226,8 @@ class ServiceTask(ASBaseTimestampMixin):
     description = models.TextField()
     start_date  = models.DateTimeField()
     end_date    = models.DateTimeField()
-    status = models.CharField(max_length=20, choices=ResaStatus.choices, 
-                              default=ResaStatus.PENDING)
+    status = models.CharField(max_length=20, choices=ReservationStatus.choices, 
+                              default=ReservationStatus.PENDING)
     type_service = models.CharField(max_length=20, choices=TaskTypeService.choices, 
                                     default=TaskTypeService.CHECKED_IN)
     completed = models.BooleanField(default=False)

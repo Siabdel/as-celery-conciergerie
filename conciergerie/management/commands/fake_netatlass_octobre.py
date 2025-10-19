@@ -15,7 +15,7 @@ from conciergerie.models import (
     CheckoutInventory, CheckoutPhoto,
 )
 from staff.models import Employee, Service
-from core.models import PlatformChoices, ResaStatus, Agency
+from core.models import PlatformChoices, ReservationStatus, Agency
 from faker import Faker
 fake = Faker()
 
@@ -54,6 +54,7 @@ class Command(BaseCommand):
             name="Netatlass Conciergerie",
             defaults=dict(
                 created_by=abdel,
+                code = "A001",
                 phone="+212600000000",
                 email="contact@netatlass.ma",
                 address="Rue Ibn Toumert, Marrakech",
@@ -141,7 +142,7 @@ class Command(BaseCommand):
                     total_price=total,
                     cleaning_fee=Decimal(random.randint(100, 300)),
                     service_fee=Decimal(random.randint(50, 150)),
-                    reservation_status=ResaStatus.CONFIRMED,
+                    reservation_status=ReservationStatus.CONFIRMED,
                     nights=(check_out - check_in).days,
                     currency="MAD",
                 )

@@ -9,7 +9,7 @@ from django.dispatch import receiver
 from schedule.models.calendars import Calendar
 from services_menage import models as serv_models
 from datetime import datetime
-from services_menage.models import Reservation, ServiceTask, ResaStatus, TaskTypeService
+from services_menage.models import Reservation, ServiceTask, ReservationStatus, TaskTypeService
 from staff.models import Employee, Service, CustomCalendar, Absence
 from staff.models import CustomCalendar as Calendar
 
@@ -67,7 +67,7 @@ def service_checkin_task():
                 start_date  = reservation.check_in,
                 end_date    = reservation.check_in,
                 property = reservation.property,
-                status =  ResaStatus.PENDING,
+                status =  ReservationStatus.PENDING,
                 type_service = TaskTypeService.CHECKED_IN,
                 description=f"Check_in guest_name = {reservation.guest_name}, Chambre de {reservation.property}"
             )
@@ -82,7 +82,7 @@ def service_checkin_task():
                 start_date  = reservation.check_in,
                 end_date = reservation.check_in,
                 property = reservation.property,
-                status = ResaStatus.PENDING,
+                status = ReservationStatus.PENDING,
                 type_service =  TaskTypeService.CHECKED_OUT,
                 description=f"Check_out guest_name = {reservation.guest_name}, left Chambre de {reservation.property}"
             )
@@ -223,42 +223,42 @@ def update_reservation_status(reservation):
 
     # Si la réservation est annulée, c'est prioritaire sur tous les autres statuts
     if hasattr(reservation, 'cancelled_at') and reservation.cancelled_at is not None:
-        reservation.reservation_status = ResaStatus.CANCELLED
+        reservation.reservation_status = ReservationStatus.CANCELLED
         return  # On arrête ici pour ne pas continuer à changer le statut
 
     # Grace period (période de grâce) pour certains statuts
     grace_period = timezone.timedelta(hours=2)
 
     # Si la réservation est "PENDING" (en attente)
-    if reservation.reservation_status == ResaStatus.PENDING:
+    if reservation.reservation_status == ReservationStatus.PENDING:
         if aujourdhui >= (reservation.check_in + grace_period):
-            reservation.reservation_status = ResaStatus.NEEDS_ATTENTION
+            reservation.reservation_status = ReservationStatus.NEEDS_ATTENTION
             # Envoyer une notification à l'équipe de gestion
             #send_notification_to_management(reservation)
         elif aujourdhui >= (reservation.check_in + timezone.timedelta(hours=24)):
-            reservation.reservation_status = ResaStatus.EXPIRED
+            reservation.reservation_status = ReservationStatus.EXPIRED
 
     # Si la réservation est "CONFIRMED" (confirmée)
-    elif reservation.reservation_status == ResaStatus.CONFIRMED:
+    elif reservation.reservation_status == ReservationStatus.CONFIRMED:
         if reservation.check_in <= aujourdhui < reservation.check_out:
-            reservation.reservation_status = ResaStatus.CHECKED_IN
+            reservation.reservation_status = ReservationStatus.CHECKED_IN
 
     # Si la réservation est "CHECKED_IN" (en cours)
-    elif reservation.reservation_status == ResaStatus.CHECKED_IN or \
-            reservation.reservation_status == ResaStatus.IN_PROGRESS :
+    elif reservation.reservation_status == ReservationStatus.CHECKED_IN or \
+            reservation.reservation_status == ReservationStatus.IN_PROGRESS :
         if aujourdhui >= reservation.check_out:
-            reservation.reservation_status = ResaStatus.CHECKED_OUT
+            reservation.reservation_status = ReservationStatus.CHECKED_OUT
 
     # Si la réservation est "CHECKED_OUT" (terminée)
-    elif reservation.reservation_status == ResaStatus.CHECKED_OUT:
+    elif reservation.reservation_status == ReservationStatus.CHECKED_OUT:
         if aujourdhui >= (reservation.check_out + timezone.timedelta(hours=24)):
-            reservation.reservation_status = ResaStatus.COMPLETED
+            reservation.reservation_status = ReservationStatus.COMPLETED
 
     # Si la réservation est "IN_PROGRESS" et que la date de check-out est dépassée
-    elif reservation.reservation_status == ResaStatus.IN_PROGRESS and reservation.check_out < aujourdhui:
-        reservation.reservation_status = ResaStatus.EXPIRED
+    elif reservation.reservation_status == ReservationStatus.IN_PROGRESS and reservation.check_out < aujourdhui:
+        reservation.reservation_status = ReservationStatus.EXPIRED
     elif not reservation.reservation_status :
-        reservation.reservation_status = ResaStatus.PENDING
+        reservation.reservation_status = ReservationStatus.PENDING
 
     # Si le statut est "EXPIRED", on ne le change pas
     # L'expiration n'est pas réversible à ce stade.

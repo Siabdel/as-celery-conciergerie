@@ -11,7 +11,7 @@ from conciergerie.models import Property, Reservation
 from conciergerie.serializers import (
     PropertySerializer, ReservationSerializer
 )
-from core.models import ResaStatus
+from core.models import ReservationStatus
 
 
 # ---------- 1. full property object ----------
@@ -31,7 +31,7 @@ class ReservationByPropertyListAPIView(ListAPIView):
         qs = Reservation.objects.filter(
             property_id=self.kwargs["property_id"]
         ).exclude(
-            reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED]
+            reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED]
         )
         # filtres optionnels
         start = self.request.query_params.get("start")
@@ -50,7 +50,7 @@ class PropertyRevenueAPIView(APIView):
                 property_id=kwargs["property_id"],
                 check_in__date__gte=start,
                 check_out__date__lte=end,
-            ).exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            ).exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .aggregate(total=Sum("total_price"))["total"]
             or 0
         )
@@ -67,7 +67,7 @@ class PropertyOccupancyAPIView(APIView):
                 property_id=kwargs["property_id"],
                 check_in__date__lte=end,
                 check_out__date__gte=start,
-            ).exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            ).exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .aggregate(s=Sum("nights"))["s"]
             or 0
         )

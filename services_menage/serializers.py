@@ -239,9 +239,9 @@ class AdditionalExpanseSerializer(serializers.ModelSerializer):
         if data.get('is_recurring') and not data.get('recurrence_interval'):
             raise serializers.ValidationError("Recurrence interval is required for recurring expenses.")
         return data
-class ResaStatusSerializer(serializers.ModelSerializer):
+class ReservationStatusSerializer(serializers.ModelSerializer):
     class Meta:
-        model = sm_models.ResaStatus
+        model = sm_models.ReservationStatus
         fields = '__all__'
 #-------------------
 # CheckinInventory Serializer

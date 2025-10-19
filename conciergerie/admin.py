@@ -24,7 +24,6 @@ from core import models as cr_models
 from django.utils.text import slugify
 from django.urls import reverse
 from django.utils.timezone import now
-from core.models import ASBaseTimestampMixin
 
 class PropertyImageInline(StackedInline):
     model = PropertyImage

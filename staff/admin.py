@@ -3,7 +3,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 # celery
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
-from schedule.models import Calendar, Event
+from icalendar import Calendar, Event
 from django.db.models import Count, Sum
 from django.utils.html import format_html
 from import_export import resources
@@ -16,6 +16,7 @@ from django.utils.timezone import now
 from django.contrib.auth import get_user_model
 from django import forms
 from django.db.models import Q
+from core.mixins.admin_mixins import AgencyScopedAdminMixin
 
 # Register your models here.
 
@@ -54,10 +55,10 @@ class EmployeeForm(forms.ModelForm):
 
 # staff/admin.py
 @admin.register(Employee)
-class EmployeeAdmin(admin.ModelAdmin):
+class EmployeeAdmin(AgencyScopedAdminMixin, admin.ModelAdmin):
     list_display = ("user", "agency", "role", "phone_number")
     list_filter = ("agency", "role")
-    readonly_fields = ("agency",)
+    #readonly_fields = ("agency",)
 
     def save_model(self, request, obj, form, change):
         if not change:                       # création
@@ -71,9 +72,7 @@ class EmployeeAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
             return qs
-        if hasattr(request.user, "employee"):
-            return qs.filter(agency=request.user.employee.agency)
-        return qs.none()
+        return qs.filter(agency=request.user.agency)
     
 @admin.register(Absence)
 class AbsenceAdmin(admin.ModelAdmin):

@@ -1,19 +1,21 @@
 from django.contrib import admin
-from core.models import Agency, UserProfile
+from core.models import Agency, CustomUser
 from conciergerie.models import Property
+from django.contrib.auth.admin import UserAdmin
+from core.mixins.admin_mixins import AgencyScopedAdminMixin
 
 
 
-class UserProfileLine(admin.TabularInline):
-    model = UserProfile
+class CustomUserLine(admin.TabularInline):
+    model = CustomUser
     extra = 1
     can_delete = True
     fk_name = 'agency'  
     
 class ProfileInline(admin.StackedInline):
-    model = UserProfile
+    model = CustomUser
     can_delete = False
-    verbose_name_plural = 'UserProfile'
+    verbose_name_plural = 'CustomUser'
     fk_name = 'user'    
 
 class PropertyInline(admin.TabularInline):
@@ -45,7 +47,7 @@ class PropertyInline(admin.TabularInline):
 #-- Agency Admin ---
 @admin.register(Agency)
 class AgencyAdmin(admin.ModelAdmin):
-    inlines = [UserProfileLine, PropertyInline, ]
+    inlines = [CustomUserLine, PropertyInline, ]
     list_display = ('name', 'slug', 'is_active', 'created_at')
     search_fields = ('name', 'slug')
     list_filter = ('is_active',)
@@ -59,23 +61,55 @@ class AgencyAdmin(admin.ModelAdmin):
             self.slug = self.name.lower().replace(" ", "-")
         super().save(*args, **kwargs)
 
-#--- UserProfile Admin ---
-    
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'agency')
-    search_fields = ('user__username', 'user__email', 'agency__name')
-    list_filter = ('agency',)
+#--- CustomUser Admin ---
+ 
+
+from django.utils.translation import gettext_lazy as _
+
+@admin.register(CustomUser)
+class CustomUserAdmin(AgencyScopedAdminMixin, UserAdmin):
+    """
+    Administration personnalisée pour le modèle CustomUser.
+    Étend le UserAdmin standard de Django pour inclure les champs spécifiques.
+    """
+    model = CustomUser
+    list_display = ("username", "email", "role", "agency", "is_staff", "is_active")
+    list_filter = ("role", "agency", "is_staff", "is_active")
+    search_fields = ("username", "email", "first_name", "last_name")
+    ordering = ("username",)
+
+    fieldsets = (
+        (None, {"fields": ("username", "password")}),
+        (_("Informations personnelles"), {"fields": ("first_name", "last_name", "email", "phone_number", "avatar")}),
+        (_("Appartenance"), {"fields": ("agency", "role")}),
+        (_("Permissions"), {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
+        (_("Dates importantes"), {"fields": ("last_login", "date_joined")}),
+    )
+
+    add_fieldsets = (
+        (None, {
+            "classes": ("wide",),
+            "fields": ("username", "email", "password1", "password2", "agency", "role", "is_staff", "is_active"),
+        }),
+    )
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        if request.user.is_superuser:
+        user = request.user
+
+        # Superadmin → voit tout
+        if user.is_superuser:
             return qs
 
-        # Employee → profils de son agence
-        if hasattr(request.user, "employee"):
-            return qs.filter(user__employee__agency=request.user.employee.agency)
+        # Admin d'agence → voit uniquement les utilisateurs de son agence
+        if user.role == CustomUser.Roles.AGENCY_ADMIN and user.agency:
+            return qs.filter(agency=user.agency)
 
-        # Owner → on peut lui montrer **rien** (ou ses propres profils s’il en a)
-        # Ici : **rien** (liste vide)
+        # Employé → ne voit que lui-même
+        if user.role == CustomUser.Roles.EMPLOYEE:
+            return qs.filter(id=user.id)
+
+        # Owner ou autres → aucun accès par défaut
         return qs.none()
+    
+    

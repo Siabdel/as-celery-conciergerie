@@ -5,7 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from conciergerie.models import Property, Reservation, ServiceTask, Incident, AdditionalExpense
 from staff.models import Employee
-from core.models import UserProfile, Agency
+from core.models import CustomUser, Agency
 from datetime import date, timedelta, datetime
 from django.utils import timezone
 from .serializers import (
@@ -13,6 +13,7 @@ from .serializers import (
     IncidentSerializer, AdditionalExpenseSerializer, EmployeeSerializer
 )
 from .permissions import IsOwnerOrReadOnly, IsManagerOrReadOnly
+from core.api.permissions import IsSameAgency, IsAgencyAdmin
 
 # conciergerie/api_views_dashboard.py
 from datetime import date, timedelta
@@ -21,7 +22,7 @@ from django.db.models import Count, Q
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from core.models import ResaStatus, TaskTypeService
+from core.models import ReservationStatus, TaskTypeService
 from conciergerie.models import Reservation, ServiceTask, Property
 from conciergerie.serializers import (
     CheckEventSerializer,
@@ -33,14 +34,14 @@ from conciergerie.serializers import (
 # conciergerie/views.py
 from django.utils import timezone
 from rest_framework.decorators import action
-from core.models import ResaStatus
+from core.models import ReservationStatus
 
 
 # conciergerie/property_public_views.py
 from django.utils.dateparse import parse_date
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from django.db.models import Sum, Avg, Q
-from core.models import ResaStatus
+from core.models import ReservationStatus
 
 
 # ---------- 1. full property object ----------
@@ -60,7 +61,7 @@ class ReservationByPropertyListAPIView(ListAPIView):
         qs = Reservation.objects.filter(
             property_id=self.kwargs["property_id"]
         ).exclude(
-            reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED]
+            reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED]
         )
         # filtres optionnels
         start = self.request.query_params.get("start")
@@ -79,7 +80,7 @@ class PropertyRevenueAPIView(APIView):
                 property_id=kwargs["property_id"],
                 check_in__date__gte=start,
                 check_out__date__lte=end,
-            ).exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            ).exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .aggregate(total=Sum("total_price"))["total"]
             or 0
         )
@@ -96,7 +97,7 @@ class PropertyOccupancyAPIView(APIView):
                 property_id=kwargs["property_id"],
                 check_in__date__lte=end,
                 check_out__date__gte=start,
-            ).exclude(reservation_status__in=[ResaStatus.CANCELLED, ResaStatus.EXPIRED])
+            ).exclude(reservation_status__in=[ReservationStatus.CANCELLED, ReservationStatus.EXPIRED])
             .aggregate(s=Sum("nights"))["s"]
             or 0
         )
@@ -104,15 +105,31 @@ class PropertyOccupancyAPIView(APIView):
         return Response({"occupancy_rate": round(rate, 2)})
 
 class PropertyViewSet(viewsets.ModelViewSet):
+    
     queryset = Property.objects.all()
     serializer_class = PropertySerializer
-    permission_classes = [IsOwnerOrReadOnly]
+    ## permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsSameAgency]
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["type", "owner__id"]
     search_fields = ["name", "address"]
     ordering_fields = ["price_per_night", "name"]
 
+
+    def get_permissions(self):
+        """Personnalisation dynamique selon le rôle"""
+        if self.action in ["create", "update", "destroy"]:
+            return [IsAuthenticated(), IsAgencyAdmin()]
+        elif self.action in ["list", "retrieve"]:
+            return [IsAuthenticated(), IsSameAgency()]
+        return super().get_permissions()
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return Property.objects.all()
+        return Property.objects.filter(agency=user.agency)
     def get_queryset(self):
         # **filtrage par agence de l’utilisateur connecté**
         return Property.objects.for_user(self.request.user)
@@ -169,10 +186,10 @@ class PropertyViewSet(viewsets.ModelViewSet):
             Reservation.objects.for_user(request.user)
             .filter(
                 reservation_status__in=[
-                    ResaStatus.CONFIRMED,
-                    ResaStatus.IN_PROGRESS,
-                    ResaStatus.CHECKED_IN,
-                    ResaStatus.CHECKED_OUT,
+                    ReservationStatus.CONFIRMED,
+                    ReservationStatus.IN_PROGRESS,
+                    ReservationStatus.CHECKED_IN,
+                    ReservationStatus.CHECKED_OUT,
                 ],
                 # chevauche la période
                 check_in__lt=end,
@@ -186,6 +203,8 @@ class PropertyViewSet(viewsets.ModelViewSet):
         # ------------------------------------------------------------------
         qs = self.get_queryset().exclude(id__in=booked_property_ids)
         serializer = self.get_serializer(qs, many=True)
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user, agency=self.request.user.agency)
         return Response(serializer.data)
 
 class ReservationViewSet(viewsets.ModelViewSet):
@@ -197,6 +216,11 @@ class ReservationViewSet(viewsets.ModelViewSet):
     search_fields = ["guest_name", "guest_email"]
     ordering_fields = ["check_in", "check_out", "total_price"]
 
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        # Log the creation of the reservation
+        print(f"Reservation created: {instance}")
+
 
 class ServiceTaskViewSet(viewsets.ModelViewSet):
     queryset = ServiceTask.objects.all()
@@ -206,6 +230,8 @@ class ServiceTaskViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["status", "employee__id", "property__id", "type_service"]
     search_fields = ["description"]
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user, agency=self.request.user.agency)
     ordering_fields = ["start_date", "end_date"]
 
 
@@ -216,6 +242,8 @@ class IncidentViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["property__id", "status", "type"]
     search_fields = ["title", "description"]
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user, agency=self.request.user.agency)
     ordering_fields = ["date_reported", "status"]
 
 
@@ -225,6 +253,8 @@ class AdditionalExpenseViewSet(viewsets.ModelViewSet):
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["property__id", "expense_type", "is_recurring"]
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user, agency=self.request.user.agency)
     ordering_fields = ["amount", "occurrence_date"]
 
 
@@ -235,6 +265,8 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["role", "is_active"]
     search_fields = ["name", "phone_number"]
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user, agency=self.request.user.agency)
     ordering_fields = ["hire_date", "name"]
 
 

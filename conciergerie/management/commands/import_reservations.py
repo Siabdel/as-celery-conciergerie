@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.contrib.auth.models import User
 from conciergerie.models import Reservation, Property
-from core.models import ResaStatus, PlatformChoices
+from core.models import ReservationStatus, PlatformChoices
 import pandas as pd
 import numpy as np
 from decimal import Decimal, InvalidOperation
@@ -153,7 +153,7 @@ class Command(BaseCommand):
 
                 defaults = {
                     "agency": agency,
-                    "reservation_status": ResaStatus.CONFIRMED,
+                    "reservation_status": ReservationStatus.CONFIRMED,
                     "guest_name": row["guest_name"],
                     "guest_email": row.get("guest_email") or "toto@example.com",
                     "platform": PlatformChoices.DIRECT,

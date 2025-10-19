@@ -24,6 +24,11 @@ class EmployeeSerializer(serializers.ModelSerializer):
         model = Employee
         fields = ['id', 'user', 'role', 'is_active', 'phone_number', 'photo', 'fullname']
     
+    def clean(self):
+        if self.owner and hasattr(self.owner, "CustomUser"):
+            if self.owner.CustomUser.agency != self.agency:
+                raise ValidationError("Owner must belong to the same agency.")
+ 
     def get_fullname(self, obj):
         if obj.user:
             return f"{obj.user.first_name} {obj.user.last_name}".strip()

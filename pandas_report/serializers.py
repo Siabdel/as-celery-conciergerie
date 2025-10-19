@@ -2,7 +2,7 @@ from rest_framework import serializers
 from schedule.models import Calendar, Event
 from django_celery_beat.models import PeriodicTask
 from services_menage.models import Employee, Reservation, ServiceTask, Property
-from services_menage.models import ResaStatus, TaskTypeService
+from services_menage.models import ReservationStatus, TaskTypeService
 
 
 #--------------------------------------------------------

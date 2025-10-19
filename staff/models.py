@@ -15,8 +15,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.models import User
-from core.models import CustomCalendar
-from core.models import Agency 
+from core.models import CustomCalendar, CustomUser
+from core.models import Agency, AbstractTenantModel, AbstractBaseModel
 
 PAYMENT_TYPES = (
     ('full', _('Full payment')),
@@ -50,7 +50,7 @@ def generate_rgb_color():
 
 
 
-class Service(models.Model):
+class Service(AbstractTenantModel):
     """
     Represents a service provided by the appointment system.
 
@@ -58,7 +58,6 @@ class Service(models.Model):
     Version: 1.1.0
     Since: 1.0.0
     """
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, blank=False)
     description = models.TextField(blank=True, null=True)
     duration = models.DurationField(validators=[MinValueValidator(datetime.timedelta(seconds=1))])
@@ -156,16 +155,14 @@ class Service(models.Model):
      
 
 
-class Employee(models.Model):
+class Employee(AbstractTenantModel):
     ROLE_CHOICES = [
         ('cleaner', 'Cleaner'),
         ('maintenance', 'Maintenance'),
         ('concierge', 'Concierge'),
         ('manager', 'Manager'),
     ]
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE) # new field
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="employee")
-    calendar = models.ForeignKey(CustomCalendar, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="employee")
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='cleaner')
     phone_number = models.CharField(max_length=15, null=True)
     hire_date = models.DateField( null=True, blank=True ) # date d'embauche
@@ -258,15 +255,18 @@ class Employee(models.Model):
     def is_working_day(self, day: int):
         return day not in self.get_non_working_days()
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["agency", "role"]),
+            models.Index(fields=["agency", "hire_date"]),
+        ]
 
-
-class Absence(models.Model):
+class Absence(AbstractTenantModel):
     class TypeAbsence(models.TextChoices):
         CONGES = 'CONG', _('En conges')
         MALADIE = 'MALD', _('En maladie')
         INCONNU = 'NJSU', _('Non justifier')
     
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
     type_absence = models.CharField(max_length=200, 
                                     choices=TypeAbsence.choices,
                                     default=TypeAbsence.INCONNU)

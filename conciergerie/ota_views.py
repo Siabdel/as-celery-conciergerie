@@ -23,7 +23,7 @@ def _ota_save_reservation(property_id, platform, reservation_id,
                           guests, status_map):
     """
     Create or update reservation in a transaction-safe way.
-    status_map: OTA status -> our ResaStatus
+    status_map: OTA status -> our ReservationStatus
     """
     prop = get_object_or_404(Property, id=property_id)
     defaults = {

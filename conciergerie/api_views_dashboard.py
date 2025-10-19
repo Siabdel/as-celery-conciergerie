@@ -5,7 +5,7 @@ from django.db.models import Count, Q, Sum, F
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from core.models import ResaStatus, TaskTypeService
+from core.models import ReservationStatus, TaskTypeService
 from conciergerie.models import Reservation, ServiceTask, Property
 from conciergerie.serializers import (
     CheckEventSerializer,
@@ -107,7 +107,7 @@ class DashboardAPIView(APIView):
             total_props = Property.objects.for_user(request.user).count()
             booked = (
                 Reservation.objects.for_user(request.user)
-                .filter(check_in__lte=d, check_out__gt=d, reservation_status__in=[ResaStatus.CONFIRMED, ResaStatus.COMPLETED])
+                .filter(check_in__lte=d, check_out__gt=d, reservation_status__in=[ReservationStatus.CONFIRMED, ReservationStatus.COMPLETED])
                 .count()
             )
             rate = (booked / total_props * 100) if total_props else 0
@@ -158,12 +158,12 @@ class DashboardWeekAPIView(APIView):
 
         checkins_week = (
             Reservation.objects.for_user(request.user)
-            .filter(check_in__date__gte=monday, check_in__date__lt=sunday, reservation_status=ResaStatus.PENDING)
+            .filter(check_in__date__gte=monday, check_in__date__lt=sunday, reservation_status=ReservationStatus.PENDING)
             .count()
         )
         checkouts_week = (
             Reservation.objects.for_user(request.user)
-            .filter(check_out__date__gte=monday, check_out__date__lt=sunday, reservation_status=ResaStatus.CHECKED_IN)
+            .filter(check_out__date__gte=monday, check_out__date__lt=sunday, reservation_status=ReservationStatus.CHECKED_IN)
             .count()
         )
         services_todo_week = (
@@ -196,7 +196,7 @@ class DashboardWeekAPIView(APIView):
             total_props = Property.objects.for_user(request.user).count()
             booked = (
                 Reservation.objects.for_user(request.user)
-                .filter(check_in__lte=d, check_out__gt=d, reservation_status__in=[ResaStatus.CONFIRMED, ResaStatus.CHECKED_IN])
+                .filter(check_in__lte=d, check_out__gt=d, reservation_status__in=[ReservationStatus.CONFIRMED, ReservationStatus.CHECKED_IN])
                 .count()
             )
             rate = (booked / total_props * 100) if total_props else 0
@@ -226,7 +226,7 @@ class DashboardWeekAPIView(APIView):
 # ------------------------------------------------------------------
 
 # conciergerie/api_views_dashboard.py
-from core.models import ResaStatus
+from core.models import ReservationStatus
 
 
 
@@ -234,11 +234,11 @@ from core.models import ResaStatus
 #  STATUTS QUI COMPTENT POUR ACTIVITÉ + CA
 # ------------------------------------------------------------------
 ACTIVE_STATUSES = [
-    ResaStatus.CONFIRMED,
-    ResaStatus.IN_PROGRESS,
-    ResaStatus.CHECKED_IN,
-    ResaStatus.CHECKED_OUT,
-    ResaStatus.COMPLETED,
+    ReservationStatus.CONFIRMED,
+    ReservationStatus.IN_PROGRESS,
+    ReservationStatus.CHECKED_IN,
+    ReservationStatus.CHECKED_OUT,
+    ReservationStatus.COMPLETED,
 ]
 
 
@@ -352,11 +352,11 @@ class DashboardMonthAPIView(APIView):
 #  STATUTS PERTINENTS (activité + CA)
 # ------------------------------------------------------------------
 ACTIVE_STATUSES = [
-    ResaStatus.CONFIRMED,
-    ResaStatus.IN_PROGRESS,
-    ResaStatus.CHECKED_IN,
-    ResaStatus.CHECKED_OUT,
-    ResaStatus.COMPLETED,
+    ReservationStatus.CONFIRMED,
+    ReservationStatus.IN_PROGRESS,
+    ReservationStatus.CHECKED_IN,
+    ReservationStatus.CHECKED_OUT,
+    ReservationStatus.COMPLETED,
 ]
 
 
@@ -522,10 +522,10 @@ class DashboardYearAPIView(APIView):
             Reservation.objects.filter(
                 check_in__year=year,
                 reservation_status__in=[
-                    ResaStatus.CONFIRMED,
-                    ResaStatus.CHECKED_IN,
-                    ResaStatus.CHECKED_OUT,
-                    ResaStatus.COMPLETED,
+                    ReservationStatus.CONFIRMED,
+                    ReservationStatus.CHECKED_IN,
+                    ReservationStatus.CHECKED_OUT,
+                    ReservationStatus.COMPLETED,
                 ],
             )
             .annotate(month=ExtractMonth("check_in"))

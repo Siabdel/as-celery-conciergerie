@@ -1,21 +1,15 @@
 from django.db import models
-from core.models import ASBaseTimestampMixin, BaseImage, ResaStatus, PlatformChoices, TaskTypeService
 from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import MinValueValidator
-from django.contrib.auth import models as auth_models
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth import models as auth_models, get_user_model
 from staff.models import Employee
 from django.conf import settings
-from django.utils import timezone
-from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models, IntegrityError
-from django.contrib.auth import get_user_model
 from django.db.models import Sum, F
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core.exceptions import ValidationError
-from core.models import Agency
-from staff.models import Employee
+from core.models import Agency, AbstractBaseModel, AbstractTenantModel, AbstractUser, BaseImage, ReservationStatus, PlatformChoices, TaskTypeService
 from conciergerie.managers import ReservationManager, PropertyManager, ServiceTaskManager, PricingRuleManager
 
 # Create your models here.
@@ -30,7 +24,6 @@ from conciergerie.managers import ReservationManager, PropertyManager, ServiceTa
 
 class PropertyImage(BaseImage):
     property = models.ForeignKey('Property', related_name="images", on_delete=models.CASCADE)
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
 
     def get_absolute_url(self):
         if self.slug:
@@ -42,22 +35,23 @@ class PropertyImage(BaseImage):
     class Meta:
         verbose_name = 'Property Image'
         verbose_name_plural = 'Property Images'
+        
 
 
 
-class Property(ASBaseTimestampMixin):
+class Property(AbstractTenantModel):
     PROPERTY_TYPES = [
         ('apartment', 'Apartment'),
         ('house', 'House'),
         ('villa', 'Villa'),
     ]
-    agency = models.ForeignKey(Agency, on_delete=models.PROTECT)
     name = models.CharField(max_length=100)
     gerant = models.ForeignKey(Employee, null=True, blank=True, on_delete=models.SET_NULL)
     type = models.CharField(max_length=20, choices=PROPERTY_TYPES)
-    owner = models.ForeignKey(auth_models.User, on_delete=models.PROTECT, related_name='properties_owned')   # ← indispe
+    owner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT, related_name='properties_owned')   # ← indispe
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     address = models.CharField(max_length=255)
+    city    = models.CharField(max_length=100, null=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
     capacity = models.PositiveIntegerField(default=1)
@@ -71,6 +65,12 @@ class Property(ASBaseTimestampMixin):
         verbose_name = 'Property'
         verbose_name_plural = 'Properties'
         unique_together = ("agency", "name")
+        indexes = [
+            models.Index(fields=["agency", "owner"]),
+            models.Index(fields=["agency", "is_active"]),
+            models.Index(fields=["agency", "city"]),
+        ]
+        
 
     def __str__(self):
         return f"{self.name} ({self.type})"
@@ -102,19 +102,16 @@ class Property(ASBaseTimestampMixin):
         return self.images.all()
 
     def get_absolute_url(self):
-        return reverse("shop:product_detail", kwargs={'pk': self.pk})
+        return reverse("conciergerie:product_detail", kwargs={'pk': self.pk})
     
     def get_edit_url(self):
-        return reverse("shop:product_edit", kwargs={'pk': self.pk})
+        return reverse("conciergerie:product_edit", kwargs={'pk': self.pk})
 
-    def get_delete_url(self):
-        return reverse("shop:product_delete", kwargs={'pk': self.pk})
     
 
 
 
-class PricingRule(models.Model):
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
+class PricingRule(AbstractTenantModel):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='pricing_rules')
     start_date = models.DateField()
     end_date = models.DateField()
@@ -155,11 +152,10 @@ class PricingRule(models.Model):
 
     
 
-class Reservation(ASBaseTimestampMixin):
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
+class Reservation(AbstractTenantModel):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='reservations')
-    reservation_status = models.CharField(max_length=20, choices=ResaStatus.choices,
-                                          default=ResaStatus.PENDING)
+    reservation_status = models.CharField(max_length=20, choices=ReservationStatus.choices,
+                                          default=ReservationStatus.PENDING)
     check_in = models.DateTimeField(default=timezone.now)
     check_out = models.DateTimeField(default=timezone.now)
     guest_name = models.CharField(max_length=100)
@@ -190,30 +186,26 @@ class Reservation(ASBaseTimestampMixin):
     is_business_trip = models.BooleanField(default=False)
     guest_rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], null=True, blank=True)
     cancellation_policy = models.CharField(max_length=100, blank=True)
-    booking_date = models.DateTimeField(auto_now_add=True)
     
     # Remplace le manager par défaut
     objects = ReservationManager()
      
-    def save(self, *args, **kwargs):
-        # auto-compute nights if empty
-        if not self.nights and self.check_in and self.check_out:
-            self.nights = (self.check_out.date() - self.check_in.date()).days
-        # auto-compute gross revenue if empty
-        if not self.gross_revenue:
-            self.gross_revenue = self.total_price  # already calculated
-        super().save(*args, **kwargs)
-
+    
 
     class Meta:
         ordering = ("property", "check_in", )
-        unique_together = ("property", "check_in", )
+        unique_together = (("agency","property","check_in"), )
+
+        indexes = [
+            models.Index(fields=['agency', 'check_in']),
+            models.Index(fields=["agency", "property"]),
+            models.Index(fields=["agency", "reservation_status"]),
+            models.Index(fields=["check_in", "check_out"]),
+        ]
+
 
     def __str__(self):
         return f"Reservation for {self.property} from {self.check_in} to {self.check_out}"
-
-    def get_duration(self):
-        return (self.check_out - self.check_in).days + 1
 
     def get_duration(self):
         return (self.check_out - self.check_in).days + 1
@@ -234,30 +226,36 @@ class Reservation(ASBaseTimestampMixin):
         
         # Vérification des statuts incohérents avec la date actuelle et les dates de check-in/check-out
         if self.check_out and aujourdhui > self.check_out:
-            if self.reservation_status == ResaStatus.PENDING:
+            if self.reservation_status == ReservationStatus.PENDING:
                 raise ValidationError("Le statut 'PENDING' est impossible si la date actuelle est après le check-out.")
-            if self.reservation_status == ResaStatus.CONFIRMED:
+            if self.reservation_status == ReservationStatus.CONFIRMED:
                 raise ValidationError("Le statut 'CONFIRMED' est impossible après la date de check-out.")
-            if self.reservation_status == ResaStatus.CHECKED_IN:
+            if self.reservation_status == ReservationStatus.CHECKED_IN:
                 raise ValidationError("Le statut 'CHECKED_IN' est impossible après la date de check-out.")
 
-        if self.check_in and aujourdhui > self.check_in and self.reservation_status == ResaStatus.PENDING:
+        if self.check_in and aujourdhui > self.check_in and self.reservation_status == ReservationStatus.PENDING:
             raise ValidationError("Le statut 'PENDING' est impossible si la date actuelle est après la date de check-in.")
         
-        if self.reservation_status == ResaStatus.CHECKED_OUT and aujourdhui < self.check_out:
+        if self.reservation_status == ReservationStatus.CHECKED_OUT and aujourdhui < self.check_out:
             raise ValidationError("Le statut 'CHECKED_OUT' ne peut pas être défini avant le check-out.")
 
-        if self.reservation_status == ResaStatus.EXPIRED and aujourdhui <= self.check_out:
+        if self.reservation_status == ReservationStatus.EXPIRED and aujourdhui <= self.check_out:
             raise ValidationError("Le statut 'EXPIRED' ne peut être défini que si la date de check-out est passée.")
 
-        if self.reservation_status == ResaStatus.COMPLETED and aujourdhui <= self.check_out:
+        if self.reservation_status == ReservationStatus.COMPLETED and aujourdhui <= self.check_out:
             raise ValidationError("Le statut 'COMPLETED' ne peut être défini que si la date de check-out n'est pas passée.")
 
     def save(self, *args, **kwargs):
         if not self.total_price:
             self.total_price = self.calculate_total_price()
-        super().save(*args, **kwargs)   # laisse l'IntegrityError remonter
-    
+        # auto-compute nights if empty
+        if not self.nights and self.check_in and self.check_out:
+            self.nights = (self.check_out.date() - self.check_in.date()).days
+        # auto-compute gross revenue if empty
+        if not self.gross_revenue:
+            self.gross_revenue = self.total_price  # already calculated
+        super().save(*args, **kwargs)
+ 
 
 
 class ServiceTaskManager(models.Manager):
@@ -267,8 +265,7 @@ class ServiceTaskManager(models.Manager):
         return self.filter(property__owner=user)
 
 
-class ServiceTask(ASBaseTimestampMixin):
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
+class ServiceTask(AbstractTenantModel):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='tasks')
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True,
                                  related_name='tasks')
@@ -277,8 +274,8 @@ class ServiceTask(ASBaseTimestampMixin):
     description = models.TextField()
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    status = models.CharField(max_length=20, choices=ResaStatus.choices,
-                              default=ResaStatus.PENDING)
+    status = models.CharField(max_length=20, choices=ReservationStatus.choices,
+                              default=ReservationStatus.PENDING)
     type_service = models.CharField(max_length=20, choices=TaskTypeService.choices,
                                     default=TaskTypeService.CHECKED_IN)
     completed = models.BooleanField(default=False)
@@ -288,8 +285,10 @@ class ServiceTask(ASBaseTimestampMixin):
     def __str__(self):
         return f"Task for {self.property} - {self.end_date}"
 
+    class Meta :
+        indexes = [models.Index(fields=['agency', 'property', 'employee',])] 
 
-class Incident(models.Model):
+class Incident(AbstractTenantModel):
     INCIDENT_TYPES = [
         ('PANNE', 'Panne'),
         ('DOMMAGE', 'Dommage'),
@@ -303,7 +302,6 @@ class Incident(models.Model):
         ('RESOLU', 'Résolu'),
         ('FERME', 'Fermé'),
     ]
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='incidents')
     title = models.CharField(max_length=100)
     reported_by = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='reported_incidents')
@@ -320,19 +318,9 @@ class Incident(models.Model):
         return f"{self.get_type_display()} - {self.status} - {self.property.name}"
 
 
-class BaseModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
-                                   related_name="%(class)s_created")
-    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
-                                   related_name="%(class)s_updated")
-
-    class Meta:
-        abstract = True
 
 
-class AdditionalExpense(BaseModel):
+class AdditionalExpense(AbstractTenantModel):
     EXPENSE_TYPES = [
         ('supplies', 'Fournitures'),
         ('repairs', 'Réparations'),
@@ -341,7 +329,6 @@ class AdditionalExpense(BaseModel):
         ('internet', 'Internet'),
         ('other', 'Autre'),
     ]
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='additional_expenses')
     expense_type = models.CharField(max_length=20, choices=EXPENSE_TYPES)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -387,8 +374,7 @@ class AdditionalExpense(BaseModel):
     #---------------------------------------
 #-Etat des lieux du bien               -
 #---------------------------------------
-class CheckoutInventory(models.Model):
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
+class CheckoutInventory(AbstractTenantModel):
     reservation = models.OneToOneField(Reservation, on_delete=models.CASCADE, related_name='checkout_inventory')
     employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name='checkout_inventories')
     date_performed = models.DateTimeField(auto_now_add=True)
@@ -405,8 +391,7 @@ class CheckoutInventory(models.Model):
     def __str__(self):
         return f"Checkout Inventory for {self.reservation}"
 
-class CheckoutPhoto(models.Model):
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
+class CheckoutPhoto(AbstractTenantModel):
     image = models.ImageField(upload_to='checkout_photos/')
     description = models.CharField(max_length=255)
     uploaded_at = models.DateTimeField(auto_now_add=True)

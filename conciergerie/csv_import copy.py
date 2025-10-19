@@ -5,7 +5,7 @@ import logging
 from django.utils import timezone
 from django.db import transaction
 from .models import Property, Reservation, AdditionalExpense
-from core.models import ResaStatus, PlatformChoices
+from core.models import ReservationStatus, PlatformChoices
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +94,7 @@ def import_reservations_csv(rows: list[dict], user) -> dict:
                         "amount_paid": amount_paid,
                         "gross_revenue": gross_revenue or amount_paid,  # fallback
                         "platform": PlatformChoices.DIRECT,
-                        "reservation_status": ResaStatus.CONFIRMED,
+                        "reservation_status": ReservationStatus.CONFIRMED,
                         "created_by": user,
                     }
                 )

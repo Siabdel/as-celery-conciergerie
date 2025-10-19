@@ -68,7 +68,7 @@ urlpatterns = [
     path("", co_views.conciergerie_page , name="home"),
     path('property/', co_views.PropretyList.as_view(), name='property_list'),
     path('show/<int:pk>/', co_views.PropertyDetail.as_view(), name='property_detail'),
-    path('resa/(?P<reservation_id>[0-9]+)/show/', co_views.details_reservation, name='checkin_detail'),
+    path('resa/<int:reservation_id>/show/', co_views.details_reservation, name='checkin_detail'),
     path('resa/<int:resa>/show/', co_views.details_reservation, name='checkin_detail'),
     path('property/<int:property_id>/show/', co_views.property_details_plus, name='property_details_plus'),
     ## reprt 

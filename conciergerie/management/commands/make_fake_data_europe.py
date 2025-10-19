@@ -9,7 +9,7 @@ from django.utils import timezone
 from faker import Faker
 # dans la méthode create_pricing_rules
 from dateutil.relativedelta import relativedelta   # <-- ajout
-from core.models import ResaStatus, PlatformChoices
+from core.models import ReservationStatus, PlatformChoices
 from services_menage.models import Property, Reservation, PricingRule, ServiceTask, TaskTypeService
 # from services_menage.models import Incident, AdditionalExpense, CheckoutInventory, CheckoutPhoto
 
@@ -150,13 +150,13 @@ class Command(BaseCommand):
             check_out_dt = timezone.make_aware(datetime.combine(check_out_date, time(12, 0)))
 
             if check_out_dt < now_dt:
-                status = random.choice([ResaStatus.COMPLETED, ResaStatus.CHECKED_OUT])
+                status = random.choice([ReservationStatus.COMPLETED, ReservationStatus.CHECKED_OUT])
             elif check_in_dt <= now_dt <= check_out_dt:
-                status = random.choice([ResaStatus.CHECKED_IN, ResaStatus.IN_PROGRESS])
+                status = random.choice([ReservationStatus.CHECKED_IN, ReservationStatus.IN_PROGRESS])
             elif check_in_dt <= now_dt + timedelta(days=7):
-                status = random.choice([ResaStatus.CONFIRMED, ResaStatus.NEEDS_ATTENTION])
+                status = random.choice([ReservationStatus.CONFIRMED, ReservationStatus.NEEDS_ATTENTION])
             else:
-                status = ResaStatus.PENDING
+                status = ReservationStatus.PENDING
 
             total = prop.get_price_for_date(check_in_date) * duration
 
