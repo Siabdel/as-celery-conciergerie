@@ -1,9 +1,32 @@
+# core/admin.py
 from django.contrib import admin
 from core.models import Agency, CustomUser
 from conciergerie.models import Property
 from django.contrib.auth.admin import UserAdmin
-from core.mixins.admin_mixins import AgencyScopedAdminMixin
+from core.mixins.admin_mixins import AgencyScopedAdminMixin, BaseAgencyAdmin
+from core.models import LandingSection
+from django.utils.html import format_html
 
+@admin.register(LandingSection)
+class LandingSectionAdmin(BaseAgencyAdmin):
+    list_display = ("title", "is_active", "order", "icon", "image_preview")
+    list_editable = ("is_active", "order")
+    search_fields = ("title", "description")
+    readonly_fields = ("image_preview",)
+    fieldsets = (
+        (None, {
+            "fields": ("title", "subtitle", "description", "icon", "image")
+        }),
+        ("Affichage", {
+            "fields": ("is_active", "order", "image_preview")
+        }),
+    )
+
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html(f'<img src="{obj.image.url}" width="120" style="border-radius:8px;" />')
+        return "—"
+    image_preview.short_description = "Aperçu"
 
 
 class CustomUserLine(admin.TabularInline):
@@ -46,7 +69,7 @@ class PropertyInline(admin.TabularInline):
     
 #-- Agency Admin ---
 @admin.register(Agency)
-class AgencyAdmin(admin.ModelAdmin):
+class AgencyAdmin(BaseAgencyAdmin):
     inlines = [CustomUserLine, PropertyInline, ]
     list_display = ('name', 'slug', 'is_active', 'created_at')
     search_fields = ('name', 'slug')

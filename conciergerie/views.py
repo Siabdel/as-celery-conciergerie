@@ -23,6 +23,19 @@ from conciergerie import models as co_models
 
 logger = logging.getLogger(__name__)
 
+# core/views.py
+from django.views.generic import TemplateView
+from core.models import LandingSection
+
+class HomePublicView(TemplateView):
+    template_name = "public_conciergerie.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["sections"] = LandingSection.objects.all()
+        return context
+
+
 def home(request):
     return render(request, "conciergerie/dashboard_conciergeriepro.html", {})
 

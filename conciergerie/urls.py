@@ -36,6 +36,7 @@ from conciergerie import api_views_dashboard as co_api_dashboard
 from conciergerie import api_views as co_api_views
 # api_reporting_views
 from conciergerie import api_reporting_views as api_report
+from core.api.views import LandingSectionPublicViewSet
 
 app_name = "conciergerie"
 
@@ -60,12 +61,15 @@ router.register(r'incidents', IncidentViewSet, basename="incident")
 router.register(r'expenses', AdditionalExpenseViewSet, basename="expense")
 router.register(r'employees', EmployeeViewSet, basename="employee")
 router.register(r'users', UserViewSet, basename="user")
+router.register(r"public/landing", LandingSectionPublicViewSet, basename="public-landing")
+
 
 # --- URL patterns ---
 urlpatterns = [
     
-    path("home/", co_views.home, name="home_page"),
-    path("", co_views.conciergerie_page , name="home"),
+    path("home_public/", co_views.HomePublicView.as_view(), name="home_public"),
+    path("dashboard/", co_views.home, name="dashboard"),
+    path("home/", co_views.conciergerie_page , name="home"),
     path('property/', co_views.PropretyList.as_view(), name='property_list'),
     path('show/<int:pk>/', co_views.PropertyDetail.as_view(), name='property_detail'),
     path('resa/<int:reservation_id>/show/', co_views.details_reservation, name='checkin_detail'),

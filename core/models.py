@@ -79,6 +79,44 @@ class AbstractTenantModel(AbstractBaseModel):
         indexes = [ models.Index(fields=["agency"]), ]
 
 
+# core/models.py (ajout)
+
+# core/models.py
+from django.db import models
+from django.utils.html import mark_safe
+
+class LandingSection(models.Model):
+    """Éléments de la page d’accueil publique."""
+    title = models.CharField("Titre", max_length=200)
+    subtitle = models.CharField("Sous-titre", max_length=300, blank=True)
+    description = models.TextField("Description")
+    icon = models.CharField(
+        "Icône Bootstrap",
+        max_length=50,
+        blank=True,
+        help_text="Ex: 'bi bi-gear', 'bi bi-lightning-charge-fill'"
+    )
+    image = models.ImageField("Image illustrée", upload_to="landing/", blank=True, null=True)
+    is_active = models.BooleanField("Visible sur la page", default=True)
+    order = models.PositiveIntegerField("Ordre d’affichage", default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["order"]
+        verbose_name = "Section de la page d’accueil"
+        verbose_name_plural = "Sections de la page d’accueil"
+
+    def __str__(self):
+        return self.title
+
+    def image_preview(self):
+        if self.image:
+            return mark_safe(f'<img src="{self.image.url}" width="100" style="border-radius:8px;" />')
+        return "(Aucune image)"
+    image_preview.short_description = "Aperçu"
+
+
+
 
 class CustomUser(AbstractUser):
     """
@@ -316,6 +354,7 @@ class CustomCalendar(AbstractTenantModel):
         response["Content-Disposition"] = f'attachment; filename="{self.employee.name}.ics"'
         return response
 
+    """ 
     @classmethod
     def create_unique(cls, name, slug):
         if not cls.objects.filter(name=name).exists():
@@ -324,5 +363,6 @@ class CustomCalendar(AbstractTenantModel):
         if not cls.objects.filter(name=name).exists():
             return cls.objects.create(name=name, slug=slug)
         return cls.objects.get(name=name)
+    """
 
 

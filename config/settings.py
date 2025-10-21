@@ -135,6 +135,7 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
     # debug 
     'debug_toolbar.middleware.DebugToolbarMiddleware', # new
+    "core.middleware.LoginRequiredMiddleware",  # 👈 ajouté ici
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -407,6 +408,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # Configurer DRF pour utiliser JWT  
 
+
 REST_FRAMEWORK = {
     
     'DEFAULT_PERMISSION_CLASSES' : [
@@ -416,6 +418,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTIFICATION_CLASS' : [
         'rest_famework.authentification.SessionAuthentification', 
         'rest_framework_simplejwt.authentication.JWTAuthentication', 
+        "rest_framework.authentication.TokenAuthentication",
         #'rest_framework.authentification.BasicAuthentification',
         ##'rest_framework_simplejwt.authentication.JWTAuthentication', 
         ##'rest_framework.authtoken',

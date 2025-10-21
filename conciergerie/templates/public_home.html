@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HappyBee — Plateforme SaaS de conciergerie</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <!-- Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js"></script>
+
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #fdfdfd;
+            color: #333;
+        }
+        header {
+            background: linear-gradient(135deg, #0d6efd, #00bcd4);
+            color: white;
+            padding: 5rem 1rem;
+            text-align: center;
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #0d6efd;
+        }
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+        footer {
+            background-color: #0d6efd;
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        .stack-icon {
+            font-size: 2rem;
+            color: #0d6efd;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="landingApp">
+    <!-- HERO -->
+    <header>
+        <h1 class="fw-bold mb-3">🏨 Bienvenue sur <span class="text-warning">HappyBee</span></h1>
+        <p class="lead mb-4">
+            La plateforme SaaS tout-en-un pour la gestion intelligente de vos services de conciergerie, réservations et équipes.
+        </p>
+        <button class="btn btn-light btn-lg px-4" @click="scrollToFeatures">Découvrir la plateforme</button>
+    </header>
+
+    <!-- FEATURES -->
+    
+
+<section id="features" class="container py-5">
+  <h2 class="text-center mb-5 fw-bold">Fonctionnalités clés</h2>
+
+  <div class="row g-4">
+    <div v-for="(section, idx) in sections" :key="idx" class="col-md-4">
+      <div class="card feature-card h-100 p-3 text-center">
+        <div class="feature-icon mb-3">
+          <i :class="section.icon || 'bi bi-lightning-charge-fill'"></i>
+        </div>
+        <h5 class="fw-bold mb-1">{{ section.title }}</h5>
+        <small v-if="section.subtitle" class="text-muted">{{ section.subtitle }}</small>
+        <div v-if="section.image" class="my-3">
+          <img :src="section.image" alt="" class="img-fluid rounded shadow-sm" style="max-height:150px; object-fit:cover;">
+        </div>
+        <p class="text-muted mt-2">{{ section.description }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+    <!-- TECH STACK -->
+    <section class="bg-light py-5 text-center">
+        <h2 class="fw-bold mb-4">Une stack technologique moderne</h2>
+        <p class="text-muted mb-4">
+            Conçue pour la performance, la sécurité et la scalabilité de votre activité de conciergerie.
+        </p>
+        <div>
+            <i class="stack-icon bi bi-database-fill"></i> Django ORM
+            <i class="stack-icon bi bi-code-slash"></i> Django REST Framework
+            <i class="stack-icon bi bi-cloud-check"></i> Vue.js + Bootstrap
+            <i class="stack-icon bi bi-graph-up"></i> Recharts / Chart.js
+            <i class="stack-icon bi bi-lock-fill"></i> Auth JWT / OAuth2
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION -->
+    <section class="container py-5 text-center">
+        <h3 class="fw-bold mb-3">Simplifiez la gestion de vos biens et de vos équipes</h3>
+        <p class="text-muted mb-4">Découvrez comment HappyBee révolutionne la conciergerie digitale.</p>
+        <a href="/admin/" class="btn btn-primary btn-lg">Se connecter à l’espace de gestion</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2025 HappyBee — Conciergerie SaaS moderne | Made with ❤️ in Marrakech</p>
+    </footer>
+</div>
+
+<!-- Vue.js App -->
+<script>
+const { createApp } = Vue;
+
+createApp({
+    data() {
+        return {
+            sections: [
+                {% for s in sections %}
+                {
+                    title: "{{ s.title|escapejs }}",
+                    description: "{{ s.description|escapejs }}",
+                    icon: "{{ s.icon|escapejs }}",
+                    image: "{{ s.image.url|default:''|escapejs }}"
+                },
+                {% endfor %}
+                // fallback if DB empty
+                {% if not sections %}
+                { title: "Gestion des réservations", description: "Synchronisation en temps réel avec Airbnb, Booking et autres plateformes.", icon: "bi bi-calendar2-check" },
+                { title: "Tâches & maintenance", description: "Suivi automatisé du ménage, maintenance et équipes internes.", icon: "bi bi-tools" },
+                { title: "Reporting intelligent", description: "Analyse de revenus, taux d’occupation et génération de rapports PDF.", icon: "bi bi-bar-chart-line" },
+                {% endif %}
+            ]
+        };
+    },
+    methods: {
+        scrollToFeatures() {
+            document.getElementById("features").scrollIntoView({ behavior: "smooth" });
+        }
+    }
+}).mount("#landingApp");
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

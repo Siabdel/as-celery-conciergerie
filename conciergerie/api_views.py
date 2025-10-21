@@ -13,7 +13,7 @@ from .serializers import (
     IncidentSerializer, AdditionalExpenseSerializer, EmployeeSerializer
 )
 from .permissions import IsOwnerOrReadOnly, IsManagerOrReadOnly
-from core.api.permissions import IsSameAgency, IsAgencyAdmin
+from core.api.permissions import IsSameAgency, IsAgencyAdmin, IsAgencyAdminOrEmployee
 
 # conciergerie/api_views_dashboard.py
 from datetime import date, timedelta
@@ -110,6 +110,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
     serializer_class = PropertySerializer
     ## permission_classes = [IsOwnerOrReadOnly]
     permission_classes = [IsAuthenticated, IsSameAgency]
+    permission_classes = [IsAgencyAdminOrEmployee]
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["type", "owner__id"]

@@ -24,6 +24,7 @@ from core import models as cr_models
 from django.utils.text import slugify
 from django.urls import reverse
 from django.utils.timezone import now
+from core.mixins.admin_mixins import AgencyScopedAdminMixin, BaseAgencyAdmin
 
 class PropertyImageInline(StackedInline):
     model = PropertyImage
@@ -42,7 +43,7 @@ class PropertyImageInline(admin.TabularInline):
 
 
 @admin.register(Incident)
-class IncidentAdmin(admin.ModelAdmin):
+class IncidentAdmin(BaseAgencyAdmin):
     list_display = ('property', 'type', 'title', 'status_tag', 'date_reported', 'reported_by', 'assigned_to')
     readonly_fields = ('date_reported', 'reported_by')
     list_filter = ('type', 'status', 'property', 'date_reported')
@@ -138,13 +139,13 @@ class AdditionalExpenseInline(admin.TabularInline):
     fields = ('property', 'expense_type', 'amount', 'description',)
     
 @admin.register(sm_models.AdditionalExpense)
-class AdditionalExpenseAdmin(admin.ModelAdmin):
+class AdditionalExpenseAdmin(BaseAgencyAdmin):
     list_display = ('property', 'expense_type', 'amount', )
     list_filter = ('expense_type', 'property', )
     search_fields = ('property__name', 'description')
  
 @admin.register(sm_models.Property)
-class PropertyAdmin(admin.ModelAdmin):
+class PropertyAdmin(BaseAgencyAdmin):
     list_display = ('name', 'type', 'agency', 'owner', 'price_per_night_display', 'address_preview')
     list_filter = ('agency', 'type', 'owner')
     search_fields = ('name', 'address', 'owner__username')
@@ -213,15 +214,16 @@ class PropertyAdmin(admin.ModelAdmin):
 
 
 @admin.register(PricingRule)
-class PricingRuleAdmin(admin.ModelAdmin):
+class PricingRuleAdmin(BaseAgencyAdmin):
     list_display = ["property", "start_date", "end_date", "price_per_night", "is_active", "priority"]
 
-
 @admin.register(ServiceTask)
-class ServiceTaskAdmin(admin.ModelAdmin):
-    list_display = ["property", "type_service", "start_date", "end_date", "employee", "completed"]
-    list_filter = ('agency', 'property', )
-
+class ServiceTaskAdmin(AgencyScopedAdminMixin, BaseAgencyAdmin):
+    list_display = ( "employee", "property", "start_date", "completed", "agency")
+    list_filter = ("completed", "agency", "start_date")
+    search_fields = ("name", "employee__user__username", "property__name")
+    date_hierarchy = "start_date"
+    ordering = ("-start_date",)
 
 
 
@@ -272,7 +274,7 @@ class ReservationResource(resources.ModelResource):
 #- Reservation Admin
 #---------------------------------
 @admin.register(Reservation)
-class ReservationAdmin(admin.ModelAdmin):
+class ReservationAdmin(BaseAgencyAdmin):
     ## list_display = [f.name for f in Reservation._meta.fields if f.name.endswith('agency')] ['agency']
     list_display = ["agency", "property", "guest_name", "guest_nationality","check_in", 
                     "check_out", "reservation_status",
@@ -321,7 +323,6 @@ class ReservationAdmin(admin.ModelAdmin):
         ('System Information', {
             'fields': (
                 ('booking_date', 'created_at'),
-                ('created_by', ),
             ),
             'classes': ('collapse',)
         }),

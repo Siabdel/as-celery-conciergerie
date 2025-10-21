@@ -22,6 +22,7 @@ from conciergerie.managers import ReservationManager, PropertyManager, ServiceTa
 
 
 
+
 class PropertyImage(BaseImage):
     property = models.ForeignKey('Property', related_name="images", on_delete=models.CASCADE)
 

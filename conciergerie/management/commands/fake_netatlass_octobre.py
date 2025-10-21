@@ -224,10 +224,7 @@ class Command(BaseCommand):
             )
 
             from core.models import CustomCalendar
-            cal, _ = CustomCalendar.objects.get_or_create(
-                name=f"Calendrier {first} {last}",
-                slug=f"{first.lower()}-{last.lower()}",
-            )
+            
 
             emp, _ = Employee.objects.get_or_create(
                 user=user,
@@ -238,8 +235,16 @@ class Command(BaseCommand):
                     hire_date=timezone.now().date() - timedelta(days=random.randint(30, 300)),
                     is_active=True,
                     slot_duration=30,
-                    calendar=cal,
                 ),
+            )
+            ##
+            emp.save()
+            print("emp = ", emp.pk)
+            # Calendar 
+            cal, _ = CustomCalendar.objects.get_or_create(
+                agency=agency, employee=emp,
+                name=f"Calendrier {first} {last}",
+                slug=f"{first.lower()}-{last.lower()}",
             )
             emp.services_offered.set(services)
             employees.append(emp)

@@ -17,6 +17,12 @@ from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.models import User
 from core.models import CustomCalendar, CustomUser
 from core.models import Agency, AbstractTenantModel, AbstractBaseModel
+from django.utils import timezone
+from django.db import models
+from django.utils import timezone
+from django.conf import settings
+from core.models import Agency
+# from conciergerie.models import Property, Reservation
 
 PAYMENT_TYPES = (
     ('full', _('Full payment')),
@@ -276,9 +282,7 @@ class Absence(AbstractTenantModel):
     end_date = models.DateTimeField()
     description = models.CharField(max_length=254, blank=True, null=True)
     # meta data
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
+   
     def __str__(self):
         return f"{self.start_date} to {self.end_date} - {self.description if self.description else 'Day off'}"
 
@@ -289,4 +293,37 @@ class Absence(AbstractTenantModel):
 
     def is_owner(self, user_id):
         return self.staff_member.user.id == user_id
+
+
+# staff/models.py
+
+class Contract(AbstractTenantModel):
+    class ContractType(models.TextChoices):
+        CDD = "cdd", "Contrat à durée déterminée"
+        CDI = "cdi", "Contrat à durée indéterminée"
+        FREELANCE = "freelance", "Prestataire externe"
+
+    employee = models.OneToOneField(Employee, on_delete=models.CASCADE, related_name="contract")
+    contract_type = models.CharField(max_length=20, choices=ContractType.choices)
+    start_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)
+    daily_salary = models.DecimalField(max_digits=10, decimal_places=2, help_text="Salaire journalier en Dirhams")
+    active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"Contrat {self.get_contract_type_display()} - {self.employee}"
+
+
+
+class PayrollEntry(AbstractTenantModel):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="payroll_entries")
+    date = models.DateField(default=timezone.now)
+    shifts_worked = models.PositiveIntegerField(default=0)
+    total_salary = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    calculated_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Paie {self.employee} - {self.date:%B %Y}"
+# staff/models.py
+
 

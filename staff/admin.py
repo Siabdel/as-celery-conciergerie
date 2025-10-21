@@ -1,3 +1,4 @@
+# staff/admin.py
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -17,20 +18,23 @@ from django.contrib.auth import get_user_model
 from django import forms
 from django.db.models import Q
 from core.mixins.admin_mixins import AgencyScopedAdminMixin
+from staff.models import Employee, Contract, Absence, PayrollEntry
 
 # Register your models here.
-
-User = get_user_model()
-
-
-# staff/admin.py
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django import forms
-from staff.models import Employee
+from staff.models import Employee, CustomCalendar
 from core.models import Agency
+from core.mixins.admin_mixins import BaseAgencyAdmin
 
 User = get_user_model()
+
+# Si la fonction generate_rgb_color n'est pas définie dans votre modèle, vous pouvez l'ajouter ici :
+import random
+
+def generate_rgb_color():
+    return f"rgb({random.randint(0, 255)}, {random.randint(0, 255)}, {random.randint(0, 255)})"
 
 
 class EmployeeForm(forms.ModelForm):
@@ -55,10 +59,12 @@ class EmployeeForm(forms.ModelForm):
 
 # staff/admin.py
 @admin.register(Employee)
-class EmployeeAdmin(AgencyScopedAdminMixin, admin.ModelAdmin):
-    list_display = ("user", "agency", "role", "phone_number")
-    list_filter = ("agency", "role")
-    #readonly_fields = ("agency",)
+class EmployeeAdmin(AgencyScopedAdminMixin, BaseAgencyAdmin):
+    list_display = ("user", "role", "agency", "hire_date", "is_active")
+    list_filter = ("role", "agency", "is_active")
+    search_fields = ("user__username", "user__email")
+    ordering = ("user__username",)
+
 
     def save_model(self, request, obj, form, change):
         if not change:                       # création
@@ -75,18 +81,28 @@ class EmployeeAdmin(AgencyScopedAdminMixin, admin.ModelAdmin):
         return qs.filter(agency=request.user.agency)
     
 @admin.register(Absence)
-class AbsenceAdmin(admin.ModelAdmin):
-    list_display = ('get_employee', 'start_date', 'end_date', 'type_absence', )
-    list_filter = ('start_date', )
-    search_fields = ('employee',)
+class AbsenceAdmin(BaseAgencyAdmin):
+    list_display = ("get_employee", "employee", "start_date", "end_date", "agency")
+    list_filter = ("agency", )
+    search_fields = ("employee__user__username",)
     
     def get_employee(self, obj):
         return obj.employee
    
-   
+
+@admin.register(Contract)
+class ContractAdmin(BaseAgencyAdmin):
+    list_display = ("employee", "contract_type", "daily_salary", "start_date", "active")
+    list_filter = ("contract_type", "active")
+
+
+@admin.register(PayrollEntry)
+class PayrollEntryAdmin(BaseAgencyAdmin):
+    list_display = ("employee", "date", "shifts_worked", "total_salary")
+    list_filter = ("date",)
 
 @admin.register(Service)
-class ServiceAdmin(admin.ModelAdmin):
+class ServiceAdmin(BaseAgencyAdmin):
     list_display = ('name', 'price_display', 'duration_display', 'allow_rescheduling', 'color_preview', 'created_at')
     list_filter = ('allow_rescheduling', 'created_at')
     search_fields = ('name', 'description')
@@ -137,8 +153,10 @@ class ServiceAdmin(admin.ModelAdmin):
             obj.background_color = generate_rgb_color()
         super().save_model(request, obj, form, change)
 
-# Si la fonction generate_rgb_color n'est pas définie dans votre modèle, vous pouvez l'ajouter ici :
-import random
 
-def generate_rgb_color():
-    return f"rgb({random.randint(0, 255)}, {random.randint(0, 255)}, {random.randint(0, 255)})"
+
+
+@admin.register(CustomCalendar)
+class CalendarAdmin(BaseAgencyAdmin):
+    pass
+

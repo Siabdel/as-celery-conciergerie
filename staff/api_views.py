@@ -7,6 +7,7 @@ from .models import Employee, Absence, Task, Reservation
 from .serializers import EmployeeSerializer, AbsenceSerializer, TaskSerializer, ReservationSerializer
 
 import pandas as pd
+from core.api.permissions import IsAgencyAdminOrEmployee
 
 """ 
 Dans cette section, nous allons créer la logique pour vérifier si un employé est disponible à un moment 
@@ -18,6 +19,7 @@ de l'assignation des tâches ou lors de la consultation des employés disponible
 class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
+    permission_classes = [IsAgencyAdminOrEmployee]
 
     # Get employees available today (not absent)
     @action(detail=False, methods=['get'])
