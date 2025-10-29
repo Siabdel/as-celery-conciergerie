@@ -23,6 +23,7 @@ from django.utils import timezone
 from django.conf import settings
 from core.models import Agency
 # from conciergerie.models import Property, Reservation
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
 PAYMENT_TYPES = (
     ('full', _('Full payment')),
@@ -161,7 +162,7 @@ class Service(AbstractTenantModel):
      
 
 
-class Employee(AbstractTenantModel):
+class Employee(AbstractTenantModel ):
     ROLE_CHOICES = [
         ('cleaner', 'Cleaner'),
         ('maintenance', 'Maintenance'),

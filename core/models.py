@@ -1,6 +1,9 @@
-from django.contrib.auth import get_user_model
-
+# core/models.py (ajout)
+# core/models.py
 import os
+import pytz
+import uuid
+from django.contrib.auth import get_user_model
 from django.db import models, IntegrityError
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User, AbstractUser, UserManager
@@ -11,10 +14,10 @@ from django.db.models import Sum, F
 from django.utils.text import slugify
 from icalendar import Calendar, Event
 from datetime import datetime, timedelta
-import pytz
-import uuid
 from django.conf import settings
-
+from django.db import models
+from django.utils.html import mark_safe
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
 # -------------------------------------------------------------------
 # CORE MODELS
@@ -79,11 +82,6 @@ class AbstractTenantModel(AbstractBaseModel):
         indexes = [ models.Index(fields=["agency"]), ]
 
 
-# core/models.py (ajout)
-
-# core/models.py
-from django.db import models
-from django.utils.html import mark_safe
 
 class LandingSection(models.Model):
     """Éléments de la page d’accueil publique."""
@@ -118,7 +116,7 @@ class LandingSection(models.Model):
 
 
 
-class CustomUser(AbstractUser):
+class CustomUser(AbstractUser, PermissionsMixin):
     """
     Modèle utilisateur unique pour le système SaaS.
     Gère les rôles, rattachement agence, et logique propriétaire/employé.

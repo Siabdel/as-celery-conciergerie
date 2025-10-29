@@ -482,3 +482,32 @@ class CACAPIView(APIView):
         )
         cac = float(marketing_costs) / new_guests if new_guests else 0
         return Response({"cac": round(cac, 2), "currency": "EUR"})
+    
+class FinancialReportSummaryView(APIView):
+    """Résumé financier global avec revenus + taux d’occupation"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        total_revenue = Reservation.objects.aggregate(total=Sum("total_price"))["total"] or 0
+        revenue_by_property = (
+            Reservation.objects.values("property__id", "property__name")
+            .annotate(total=Sum("total_price"))
+            .order_by("-total")
+        )
+
+        data = []
+        for item in revenue_by_property:
+            property_id = item["property__id"]
+            property_name = item["property__name"]
+            reservations = Reservation.objects.filter(property_id=property_id)
+            days_reserved = sum(r.get_duration() for r in reservations)
+            data.append({
+                "property": property_name,
+                "revenue": float(item["total"]),
+                "days_reserved": days_reserved,
+            })
+
+        return Response({
+            "total_revenue": float(total_revenue),
+            "properties": data
+        })

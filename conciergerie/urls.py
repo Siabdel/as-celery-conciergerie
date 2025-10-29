@@ -94,6 +94,8 @@ urlpatterns = [
          name="property-monthly-revenue"),
     path("api/reports/property/<int:property_id>/occupancy/", OccupancyRateView.as_view(), name="occupancy-rate"),
     path("api/reports/pdf/", FinancialPDFReportView.as_view(), name="financial-pdf"),
+    ##
+    path("api/financial-reports/", api_report.FinancialReportSummaryView.as_view(), name="financial-report-summary"),
 ]
 
 ## generer rapport pdf 
